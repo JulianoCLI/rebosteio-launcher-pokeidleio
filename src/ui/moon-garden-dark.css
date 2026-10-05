@@ -1273,6 +1273,18 @@ html,body {background:#091522!important;color:#edf4ef!important;color-scheme:dar
   border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
+.dispatch-hunt-lv-badge.kanto {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.dispatch-hunt-lv-badge.johto {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
 .dispatch-hunt-lv-badge.starter {
   background: rgba(74, 222, 128, 0.2);
   color: #4ade80;
@@ -1291,10 +1303,105 @@ html,body {background:#091522!important;color:#edf4ef!important;color-scheme:dar
   border: 1px solid rgba(251, 146, 60, 0.35);
 }
 
+.dispatch-hunt-lv-badge.outland {
+  background: rgba(126, 224, 160, 0.2);
+  color: #7ee0a0;
+  border: 1px solid rgba(126, 224, 160, 0.45);
+}
+
+.dispatch-hunt-lv-badge.orre {
+  background: rgba(194, 151, 255, 0.2);
+  color: #c297ff;
+  border: 1px solid rgba(194, 151, 255, 0.45);
+}
+
 .dispatch-hunt-lv-badge.boss {
   background: rgba(244, 63, 94, 0.2);
   color: #f43f5e;
   border: 1px solid rgba(244, 63, 94, 0.35);
+}
+
+/* Sub-barra de degraus de Outland (8 níveis) */
+.dispatch-outland-tiers-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(10, 32, 24, 0.65);
+  border: 1px solid rgba(126, 224, 160, 0.35);
+  border-radius: 8px;
+}
+
+.dispatch-outland-tier-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dispatch-outland-tier-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7ee0a0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.dispatch-outland-tier-desc {
+  font-size: 11px;
+  color: #c2eed5;
+  font-weight: 600;
+}
+
+.dispatch-outland-tier-chips {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+
+.dispatch-outland-tier-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.dispatch-tier-chip {
+  padding: 4px 8px !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  background: rgba(16, 42, 32, 0.75) !important;
+  color: #a3e2c0 !important;
+  border: 1px solid rgba(126, 224, 160, 0.3) !important;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.dispatch-tier-chip:hover {
+  background: rgba(25, 68, 52, 0.9) !important;
+  color: #fff !important;
+  border-color: #7ee0a0 !important;
+}
+
+.dispatch-tier-chip.active {
+  background: linear-gradient(135deg, #1f6e4a, #144f35) !important;
+  color: #fff !important;
+  border-color: #7ee0a0 !important;
+  box-shadow: 0 0 8px rgba(126, 224, 160, 0.35) !important;
+}
+
+.dispatch-banner-outland-select {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 600;
+  background: #091f16 !important;
+  color: #7ee0a0 !important;
+  border: 1px solid rgba(126, 224, 160, 0.45) !important;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
 }
 
 .dispatch-hunt-check {

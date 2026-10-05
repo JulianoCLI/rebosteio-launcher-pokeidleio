@@ -518,16 +518,23 @@
           <div class="dispatch-hunts-filter-row">
             <div class="dispatch-search-box">
               <span class="dispatch-search-ico">🔍</span>
-              <input type="text" id="dispatchHuntSearch" placeholder="Buscar por Pokémon, Hunt ou Nível (ex: Blastoise, Charizard, 150, Cerulean)..." autocomplete="off">
+              <input type="text" id="dispatchHuntSearch" placeholder="Buscar por Pokémon, Região, Nível ou Outland (ex: Kanto, Johto, Charizard, Nv 80, Outland 3, Orre)..." autocomplete="off">
               <button type="button" id="dispatchHuntSearchClear" class="dispatch-clear-btn" style="display:none" title="Limpar busca">&times;</button>
             </div>
             <div class="dispatch-filter-chips" id="dispatchFilterChips">
               <button type="button" class="dispatch-chip active" data-filter="all">Todas</button>
-              <button type="button" class="dispatch-chip" data-filter="starter">Iniciais (1-30)</button>
-              <button type="button" class="dispatch-chip" data-filter="mid">Médias (31-79)</button>
-              <button type="button" class="dispatch-chip" data-filter="high">Avançadas (80-149)</button>
-              <button type="button" class="dispatch-chip" data-filter="boss">Bosses (150+)</button>
+              <button type="button" class="dispatch-chip" data-filter="kanto">Kanto</button>
+              <button type="button" class="dispatch-chip" data-filter="johto">Johto</button>
+              <button type="button" class="dispatch-chip" data-filter="orre">Orre (510-600)</button>
+              <button type="button" class="dispatch-chip" data-filter="outland">Outland (8 Níveis)</button>
               <button type="button" class="dispatch-chip" data-filter="city">Cidades</button>
+            </div>
+            <div class="dispatch-outland-tiers-row" id="dispatchOutlandTiersRow" style="display:none">
+              <div class="dispatch-outland-tier-header">
+                <span class="dispatch-outland-tier-title">⚡ Degrau da Outland (8 Níveis de Dificuldade & Drop):</span>
+                <span class="dispatch-outland-tier-desc" id="dispatchOutlandTierDesc">Outland 1 (Nv 150 · 1× drop)</span>
+              </div>
+              <div class="dispatch-outland-tier-chips" id="dispatchOutlandTierChips"></div>
             </div>
           </div>
         </div>
@@ -1123,7 +1130,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
               wv.executeJavaScript('window.__pokeSeed=' + j).catch(() => {});
             }
           } catch {}
-          wv.executeJavaScript(`(()=>{if(window.__poke)return;const nL=v=>{const m=String(v==null?'':v).match(/[0-9]+([.,][0-9]+)?/);return m?+m[0].replace(',','.'):0};const mk=()=>({start:Date.now(),kills:0,xp:0,balls:0,captures:0,drops:{},shinyN:0,shinySeen:{},shinyCapN:0,faintN:0,sellG:0,supGold:0,supN:0,slug:'',hp:{}});const P={ws:{},api:{},sess:mk(),prev:null,knownPokes:{},pokesBaselined:false};window.__poke=P;try{const sd=window.__pokeSeed;delete window.__pokeSeed;if(sd&&sd.s&&sd.s.start&&Date.now()-(sd.t||0)<600e3){P.sess=sd.s;if(sd.slug)P.lastSlug=sd.slug;if(sd.cl&&sd.cl.length)P.catchLog=sd.cl;if(sd.sl&&sd.sl.length)P.shinyLog=sd.sl;if(sd.ab&&typeof sd.ab==='object')P.anBase=sd.ab;}}catch(x){}let auth=null;const OW=window.WebSocket;window.WebSocket=function(...ar){const s=Reflect.construct(OW,ar);P.sock=s;const origSend=s.send;s.send=function(data){try{if(typeof data==='string'){const sent=JSON.parse(data);if(sent&&sent.t==='hello'){P.nick=sent.nick;P.token=sent.token;}}}catch(x){}return origSend.apply(this,arguments);};s.addEventListener('message',e=>{try{if(typeof e.data==='string'){const m=JSON.parse(e.data);if(!m)return;const S=P.sess;if(m.t){P.ws[m.t]=m;if(m.t==='welcome'){const est=m.estado||{};P.estado=est;if(m.hunts&&Array.isArray(m.hunts))P.hunts=m.hunts;P.cid=est.id||'';P.nick=est.nick||'';P.level=est.level||0;P.gold=est.gold||0;P.diamonds=est.diamonds||0;P.isVip=!!(est.loja&&est.loja.vip);P.clan=(est.guild&&(est.guild.nome||est.guild.name))||null;P.api['/api/characters/me']={character:{id:P.cid,name:P.nick,level:P.level,gold:P.gold,diamonds:P.diamonds,isVip:P.isVip,clan:P.clan}};if(m.catalogoBolas&&Array.isArray(m.catalogoBolas)){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.catalog=m.catalogoBolas.map(b=>({id:b.id,name:b.nome||b.name,priceGold:b.priceGold||0,p:b.priceGold||0,infinite:!b.compravel}));}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.pokemons&&Array.isArray(est.pokemons)){const H2={};P.ws.pokes={list:est.pokemons.map(pk=>{if(pk.slot!=null)H2[pk.id]=pk.hp;P.knownPokes[pk.id]=1;return{id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivTotal:pk.ivs?(pk.ivs.hp+pk.ivs.atk+pk.ivs.def+pk.ivs.spAtk+pk.ivs.spDef+pk.ivs.speed):null};})};S.hp=H2;P.pokesBaselined=true;}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}}else if(m.t==='campo.init'){const sl=m.slug||'';P.ws['campo.init']=m;P.ws['field-init']={slug:sl,name:sl};P.fiT=Date.now();if(sl&&sl!=='centro'&&!['cerulean','pewter','viridian','cassino','arena_pvp'].includes(sl)){if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;}}}else if(m.t==='batalha'){(m.ev||[]).forEach(ev=>{if(ev.k==='spawn'){if(ev.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:0,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.k==='morte'){if(ev.quem==='selvagem'){S.kills++;S.lastKillT=Date.now();S.xp+=(ev.xp||ev.xpTreinador||0);(ev.drops||[]).forEach(l=>{const k=l.itemId||l.nome;const d=S.drops[k]||(S.drops[k]={name:l.nome,qty:0});d.qty+=(l.qtd||l.qty||0);});if(ev.shiny){S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.quem==='jogador'){S.faintN=(S.faintN||0)+1;}}else if(ev.k==='bola'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;const bPrice=ev.ballId===1?5:ev.ballId===2?20:ev.ballId===3?50:130;S.supGold=(S.supGold||0)+bPrice;}else if(ev.k==='capturado'){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;const pk=ev.pokemon||{};if(pk.shiny){S.shinyCapN=(S.shinyCapN||0)+1;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.nome||'',sid:pk.speciesId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];CL.push({n:pk.nome||'?',iv:0,q:nL(pk.quality),sh:!!pk.shiny,fx:false,t:Date.now()});if(CL.length>50)CL.shift();}});}else if(m.t==='estado'){const est=m.estado||{};if(est.gold!=null){P.gold=est.gold;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.gold=est.gold;}if(est.level!=null){P.level=est.level;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.level=est.level;}if(est.xp!=null)P.xp=est.xp;if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}if(est.centroMotivo==='morte'){S.faintN=(S.faintN||0)+1;}if(est.pkMud&&Array.isArray(est.pkMud)){P.ws.pokes=P.ws.pokes||{list:[]};est.pkMud.forEach(pk=>{const ix=P.ws.pokes.list.findIndex(x=>x.id===pk.id);const was=S.hp[pk.id];if(pk.slot!=null&&pk.hp===0&&was>0)S.faintN=(S.faintN||0)+1;if(pk.slot!=null)S.hp[pk.id]=pk.hp;const obj={id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivTotal:pk.ivs?(pk.ivs.hp+pk.ivs.atk+pk.ivs.def+pk.ivs.spAtk+pk.ivs.spDef+pk.ivs.speed):null};if(ix>=0)Object.assign(P.ws.pokes.list[ix],obj);else P.ws.pokes.list.push(obj);});}}}if(m.type){P.ws[m.type]=m;if(m.type==='field-init'){const sl=m.slug||'';P.fiT=Date.now();if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;P.ws.analyzer=null;P.anBase=null;try{if(P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'analyzer-get'}))}catch(x){}}}else if(m.type==='field-none'||m.type==='field-teleport-city'){P.ws['field-init']=null;}else if(m.type==='field-kill'){S.kills++;S.lastKillT=Date.now();S.xp+=m.xpGained||0;(m.loot||[]).forEach(l=>{const d=S.drops[l.itemId]||(S.drops[l.itemId]={name:l.name,qty:0});d.qty+=l.qty||0;});if(m.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:m.speciesName||m.name||'',sid:m.speciesId||m.pokeId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(m.type==='catch-result'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;const bbc=((P.ws.balls&&P.ws.balls.catalog)||[]).find(x=>x.id===m.ballId);if(bbc&&!bbc.infinite)S.supGold=(S.supGold||0)+(+bbc.priceGold||0);if(m.success){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;}}else if(m.type==='field'){if(m.mobs&&m.mobs.length){for(const mb of m.mobs){if(mb&&+mb.maxHp>0)(S.slotHp=S.slotHp||{})[mb.slot]=+mb.maxHp;}}if(m.hits&&m.hits.length){const bm={};for(const h of m.hits){if(!(h&&h.slot>=0&&+h.amount>0))continue;const k=String(h.move||'?').slice(0,24);const c=bm[k]||(bm[k]={n:0,sl:{},p:0,pn:0});c.n++;c.sl[h.slot]=1;const mh=S.slotHp&&S.slotHp[h.slot];if(mh>0&&!h.crit&&!h.blocked){c.p+=(+h.amount)/mh;c.pn++;}}S.mv=S.mv||{};const ag=Date.now();for(const k in bm){const c=bm[k],ns=Object.keys(c.sl).length;let T=S.mv[k];if(!T){const ks=Object.keys(S.mv);if(ks.length>=12){const v=ks.sort((p,q)=>(S.mv[p].t||0)-(S.mv[q].t||0))[0],X=S.mvX=S.mvX||{n:0,s:0,a:0};X.n+=S.mv[v].n;X.s+=S.mv[v].s;X.a+=S.mv[v].a;delete S.mv[v];}T=S.mv[k]={n:0,s:0,a:0,p:0,pn:0,t:ag};}T.t=ag;T.n+=c.n;T.p+=c.p;T.pn+=c.pn;if(ns>=2){T.s++;T.a+=ns;}}}}else if(m.type==='poke-delta'){const pk=m.poke;if(pk){const LP=P.ws.pokes&&P.ws.pokes.list;if(LP){const ix=LP.findIndex(x=>x.id===pk.id);if(ix>=0)Object.assign(LP[ix],pk);else LP.push(pk);}const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)S.hp[pk.id]=pk.hp;else delete S.hp[pk.id];if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;}}else if(m.type==='pokes'){const H2={};(m.list||[]).forEach(pk=>{const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)H2[pk.id]=pk.hp;if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;});S.hp=H2;if(!P.pokesBaselined)P.pokesBaselined=true;}else if(m.type==='inventory'){let now=0;const doc0=P.api['/game/items.json']||P.api['/assets/items.json'];const cat0={};if(doc0&&doc0.items)doc0.items.forEach(it=>cat0[it.id]=it);const cur={};(m.items||[]).forEach(it=>{if(it.itemId===59195)now=it.quantity||0;const c=(cat0[it.itemId]||{}).category;if(c==='heal'||c==='potion'||c==='revive')cur[it.itemId]=it.quantity||0;});if(S.supBase){for(const id in S.supBase){const antes=S.supBase[id]||0,agora=(cur[id]!=null?cur[id]:0),d=antes-agora;if(d>0){const it=cat0[id]||{};S.supGold=(S.supGold||0)+d*(it.priceGold||it.npcPrice||0);S.supN=(S.supN||0)+d;}}}S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const doc=P.api['/game/items.json']||P.api['/assets/items.json'];const it=doc&&doc.items&&doc.items.find(x=>x.id===59195);const d=S.drops[59195]||(S.drops[59195]={name:(it&&it.name)||'Rare Pokémon Picture',qty:0});d.qty+=(now-S.picBase);}S.picBase=now;}}else if(m.type==='chat'||m.type==='history'){const chS=(mm)=>{try{if(!mm||!mm.body)return;const re=/\\[poke!([A-Za-z0-9_-]+)\\]/g;let mt;while((mt=re.exec(mm.body))){try{const j=JSON.parse(atob(mt[1].replace(/-/g,'+').replace(/_/g,'/')));if(j&&j.k==='poke'){const CS=P.chatShares=P.chatShares||[];const N=(v)=>{v=Number(v);return isFinite(v)?v:0;};const cn=String(j.n||'?').slice(0,40),cf=String(mm.fromName||'').slice(0,40);if(!CS.some(c=>c.n===cn&&c.iv===N(j.iv)&&c.lv===N(j.lv)&&c.fr===cf)){CS.push({fr:cf,n:cn,sh:!!j.sh,lv:N(j.lv),q:N(j.q),iv:N(j.iv),pw:N(j.pw),t:Date.now()});if(CS.length>15)CS.shift();}}}catch(x){}}}catch(x){}};if(m.type==='chat')chS(m.msg);else['world','trade','help'].forEach(c2=>(m[c2]||[]).forEach(chS));}}}}catch(x){}});return s;};window.WebSocket.prototype=OW.prototype;['CONNECTING','OPEN','CLOSING','CLOSED'].forEach(k=>{try{window.WebSocket[k]=OW[k]}catch(x){}});const OF=window.fetch;window.fetch=function(...a){try{let H;const r0=a[0],ini=a[1];if(ini&&ini.headers)H=ini.headers;else if(r0&&typeof r0==='object'&&r0.headers)H=r0.headers;if(H){let au;if(typeof H.get==='function')au=H.get('authorization');else au=H.Authorization||H.authorization;if(au){auth=au;P.auth=au;}}}catch(x){}const p=OF.apply(this,a);try{let u=(a[0]&&a[0].url)||a[0];if(typeof u==='string'&&(/\\/api\\/|items\\.json/.test(u)||u.includes('items.json'))){p.then(r=>{const c=r.clone();c.json().then(j=>{const key=u.split('?')[0];if(u.includes('items.json')){P.api['/game/items.json']=j;P.api['/assets/items.json']=j;}if(key==='/api/game/used-balls'){if(j&&j.pokemons){const cs=new Set(Array.isArray(j.caught)?j.caught:[]);P.shinyEnc=j.pokemons.reduce((s,p)=>s+(p.shiny?(+p.total||0):0),0);P.usedList=j.pokemons.map(p=>({sid:p.speciesId||p.dexId,name:p.name,shiny:!!p.shiny,attempts:p.attempts||0,total:p.total||0,caught:!!p.caught||(p.shiny?(+p.total||0)>(+p.attempts||0):cs.has(p.dexId!=null?p.dexId:p.speciesId))}));}return;}if(key==='/api/characters/me'){if(!j||!j.character){P.meMiss=(P.meMiss||0)+1;return;}P.meMiss=0;const o0=P.api[key];if(o0&&o0.character&&o0.character.id!==j.character.id){P.knownPokes={};P.pokesBaselined=false;}}P.api[key]=j}).catch(()=>{})}).catch(()=>{})}}catch(x){}return p;};const poll=()=>{try{while(P.catchLog&&P.catchLog.length>400)P.catchLog.shift();while(P.shinyLog&&P.shinyLog.length>300)P.shinyLog.shift();const isPokeIdle=typeof location!=='undefined'&&location.hostname.includes('pokeidle.io');if(!isPokeIdle){const o=auth?{headers:{Authorization:auth}}:undefined;fetch('/api/characters/me',o).catch(()=>{});fetch('/api/game/used-balls',o).catch(()=>{});try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({type:'inv-get'}));P.sock.send(JSON.stringify({type:'analyzer-get'}));}}catch(x){}}else{try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({t:'ping'}));}}catch(x){}}}catch(x){}};setInterval(poll,30000);setTimeout(poll,9000);let bT=0;setInterval(()=>{try{const B=P.ws.boosts,lv=!!(B&&Array.isArray(B.boosts)&&B.boosts.some(b=>b&&b.live));if((lv||++bT%5===0)&&P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'boosts-refresh'}));}catch(x){}},25000);})()`).catch(() => {}); // coletor de estado + sessao dual-protocol (pokeidle.io WS + legado)
+          wv.executeJavaScript(`(()=>{if(window.__poke)return;const nL=v=>{const m=String(v==null?'':v).match(/[0-9]+([.,][0-9]+)?/);return m?+m[0].replace(',','.'):0};const nIvs=v=>{if(!v||typeof v!=='object')return null;const h=nL(v.hp),a=nL(v.atk),d=nL(v.def),sa=nL(v.spAtk!=null?v.spAtk:v.spa),sd=nL(v.spDef!=null?v.spDef:v.spd),sp=nL(v.speed!=null?v.speed:(v.spe!=null?v.spe:v.vel));return(h||a||d||sa||sd||sp)?{hp:h,atk:a,def:d,spAtk:sa,spDef:sd,speed:sp}:null;};const mk=()=>({start:Date.now(),kills:0,xp:0,balls:0,captures:0,drops:{},shinyN:0,shinySeen:{},shinyCapN:0,faintN:0,sellG:0,supGold:0,supN:0,slug:'',hp:{}});const P={ws:{},api:{},sess:mk(),prev:null,knownPokes:{},pokesBaselined:false};window.__poke=P;try{const sd=window.__pokeSeed;delete window.__pokeSeed;if(sd&&sd.s&&sd.s.start&&Date.now()-(sd.t||0)<600e3){P.sess=sd.s;if(sd.slug)P.lastSlug=sd.slug;if(sd.cl&&sd.cl.length)P.catchLog=sd.cl;if(sd.sl&&sd.sl.length)P.shinyLog=sd.sl;if(sd.ab&&typeof sd.ab==='object')P.anBase=sd.ab;}}catch(x){}let auth=null;const OW=window.WebSocket;window.WebSocket=function(...ar){const s=Reflect.construct(OW,ar);P.sock=s;const origSend=s.send;s.send=function(data){try{if(typeof data==='string'){const sent=JSON.parse(data);if(sent&&sent.t==='hello'){P.nick=sent.nick;P.token=sent.token;}}}catch(x){}return origSend.apply(this,arguments);};s.addEventListener('message',e=>{try{if(typeof e.data==='string'){const m=JSON.parse(e.data);if(!m)return;const S=P.sess;if(m.t){P.ws[m.t]=m;if(m.t==='welcome'){const est=m.estado||{};P.estado=est;if(m.hunts&&Array.isArray(m.hunts))P.hunts=m.hunts;P.cid=est.id||'';P.nick=est.nick||'';P.level=est.level||0;P.gold=est.gold||0;P.diamonds=est.diamonds||0;P.isVip=!!(est.loja&&est.loja.vip);P.clan=(est.guild&&(est.guild.nome||est.guild.name))||null;P.api['/api/characters/me']={character:{id:P.cid,name:P.nick,level:P.level,gold:P.gold,diamonds:P.diamonds,isVip:P.isVip,clan:P.clan}};if(m.catalogoBolas&&Array.isArray(m.catalogoBolas)){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.catalog=m.catalogoBolas.map(b=>({id:b.id,name:b.nome||b.name,priceGold:b.priceGold||0,p:b.priceGold||0,infinite:!b.compravel}));}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.pokemons&&Array.isArray(est.pokemons)){const H2={};P.ws.pokes={list:est.pokemons.map(pk=>{if(pk.slot!=null)H2[pk.id]=pk.hp;P.knownPokes[pk.id]=1;const ivs=nIvs(pk.ivs);return{id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivs:ivs,ivTotal:ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):null};})};S.hp=H2;P.pokesBaselined=true;if(P.catchLog&&P.catchLog.length){P.catchLog.forEach(c=>{if(!c.iv||c.iv===0||!c.ivs){const match=P.ws.pokes.list.find(x=>(c.id!=null&&x.id===c.id)||(x.name===c.n&&Math.abs(nL(x.quality)-nL(c.q))<0.02&&(x.ivTotal||x.ivs)));if(match){if(match.ivTotal&&(!c.iv||c.iv===0))c.iv=match.ivTotal;if(match.ivs&&!c.ivs)c.ivs=match.ivs;if(match.id&&!c.id)c.id=match.id;}}});}}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}}else if(m.t==='campo.init'){const sl=m.slug||'';P.ws['campo.init']=m;P.ws['field-init']={slug:sl,name:sl};P.fiT=Date.now();if(sl&&sl!=='centro'&&!['cerulean','pewter','viridian','cassino','arena_pvp'].includes(sl)){if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;}}}else if(m.t==='batalha'){(m.ev||[]).forEach(ev=>{if(ev.k==='spawn'){if(ev.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:0,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.k==='morte'){if(ev.quem==='selvagem'){S.kills++;S.lastKillT=Date.now();S.xp+=(ev.xp||ev.xpTreinador||0);(ev.drops||[]).forEach(l=>{const k=l.itemId||l.nome;const d=S.drops[k]||(S.drops[k]={name:l.nome,qty:0});d.qty+=(l.qtd||l.qty||0);});if(ev.shiny){S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.quem==='jogador'){S.faintN=(S.faintN||0)+1;}}else if(ev.k==='bola'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;const bPrice=ev.ballId===1?5:ev.ballId===2?20:ev.ballId===3?50:130;S.supGold=(S.supGold||0)+bPrice;}else if(ev.k==='capturado'){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;const pk=ev.pokemon||{};if(pk.shiny){S.shinyCapN=(S.shinyCapN||0)+1;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.nome||'',sid:pk.speciesId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}let iv=0;let ivs=nIvs(pk.ivs);if(ivs)iv=ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed;else if(pk.ivTotal!=null)iv=nL(pk.ivTotal);else if(pk.iv!=null)iv=nL(pk.iv);else if(pk.id!=null){const f=(P.ws.pokes&&P.ws.pokes.list||[]).find(x=>x.id===pk.id);if(f){if(f.ivTotal!=null)iv=nL(f.ivTotal);if(f.ivs&&!ivs)ivs=f.ivs;}}const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];const CL=P.catchLog=P.catchLog||[];CL.push({id:pk.id||null,n:pk.nome||pk.name||'?',sid:sd,iv:iv||0,ivs:ivs||null,q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift();}});}else if(m.t==='estado'){const est=m.estado||{};if(est.gold!=null){P.gold=est.gold;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.gold=est.gold;}if(est.level!=null){P.level=est.level;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.level=est.level;}if(est.xp!=null)P.xp=est.xp;if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}if(est.centroMotivo==='morte'){S.faintN=(S.faintN||0)+1;}if(est.pkMud&&Array.isArray(est.pkMud)){P.ws.pokes=P.ws.pokes||{list:[]};est.pkMud.forEach(pk=>{const ix=P.ws.pokes.list.findIndex(x=>x.id===pk.id);const was=S.hp[pk.id];if(pk.slot!=null&&pk.hp===0&&was>0)S.faintN=(S.faintN||0)+1;if(pk.slot!=null)S.hp[pk.id]=pk.hp;const ivs=nIvs(pk.ivs);const ivT=ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):(pk.ivTotal!=null?nL(pk.ivTotal):(pk.iv!=null?nL(pk.iv):null));const obj={id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivTotal:ivT,ivs:ivs};if(ix>=0)Object.assign(P.ws.pokes.list[ix],obj);else P.ws.pokes.list.push(obj);const isNew=P.pokesBaselined&&!P.knownPokes[pk.id];if(isNew){P.knownPokes[pk.id]=1;if(pk.sellValue)S.sellG=(S.sellG||0)+(pk.sellValue||0);}const CL=P.catchLog=P.catchLog||[];const pkNome=pk.nome||pk.name||'';const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];const cEntry=CL.slice().reverse().find(c=>(c.id!=null&&pk.id!=null&&c.id===pk.id)||(((!c.iv||c.iv===0)||!c.ivs)&&(c.n===pkNome||c.n==='?')&&(Date.now()-(c.t||0)<60000)));if(cEntry){if(ivT!=null&&(!cEntry.iv||cEntry.iv===0))cEntry.iv=ivT;if(ivs&&!cEntry.ivs)cEntry.ivs=ivs;if(pk.id&&!cEntry.id)cEntry.id=pk.id;if(cEntry.n==='?'&&pkNome)cEntry.n=pkNome;if(!cEntry.q&&pk.quality!=null)cEntry.q=nL(pk.quality);if(!cEntry.sid&&sd)cEntry.sid=sd;}else if(isNew){CL.push({id:pk.id,n:pkNome||'?',sid:sd,iv:ivT||0,ivs:ivs||null,q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift();};});}if(m.type){P.ws[m.type]=m;if(m.type==='field-init'){const sl=m.slug||'';P.fiT=Date.now();if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;P.ws.analyzer=null;P.anBase=null;try{if(P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'analyzer-get'}))}catch(x){}}}else if(m.type==='field-none'||m.type==='field-teleport-city'){P.ws['field-init']=null;}else if(m.type==='field-kill'){S.kills++;S.lastKillT=Date.now();S.xp+=m.xpGained||0;(m.loot||[]).forEach(l=>{const d=S.drops[l.itemId]||(S.drops[l.itemId]={name:l.name,qty:0});d.qty+=l.qty||0;});if(m.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:m.speciesName||m.name||'',sid:m.speciesId||m.pokeId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(m.type==='catch-result'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;const bbc=((P.ws.balls&&P.ws.balls.catalog)||[]).find(x=>x.id===m.ballId);if(bbc&&!bbc.infinite)S.supGold=(S.supGold||0)+(+bbc.priceGold||0);if(m.success){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;}}else if(m.type==='field'){if(m.mobs&&m.mobs.length){for(const mb of m.mobs){if(mb&&+mb.maxHp>0)(S.slotHp=S.slotHp||{})[mb.slot]=+mb.maxHp;}}if(m.hits&&m.hits.length){const bm={};for(const h of m.hits){if(!(h&&h.slot>=0&&+h.amount>0))continue;const k=String(h.move||'?').slice(0,24);const c=bm[k]||(bm[k]={n:0,sl:{},p:0,pn:0});c.n++;c.sl[h.slot]=1;const mh=S.slotHp&&S.slotHp[h.slot];if(mh>0&&!h.crit&&!h.blocked){c.p+=(+h.amount)/mh;c.pn++;}}S.mv=S.mv||{};const ag=Date.now();for(const k in bm){const c=bm[k],ns=Object.keys(c.sl).length;let T=S.mv[k];if(!T){const ks=Object.keys(S.mv);if(ks.length>=12){const v=ks.sort((p,q)=>(S.mv[p].t||0)-(S.mv[q].t||0))[0],X=S.mvX=S.mvX||{n:0,s:0,a:0};X.n+=S.mv[v].n;X.s+=S.mv[v].s;X.a+=S.mv[v].a;delete S.mv[v];}T=S.mv[k]={n:0,s:0,a:0,p:0,pn:0,t:ag};}T.t=ag;T.n+=c.n;T.p+=c.p;T.pn+=c.pn;if(ns>=2){T.s++;T.a+=ns;}}}}else if(m.type==='poke-delta'){const pk=m.poke;if(pk){const LP=P.ws.pokes&&P.ws.pokes.list;if(LP){const ix=LP.findIndex(x=>x.id===pk.id);if(ix>=0)Object.assign(LP[ix],pk);else LP.push(pk);}const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)S.hp[pk.id]=pk.hp;else delete S.hp[pk.id];if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;}}else if(m.type==='pokes'){const H2={};(m.list||[]).forEach(pk=>{const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)H2[pk.id]=pk.hp;if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;});S.hp=H2;if(!P.pokesBaselined)P.pokesBaselined=true;}else if(m.type==='inventory'){let now=0;const doc0=P.api['/game/items.json']||P.api['/assets/items.json'];const cat0={};if(doc0&&doc0.items)doc0.items.forEach(it=>cat0[it.id]=it);const cur={};(m.items||[]).forEach(it=>{if(it.itemId===59195)now=it.quantity||0;const c=(cat0[it.itemId]||{}).category;if(c==='heal'||c==='potion'||c==='revive')cur[it.itemId]=it.quantity||0;});if(S.supBase){for(const id in S.supBase){const antes=S.supBase[id]||0,agora=(cur[id]!=null?cur[id]:0),d=antes-agora;if(d>0){const it=cat0[id]||{};S.supGold=(S.supGold||0)+d*(it.priceGold||it.npcPrice||0);S.supN=(S.supN||0)+d;}}}S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const doc=P.api['/game/items.json']||P.api['/assets/items.json'];const it=doc&&doc.items&&doc.items.find(x=>x.id===59195);const d=S.drops[59195]||(S.drops[59195]={name:(it&&it.name)||'Rare Pokémon Picture',qty:0});d.qty+=(now-S.picBase);}S.picBase=now;}}else if(m.type==='chat'||m.type==='history'){const chS=(mm)=>{try{if(!mm||!mm.body)return;const re=/\\[poke!([A-Za-z0-9_-]+)\\]/g;let mt;while((mt=re.exec(mm.body))){try{const j=JSON.parse(atob(mt[1].replace(/-/g,'+').replace(/_/g,'/')));if(j&&j.k==='poke'){const CS=P.chatShares=P.chatShares||[];const N=(v)=>{v=Number(v);return isFinite(v)?v:0;};const cn=String(j.n||'?').slice(0,40),cf=String(mm.fromName||'').slice(0,40);if(!CS.some(c=>c.n===cn&&c.iv===N(j.iv)&&c.lv===N(j.lv)&&c.fr===cf)){CS.push({fr:cf,n:cn,sh:!!j.sh,lv:N(j.lv),q:N(j.q),iv:N(j.iv),pw:N(j.pw),t:Date.now()});if(CS.length>15)CS.shift();}}}catch(x){}}}catch(x){}};if(m.type==='chat')chS(m.msg);else['world','trade','help'].forEach(c2=>(m[c2]||[]).forEach(chS));}}}}catch(x){}});return s;};window.WebSocket.prototype=OW.prototype;['CONNECTING','OPEN','CLOSING','CLOSED'].forEach(k=>{try{window.WebSocket[k]=OW[k]}catch(x){}});const OF=window.fetch;window.fetch=function(...a){try{let H;const r0=a[0],ini=a[1];if(ini&&ini.headers)H=ini.headers;else if(r0&&typeof r0==='object'&&r0.headers)H=r0.headers;if(H){let au;if(typeof H.get==='function')au=H.get('authorization');else au=H.Authorization||H.authorization;if(au){auth=au;P.auth=au;}}}catch(x){}const p=OF.apply(this,a);try{let u=(a[0]&&a[0].url)||a[0];if(typeof u==='string'&&(/\\/api\\/|items\\.json/.test(u)||u.includes('items.json'))){p.then(r=>{const c=r.clone();c.json().then(j=>{const key=u.split('?')[0];if(u.includes('items.json')){P.api['/game/items.json']=j;P.api['/assets/items.json']=j;}if(key==='/api/game/used-balls'){if(j&&j.pokemons){const cs=new Set(Array.isArray(j.caught)?j.caught:[]);P.shinyEnc=j.pokemons.reduce((s,p)=>s+(p.shiny?(+p.total||0):0),0);P.usedList=j.pokemons.map(p=>({sid:p.speciesId||p.dexId,name:p.name,shiny:!!p.shiny,attempts:p.attempts||0,total:p.total||0,caught:!!p.caught||(p.shiny?(+p.total||0)>(+p.attempts||0):cs.has(p.dexId!=null?p.dexId:p.speciesId))}));}return;}if(key==='/api/characters/me'){if(!j||!j.character){P.meMiss=(P.meMiss||0)+1;return;}P.meMiss=0;const o0=P.api[key];if(o0&&o0.character&&o0.character.id!==j.character.id){P.knownPokes={};P.pokesBaselined=false;}}P.api[key]=j}).catch(()=>{})}).catch(()=>{})}}catch(x){}return p;};const poll=()=>{try{while(P.catchLog&&P.catchLog.length>400)P.catchLog.shift();while(P.shinyLog&&P.shinyLog.length>300)P.shinyLog.shift();const isPokeIdle=typeof location!=='undefined'&&location.hostname.includes('pokeidle.io');if(!isPokeIdle){const o=auth?{headers:{Authorization:auth}}:undefined;fetch('/api/characters/me',o).catch(()=>{});fetch('/api/game/used-balls',o).catch(()=>{});try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({type:'inv-get'}));P.sock.send(JSON.stringify({type:'analyzer-get'}));}}catch(x){}}else{try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({t:'ping'}));}}catch(x){}}}catch(x){}};setInterval(poll,30000);setTimeout(poll,9000);let bT=0;setInterval(()=>{try{const B=P.ws.boosts,lv=!!(B&&Array.isArray(B.boosts)&&B.boosts.some(b=>b&&b.live));if((lv||++bT%5===0)&&P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'boosts-refresh'}));}catch(x){}},25000);})()`).catch(() => {}); // coletor de estado + sessao dual-protocol (pokeidle.io WS + legado)
           // volta pra hunt (experimental): so se a conta estava farmando ha pouco (kill nos ultimos 10 min),
           // senao quem estacionou na cidade de proposito seria mandado de volta
           try {
@@ -2335,6 +2342,123 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
   let currentHuntFilter = 'all';
   let currentHuntSearch = '';
 
+  const OUTLAND_TIERS = [
+    { tier: 1, rotulo: 'Outland 1', nivel: 150, mult: 1 },
+    { tier: 2, rotulo: 'Outland 2', nivel: 500, mult: 1.25 },
+    { tier: 3, rotulo: 'Outland 3', nivel: 1000, mult: 1.5 },
+    { tier: 4, rotulo: 'Outland 4', nivel: 2000, mult: 2 },
+    { tier: 5, rotulo: 'Outland 5', nivel: 4000, mult: 3 },
+    { tier: 6, rotulo: 'Outland 6', nivel: 8000, mult: 4 },
+    { tier: 7, rotulo: 'Outland 7', nivel: 16000, mult: 6 },
+    { tier: 8, rotulo: 'Outland 8', nivel: 25000, mult: 8 },
+  ];
+
+  let selectedOutlandTier = (() => {
+    try {
+      const v = Number(lsGet('dispatchOutlandTier') || 1);
+      return (v >= 1 && v <= 8) ? v : 1;
+    } catch { return 1; }
+  })();
+
+  const OUTLAND_PREFIXES = [
+    'brave_', 'tribal_', 'ancient_', 'war_', 'furious_', 'enigmatic_',
+    'charged_', 'magnetic_', 'evil_', 'freezing_', 'psy_', 'heavy_',
+    'milch_', 'roll_', 'hard_', 'brute_', 'enraged_', 'dark_',
+    'trickmaster_', 'banshee_', 'taekwondo_'
+  ];
+
+  function isOutlandHunt(itemOrSlug) {
+    if (!itemOrSlug) return false;
+    if (typeof itemOrSlug === 'object') {
+      if (itemOrSlug.ar === 'outland' || itemOrSlug.area === 'outland') return true;
+      const sl = String(itemOrSlug.sl || itemOrSlug.slug || '').toLowerCase();
+      if (OUTLAND_PREFIXES.some(p => sl.startsWith(p))) return true;
+      const nm = String(itemOrSlug.name || '').toLowerCase();
+      return OUTLAND_PREFIXES.some(p => nm.startsWith(p.replace('_', ' ')));
+    }
+    const sl = String(itemOrSlug).toLowerCase();
+    return OUTLAND_PREFIXES.some(p => sl.startsWith(p));
+  }
+
+  const ORRE_SLUGS_SET = new Set([
+    'treecko','grovyle','sceptile','torchic','combusken','blaziken','mudkip',
+    'marshtomp','swampert','seedot','nuzleaf','shiftry','wingull','pelipper',
+    'ralts','kirlia','gardevoir','whismur','loudred','exploud','makuhita',
+    'sableye','mawile','lairon','aggron','meditite','medicham','electrike',
+    'manectric','numel','camerupt','torkoal','spoink','grumpig','vibrava',
+    'flygon','cacturne','seviper','corphish','crawdaunt','claydol','duskull',
+    'snorunt','glalie','spheal','sealeo','walrein','bagon','shelgon','beldum',
+    'metang','poochyena','mightyena','lotad','lombre','ludicolo','taillow',
+    'swellow','slakoth','vigoroth','aron','trapinch','swablu','altaria',
+    'zangoose','baltoy','banette','dusclops','tropius','absol','riolu','lucario'
+  ]);
+
+  function isOrreHunt(itemOrSlug) {
+    if (!itemOrSlug) return false;
+    if (typeof itemOrSlug === 'object') {
+      if (itemOrSlug.ar === 'orre' || itemOrSlug.area === 'orre') return true;
+      const lv = Number(itemOrSlug.level) || 0;
+      if (lv >= 510 && lv <= 600 && !isOutlandHunt(itemOrSlug)) return true;
+    }
+    const raw = String(typeof itemOrSlug === 'object' ? (itemOrSlug.sl || itemOrSlug.slug || '') : itemOrSlug).toLowerCase();
+    const clean = raw.replace(/[_-]+/g, '');
+    return raw.startsWith('orre_') || ORRE_SLUGS_SET.has(raw) || ORRE_SLUGS_SET.has(clean);
+  }
+
+  const JOHTO_POKEMON_SET = new Set([
+    'chikorita','bayleef','meganium','cyndaquil','quilava','typhlosion',
+    'totodile','croconaw','feraligatr','sentret','furret','hoothoot','noctowl',
+    'ledyba','ledian','spinarak','ariados','crobat','chinchou','lanturn',
+    'pichu','cleffa','igglybuff','togepi','togetic','natu','xatu','mareep',
+    'flaaffy','ampharos','bellossom','marill','azumarill','sudowoodo',
+    'politoed','hoppip','skiploom','jumpluff','aipom','sunkern','sunflora',
+    'yanma','wooper','quagsire','espeon','umbreon','murkrow','slowking',
+    'misdreavus','unown','wobbuffet','girafarig','pineco','forretress',
+    'dunsparce','gligar','steelix','snubbull','granbull','qwilfish','scizor',
+    'shuckle','heracross','sneasel','teddiursa','ursaring','slugma','magcargo',
+    'swinub','piloswine','corsola','remoraid','octillery','delibird','mantine',
+    'skarmory','houndour','houndoom','kingdra','phanpy','donphan','porygon2',
+    'stantler','smeargle','tyrogue','hitmontop','smoochum','elekid','magby',
+    'miltank','blissey','raikou','entei','suicune','larvitar','pupitar',
+    'tyranitar','lugia','hooh','celebi'
+  ]);
+
+  const CITY_SLUGS_SET = new Set([
+    'cerulean', 'pewter', 'viridian', 'cassino', 'saffron', 'vermilion',
+    'celadon', 'fuchsia', 'cinnabar', 'pallet', 'lavender'
+  ]);
+
+  function getHuntRegion(hunt) {
+    if (!hunt) return 'kanto';
+    if (isOutlandHunt(hunt)) return 'outland';
+    
+    const rawSl = String(typeof hunt === 'object' ? (hunt.sl || hunt.slug || hunt.name || '') : hunt)
+      .toLowerCase()
+      .trim();
+    const sl = rawSl.replace(/[_-]+/g, '');
+
+    if (CITY_SLUGS_SET.has(rawSl) || CITY_SLUGS_SET.has(sl)) return 'city';
+    if (typeof hunt === 'object' && Number(hunt.level) === 0 && !isOutlandHunt(hunt)) return 'city';
+    if (isOrreHunt(hunt)) return 'orre';
+    
+    if (typeof hunt === 'object') {
+      if (hunt.ar === 'johto' || hunt.area === 'johto') return 'johto';
+      if (hunt.ar === 'kanto' || hunt.area === 'kanto') return 'kanto';
+      if (hunt.ar === 'orre' || hunt.area === 'orre') return 'orre';
+    }
+    
+    if (JOHTO_POKEMON_SET.has(rawSl) || JOHTO_POKEMON_SET.has(sl)) return 'johto';
+    return 'kanto';
+  }
+
+  function getEffectiveHuntLevel(hunt) {
+    if (isOutlandHunt(hunt)) {
+      const tInfo = OUTLAND_TIERS.find(t => t.tier === selectedOutlandTier);
+      return tInfo ? tInfo.nivel : 150;
+    }
+    return Number(hunt?.level) || 0;
+  }
+
   // Resolução de dexId e sprites para Pokémons e Hunts
   let pokeDexMap = null;
   function getPokeDexMap() {
@@ -2450,24 +2574,71 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     return hunts.slice().sort((a, b) => (+a.level || 0) - (+b.level || 0));
   }
 
-  function getHuntBadgeInfo(level) {
-    const lv = Number(level) || 0;
-    if (lv === 0) return { cls: 'city', text: 'Cidade' };
-    if (lv <= 30) return { cls: 'starter', text: `Nv ${lv}` };
-    if (lv < 80) return { cls: 'mid', text: `Nv ${lv}` };
-    if (lv < 150) return { cls: 'high', text: `Nv ${lv}` };
-    return { cls: 'boss', text: `Nv ${lv}` };
+  function getHuntBadgeInfo(level, hunt) {
+    const reg = getHuntRegion(hunt);
+    if (reg === 'outland') {
+      const tInfo = OUTLAND_TIERS.find(t => t.tier === selectedOutlandTier) || OUTLAND_TIERS[0];
+      return { cls: 'outland', text: `OUT T${tInfo.tier} · Nv ${tInfo.nivel.toLocaleString('pt-BR')}` };
+    }
+    if (reg === 'city') {
+      return { cls: 'city', text: 'Cidade' };
+    }
+    const lv = Number(level) || (hunt && Number(hunt.level)) || 0;
+    if (reg === 'johto') {
+      return { cls: 'johto', text: `JOHTO · Nv ${lv}` };
+    }
+    if (reg === 'orre') {
+      return { cls: 'orre', text: `ORRE · Nv ${lv}` };
+    }
+    return { cls: 'kanto', text: `KANTO · Nv ${lv}` };
   }
 
-  function matchesCategory(level, category) {
-    const lv = Number(level) || 0;
-    if (category === 'all') return true;
-    if (category === 'city') return lv === 0;
-    if (category === 'starter') return lv > 0 && lv <= 30;
-    if (category === 'mid') return lv > 30 && lv < 80;
-    if (category === 'high') return lv >= 80 && lv < 150;
-    if (category === 'boss') return lv >= 150;
-    return true;
+  function matchesCategory(hunt, category) {
+    if (!category || category === 'all') return true;
+    const reg = getHuntRegion(hunt);
+    return reg === category;
+  }
+
+  function renderDispatchOutlandTierBar() {
+    const row = document.getElementById('dispatchOutlandTiersRow');
+    const chipsWrap = document.getElementById('dispatchOutlandTierChips');
+    const descEl = document.getElementById('dispatchOutlandTierDesc');
+    if (!row || !chipsWrap) return;
+
+    if (currentHuntFilter === 'outland') {
+      row.style.display = 'flex';
+    } else {
+      row.style.display = 'none';
+      return;
+    }
+
+    const cur = OUTLAND_TIERS.find(t => t.tier === selectedOutlandTier) || OUTLAND_TIERS[0];
+    if (descEl) {
+      descEl.textContent = `${cur.rotulo} · Nv ${cur.nivel.toLocaleString('pt-BR')} (Drop ${cur.mult}×)`;
+    }
+
+    let html = '';
+    OUTLAND_TIERS.forEach(t => {
+      const isActive = (t.tier === selectedOutlandTier);
+      html += `
+        <button type="button" class="dispatch-tier-chip ${isActive ? 'active' : ''}" data-tier="${t.tier}">
+          T${t.tier} (Nv ${t.nivel >= 1000 ? (t.nivel / 1000) + 'k' : t.nivel}) · ${t.mult}×
+        </button>
+      `;
+    });
+    chipsWrap.innerHTML = html;
+
+    chipsWrap.querySelectorAll('.dispatch-tier-chip').forEach(btn => {
+      btn.onclick = () => {
+        selectedOutlandTier = Number(btn.dataset.tier) || 1;
+        try { lsSet('dispatchOutlandTier', selectedOutlandTier); } catch {}
+        renderDispatchOutlandTierBar();
+        renderDispatchHuntsGrid();
+        updateSelectedHuntBanner();
+        updateDispatchButtonState();
+        populateDispatchHunts();
+      };
+    });
   }
 
   function updateSelectedHuntBanner() {
@@ -2481,20 +2652,55 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     const allHunts = getHuntsList();
     const item = allHunts.find(h => (h.sl || h.name) === selectedSlug);
     const name = item ? item.name : prettyHunt(selectedSlug);
-    const level = item ? Number(item.level) || 0 : 0;
-    const badge = getHuntBadgeInfo(level);
-    const isCity = level === 0;
+    const isOut = isOutlandHunt(item || selectedSlug);
+    const effLevel = getEffectiveHuntLevel(item || { sl: selectedSlug, level: item?.level || 0 });
+    const badge = getHuntBadgeInfo(effLevel, item || selectedSlug);
+    const isCity = effLevel === 0 && !isOut;
     const spriteUrl = isCity ? null : getPokemonSpriteUrl(selectedSlug, 0, false);
 
     dispatchSelectedHuntBanner.className = 'dispatch-selected-hunt-banner has-selection';
+    
+    let tierSelectorHtml = '';
+    if (isOut) {
+      let opts = '';
+      OUTLAND_TIERS.forEach(t => {
+        const sel = (t.tier === selectedOutlandTier) ? 'selected' : '';
+        opts += `<option value="${t.tier}" ${sel}>${t.rotulo} (Nv ${t.nivel.toLocaleString('pt-BR')} · ${t.mult}× drop)</option>`;
+      });
+      tierSelectorHtml = `
+        <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap">
+          <label for="dispatchBannerTierSelect" style="font-size:11px;font-weight:700;color:#7ee0a0">Nível Outland:</label>
+          <select id="dispatchBannerTierSelect" class="dispatch-banner-outland-select">
+            ${opts}
+          </select>
+        </div>
+      `;
+    }
+
     dispatchSelectedHuntBanner.innerHTML = `
-      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;flex-wrap:wrap">
         ${isCity ? '<span style="font-size:16px">🏛️</span>' : (spriteUrl ? `<img src="${esc(spriteUrl)}" style="width:24px;height:24px;image-rendering:pixelated;object-fit:contain" alt="${esc(name)}">` : '<span style="font-size:16px">⚔️</span>')}
         <span style="font-size:12px;font-weight:700;color:#fff">${esc(name)}</span>
         <span class="dispatch-hunt-lv-badge ${badge.cls}">${badge.text}</span>
       </div>
-      <span style="font-size:11px;color:#7ee787;font-weight:600">✓ Destino Selecionado</span>
+      ${tierSelectorHtml}
+      <span style="font-size:11px;color:#7ee787;font-weight:600;margin-left:6px;white-space:nowrap">✓ Destino Selecionado</span>
     `;
+
+    if (isOut) {
+      const bannerSel = document.getElementById('dispatchBannerTierSelect');
+      if (bannerSel) {
+        bannerSel.onchange = (e) => {
+          selectedOutlandTier = Number(e.target.value) || 1;
+          try { lsSet('dispatchOutlandTier', selectedOutlandTier); } catch {}
+          renderDispatchOutlandTierBar();
+          renderDispatchHuntsGrid();
+          updateSelectedHuntBanner();
+          updateDispatchButtonState();
+          populateDispatchHunts();
+        };
+      }
+    }
   }
 
   function renderDispatchHuntsGrid() {
@@ -2504,12 +2710,18 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     const q = currentHuntSearch.trim().toLowerCase();
 
     const filtered = allHunts.filter(h => {
-      if (!matchesCategory(h.level, currentHuntFilter)) return false;
+      if (!matchesCategory(h, currentHuntFilter)) return false;
       if (q) {
+        const isOut = isOutlandHunt(h);
+        const effLevel = getEffectiveHuntLevel(h);
+        const reg = getHuntRegion(h);
         const nameMatch = String(h.name || '').toLowerCase().includes(q);
-        const slugMatch = String(h.sl || '').toLowerCase().includes(q);
-        const levelMatch = String(h.level || '').includes(q);
-        if (!nameMatch && !slugMatch && !levelMatch) return false;
+        const slugMatch = String(h.sl || h.slug || '').toLowerCase().includes(q);
+        const levelMatch = String(effLevel).includes(q) || String(h.level || '').includes(q);
+        const outlandMatch = isOut && ('outland'.includes(q) || `outland ${selectedOutlandTier}`.includes(q) || `t${selectedOutlandTier}`.includes(q));
+        const orreMatch = isOrreHunt(h) && ('orre'.includes(q) || 'hoenn'.includes(q));
+        const regionMatch = reg.includes(q) || (reg === 'orre' && 'hoenn'.includes(q)) || (reg === 'city' && 'cidade'.includes(q));
+        if (!nameMatch && !slugMatch && !levelMatch && !outlandMatch && !orreMatch && !regionMatch) return false;
       }
       return true;
     });
@@ -2527,8 +2739,10 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     filtered.forEach(h => {
       const slug = h.sl || h.name;
       const isSelected = (curVal === slug);
-      const isCity = (+h.level === 0);
-      const badge = getHuntBadgeInfo(h.level);
+      const isOut = isOutlandHunt(h);
+      const effLevel = getEffectiveHuntLevel(h);
+      const isCity = (+effLevel === 0 && !isOut);
+      const badge = getHuntBadgeInfo(effLevel, h);
       const spriteUrl = isCity ? null : getPokemonSpriteUrl(slug, 0, false);
 
       html += `
@@ -2576,9 +2790,20 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
         const allHunts = getHuntsList();
         const selHunt = allHunts.find(h => (h.sl || h.name) === dispatchHuntSelect.value);
         const name = selHunt ? selHunt.name : prettyHunt(dispatchHuntSelect.value);
-        const lv = selHunt && selHunt.level ? ` (Nv ${selHunt.level})` : '';
+        const isOut = isOutlandHunt(selHunt || dispatchHuntSelect.value);
+        const reg = getHuntRegion(selHunt || dispatchHuntSelect.value);
+        let lvText = '';
+        if (isOut) {
+          const tInfo = OUTLAND_TIERS.find(t => t.tier === selectedOutlandTier);
+          lvText = ` (Outland ${selectedOutlandTier} · Nv ${tInfo ? tInfo.nivel.toLocaleString('pt-BR') : 150})`;
+        } else if (reg === 'city') {
+          lvText = ` (Cidade)`;
+        } else if (selHunt && selHunt.level) {
+          const regLabel = reg === 'johto' ? 'Johto' : (reg === 'orre' ? 'Orre' : 'Kanto');
+          lvText = ` (${regLabel} · Nv ${selHunt.level})`;
+        }
         const count = selectedDispatchAccounts.size;
-        dispatchConfirm.textContent = `🚀 Enviar ${count} Conta${count > 1 ? 's' : ''} para ${name}${lv}`;
+        dispatchConfirm.textContent = `🚀 Enviar ${count} Conta${count > 1 ? 's' : ''} para ${name}${lvText}`;
       } else {
         dispatchConfirm.textContent = '🚀 Enviar Contas para a Hunt';
       }
@@ -2609,6 +2834,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     if (selectedDispatchAccounts.size === 0) selectedDispatchAccounts.add(0);
 
     renderDispatchAccounts();
+    renderDispatchOutlandTierBar();
     populateDispatchHunts();
     populateDispatchPokeList();
     updateDispatchMatches();
@@ -2669,6 +2895,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
         dispatchFilterChips.querySelectorAll('.dispatch-chip').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentHuntFilter = btn.dataset.filter || 'all';
+        renderDispatchOutlandTierBar();
         renderDispatchHuntsGrid();
       };
     });
@@ -2690,7 +2917,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     dispatchPokeList.innerHTML = sorted.map(name => `<option value="${esc(name)}">`).join('');
   }
 
-  const DEFAULT_DISPATCH_HUNTS = [["cerulean","Cerulean",0],["pewter","Pewter",0],["viridian","Viridian",0],["cassino","Cassino",0],["bulbasaur","Bulbasaur",20],["ivysaur","Ivysaur",40],["venusaur","Venusaur",80],["charmander","Charmander",20],["charmeleon","Charmeleon",40],["charizard","Charizard",80],["squirtle","Squirtle",20],["wartortle","Wartortle",40],["blastoise","Blastoise",150],["caterpie","Caterpie",1],["metapod","Metapod",10],["butterfree","Butterfree",30],["weedle","Weedle",1],["kakuna","Kakuna",10],["beedrill","Beedrill",30],["pidgey","Pidgey",1],["pidgeotto","Pidgeotto",20],["pidgeot","Pidgeot",80],["rattata","Rattata",1],["raticate","Raticate",30],["spearow","Spearow",10],["fearow","Fearow",50],["ekans","Ekans",10],["arbok","Arbok",40],["pikachu","Pikachu",60],["raichu","Raichu",80],["sandshrew","Sandshrew",20],["sandslash","Sandslash",60],["nidoranfe","Nidoranfe",10],["nidorina","Nidorina",30],["nidoqueen","Nidoqueen",80],["nidoranma","Nidoranma",10],["nidorino","Nidorino",30],["nidoking","Nidoking",80],["clefairy","Clefairy",40],["clefable","Clefable",80],["vulpix","Vulpix",20],["ninetales","Ninetales",100],["jigglypuff","Jigglypuff",40],["wigglytuff","Wigglytuff",80],["zubat","Zubat",10],["golbat","Golbat",40],["oddish","Oddish",1],["gloom","Gloom",30],["vileplume","Vileplume",60],["paras","Paras",1],["parasect","Parasect",50],["venonat","Venonat",20],["venomoth","Venomoth",60],["diglett","Diglett",10],["dugtrio","Dugtrio",40],["meowth","Meowth",20],["persian","Persian",50],["psyduck","Psyduck",20],["golduck","Golduck",80],["mankey","Mankey",10],["primeape","Primeape",30],["growlithe","Growlithe",30],["arcanine","Arcanine",100],["poliwag","Poliwag",1],["poliwhirl","Poliwhirl",30],["poliwrath","Poliwrath",80],["abra","Abra",10],["kadabra","Kadabra",50],["alakazam","Alakazam",100],["machop","Machop",20],["machoke","Machoke",40],["machamp","Machamp",80],["bellsprout","Bellsprout",1],["weepinbell","Weepinbell",30],["victreebel","Victreebel",60],["tentacool","Tentacool",10],["tentacruel","Tentacruel",80],["geodude","Geodude",1],["graveler","Graveler",40],["golem","Golem",80],["ponyta","Ponyta",20],["rapidash","Rapidash",80],["brave_blastoise","Brave Blastoise",150],["tribal_feraligatr","Tribal Feraligatr",150],["ancient_meganium","Ancient Meganium",150],["brave_venusaur","Brave Venusaur",150],["war_heracross","War Heracross",150],["furious_scyther","Furious Scyther",150],["enigmatic_girafarig","Enigmatic Girafarig",150],["charged_raichu","Charged Raichu",150],["furious_ampharos","Furious Ampharos",150],["magnetic_electabuzz","Magnetic Electabuzz",150],["ancient_dragonair","Ancient Dragonair",150],["evil_cloyster","Evil Cloyster",150],["freezing_dewgong","Freezing Dewgong",150],["psy_jynx","Psy Jynx",150],["heavy_piloswine","Heavy Piloswine",150],["milch_miltank","Milch Miltank",150],["roll_donphan","Roll Donphan",150],["furious_sandslash","Furious Sandslash",150],["hard_golem","Hard Golem",150],["brute_rhydon","Brute Rhydon",150],["brave_charizard","Brave Charizard",150],["enraged_typhlosion","Enraged Typhlosion",150],["brave_nidoking","Brave Nidoking",150],["brave_nidoqueen","Brave Nidoqueen",150],["dark_crobat","Dark Crobat",150],["trickmaster_gengar","Trickmaster Gengar",150],["banshee_misdreavus","Banshee Misdreavus",150],["slowpoke","Slowpoke",10],["slowbro","Slowbro",60],["magnemite","Magnemite",10],["magneton","Magneton",80],["farfetch_d","Farfetch'D",50],["doduo","Doduo",10],["dodrio","Dodrio",60],["seel","Seel",20],["dewgong","Dewgong",60],["grimer","Grimer",10],["muk","Muk",80],["shellder","Shellder",10],["cloyster","Cloyster",60],["gastly","Gastly",20],["haunter","Haunter",50],["gengar","Gengar",100],["onix","Onix",60],["drowzee","Drowzee",30],["hypno","Hypno",60],["krabby","Krabby",10],["kingler","Kingler",60],["voltorb","Voltorb",10],["electrode","Electrode",40],["exeggcute","Exeggcute",10],["exeggutor","Exeggutor",100],["cubone","Cubone",20],["marowak","Marowak",50],["hitmonlee","Hitmonlee",60],["hitmonchan","Hitmonchan",60],["lickitung","Lickitung",60],["koffing","Koffing",10],["weezing","Weezing",60],["rhyhorn","Rhyhorn",30],["rhydon","Rhydon",80],["tangela","Tangela",50],["kangaskhan","Kangaskhan",80],["staryu","Staryu",20],["starmie","Starmie",80],["mr_mime","Mr. Mime",80],["scyther","Scyther",100],["jynx","Jynx",100],["electabuzz","Electabuzz",100],["magmar","Magmar",100],["pinsir","Pinsir",100],["tauros","Tauros",60],["gyarados","Gyarados",100],["lapras","Lapras",100],["omanyte","Omanyte",20],["omastar","Omastar",80],["kabuto","Kabuto",20],["kabutops","Kabutops",80],["aerodactyl","Aerodactyl",100],["snorlax","Snorlax",100],["dratini","Dratini",30],["dragonair","Dragonair",80],["dragonite","Dragonite",100],["chikorita","Chikorita",20],["bayleef","Bayleef",40],["meganium","Meganium",80],["cyndaquil","Cyndaquil",20],["quilava","Quilava",40],["typhlosion","Typhlosion",80],["totodile","Totodile",20],["croconaw","Croconaw",40],["feraligatr","Feraligatr",80],["noctowl","Noctowl",60],["crobat","Crobat",80],["chinchou","Chinchou",10],["lanturn","Lanturn",80],["pichu","Pichu",20],["cleffa","Cleffa",20],["igglybuff","Igglybuff",20],["natu","Natu",30],["xatu","Xatu",80],["mareep","Mareep",20],["flaaffy","Flaaffy",40],["ampharos","Ampharos",80],["bellossom","Bellossom",50],["marill","Marill",20],["azumarill","Azumarill",60],["politoed","Politoed",70],["sunflora","Sunflora",30],["quagsire","Quagsire",60],["misdreavus","Misdreavus",100],["wobbuffet","Wobbuffet",100],["girafarig","Girafarig",80],["pineco","Pineco",10],["forretress","Forretress",80],["gligar","Gligar",40],["steelix","Steelix",100],["snubbull","Snubbull",30],["granbull","Granbull",80],["scizor","Scizor",100],["heracross","Heracross",100],["teddiursa","Teddiursa",30],["ursaring","Ursaring",100],["slugma","Slugma",10],["magcargo","Magcargo",80],["swinub","Swinub",10],["piloswine","Piloswine",80],["mantine","Mantine",100],["skarmory","Skarmory",100],["houndour","Houndour",20],["houndoom","Houndoom",100],["kingdra","Kingdra",100],["phanpy","Phanpy",20],["donphan","Donphan",80],["tyrogue","Tyrogue",30],["hitmontop","Hitmontop",60],["smoochum","Smoochum",30],["elekid","Elekid",30],["magby","Magby",30],["miltank","Miltank",80],["larvitar","Larvitar",30],["pupitar","Pupitar",60],["tyranitar","Tyranitar",100],["taekwondo_hitmonchan","Taekwondo Hitmonchan",150],["taekwondo_hitmonlee","Taekwondo Hitmonlee",150],["taekwondo_hitmontop","Taekwondo Hitmontop",150],["brave_arcanine","Brave Arcanine",150],["furious_magmar","Furious Magmar",150],["ancient_pupitar","Ancient Pupitar",150],["brave_steelix","Brave Steelix",150],["furious_wigglytuff","Furious Wigglytuff",150],["ancient_xatu","Ancient Xatu",150],["brave_alakazam","Brave Alakazam",150],["ancient_hypno","Ancient Hypno",150],["furious_gyarados","Furious Gyarados",150],["brave_mantine","Brave Mantine",150],["ancient_pinsir","Ancient Pinsir",150],["brave_clefable","Brave Clefable",150],["ancient_granbull","Ancient Granbull",150],["furious_skarmory","Furious Skarmory",150],["brave_noctowl","Brave Noctowl",150],["furious_pidgeot","Furious Pidgeot",150],["ancient_marowak","Ancient Marowak",150],["chansey","Chansey",60],["horsea","Horsea",10],["seadra","Seadra",50],["goldeen","Goldeen",10],["seaking","Seaking",50],["sentret","Sentret",10],["furret","Furret",40],["hoothoot","Hoothoot",20],["ledyba","Ledyba",10],["ledian","Ledian",40],["spinarak","Spinarak",10],["ariados","Ariados",40],["togepi","Togepi",1],["togetic","Togetic",80],["hoppip","Hoppip",1],["skiploom","Skiploom",30],["jumpluff","Jumpluff",50],["aipom","Aipom",40],["sunkern","Sunkern",1],["yanma","Yanma",50],["wooper","Wooper",20],["dunsparce","Dunsparce",30],["qwilfish","Qwilfish",50],["shuckle","Shuckle",40],["sneasel","Sneasel",50],["corsola","Corsola",50],["remoraid","Remoraid",10],["octillery","Octillery",70],["delibird","Delibird",40],["stantler","Stantler",50],["treecko","Treecko",520],["grovyle","Grovyle",540],["sceptile","Sceptile",580],["torchic","Torchic",520],["combusken","Combusken",540],["blaziken","Blaziken",580],["mudkip","Mudkip",520],["marshtomp","Marshtomp",540],["swampert","Swampert",580],["seedot","Seedot",510],["nuzleaf","Nuzleaf",530],["shiftry","Shiftry",580],["wingull","Wingull",530],["pelipper","Pelipper",580],["ralts","Ralts",530],["kirlia","Kirlia",560],["gardevoir","Gardevoir",600],["whismur","Whismur",520],["loudred","Loudred",550],["exploud","Exploud",600],["makuhita","Makuhita",540],["sableye","Sableye",560],["mawile","Mawile",580],["lairon","Lairon",560],["aggron","Aggron",600],["meditite","Meditite",530],["medicham","Medicham",580],["electrike","Electrike",530],["manectric","Manectric",580],["numel","Numel",530],["camerupt","Camerupt",580],["torkoal","Torkoal",600],["spoink","Spoink",520],["grumpig","Grumpig",580],["vibrava","Vibrava",550],["flygon","Flygon",600],["cacturne","Cacturne",600],["seviper","Seviper",600],["corphish","Corphish",530],["crawdaunt","Crawdaunt",580],["claydol","Claydol",580],["duskull","Duskull",540],["snorunt","Snorunt",530],["glalie","Glalie",580],["spheal","Spheal",530],["sealeo","Sealeo",560],["walrein","Walrein",600],["bagon","Bagon",540],["shelgon","Shelgon",560],["beldum","Beldum",520],["metang","Metang",580],["poochyena","Poochyena",530],["mightyena","Mightyena",600],["lotad","Lotad",520],["lombre","Lombre",550],["ludicolo","Ludicolo",600],["taillow","Taillow",530],["swellow","Swellow",580],["slakoth","Slakoth",540],["vigoroth","Vigoroth",560],["aron","Aron",530],["trapinch","Trapinch",520],["swablu","Swablu",540],["altaria","Altaria",580],["zangoose","Zangoose",600],["baltoy","Baltoy",530],["banette","Banette",580],["dusclops","Dusclops",600],["tropius","Tropius",600],["absol","Absol",600],["riolu","Riolu",530],["lucario","Lucario",580]].map(([sl,name,level])=>({sl,name,level}));
+  const DEFAULT_DISPATCH_HUNTS = [["cerulean","Cerulean",0],["pewter","Pewter",0],["viridian","Viridian",0],["cassino","Cassino",0],["bulbasaur","Bulbasaur",20],["ivysaur","Ivysaur",40],["venusaur","Venusaur",80],["charmander","Charmander",20],["charmeleon","Charmeleon",40],["charizard","Charizard",80],["squirtle","Squirtle",20],["wartortle","Wartortle",40],["blastoise","Blastoise",150],["caterpie","Caterpie",1],["metapod","Metapod",10],["butterfree","Butterfree",30],["weedle","Weedle",1],["kakuna","Kakuna",10],["beedrill","Beedrill",30],["pidgey","Pidgey",1],["pidgeotto","Pidgeotto",20],["pidgeot","Pidgeot",80],["rattata","Rattata",1],["raticate","Raticate",30],["spearow","Spearow",10],["fearow","Fearow",50],["ekans","Ekans",10],["arbok","Arbok",40],["pikachu","Pikachu",60],["raichu","Raichu",80],["sandshrew","Sandshrew",20],["sandslash","Sandslash",60],["nidoranfe","Nidoranfe",10],["nidorina","Nidorina",30],["nidoqueen","Nidoqueen",80],["nidoranma","Nidoranma",10],["nidorino","Nidorino",30],["nidoking","Nidoking",80],["clefairy","Clefairy",40],["clefable","Clefable",80],["vulpix","Vulpix",20],["ninetales","Ninetales",100],["jigglypuff","Jigglypuff",40],["wigglytuff","Wigglytuff",80],["zubat","Zubat",10],["golbat","Golbat",40],["oddish","Oddish",1],["gloom","Gloom",30],["vileplume","Vileplume",60],["paras","Paras",1],["parasect","Parasect",50],["venonat","Venonat",20],["venomoth","Venomoth",60],["diglett","Diglett",10],["dugtrio","Dugtrio",40],["meowth","Meowth",20],["persian","Persian",50],["psyduck","Psyduck",20],["golduck","Golduck",80],["mankey","Mankey",10],["primeape","Primeape",30],["growlithe","Growlithe",30],["arcanine","Arcanine",100],["poliwag","Poliwag",1],["poliwhirl","Poliwhirl",30],["poliwrath","Poliwrath",80],["abra","Abra",10],["kadabra","Kadabra",50],["alakazam","Alakazam",100],["machop","Machop",20],["machoke","Machoke",40],["machamp","Machamp",80],["bellsprout","Bellsprout",1],["weepinbell","Weepinbell",30],["victreebel","Victreebel",60],["tentacool","Tentacool",10],["tentacruel","Tentacruel",80],["geodude","Geodude",1],["graveler","Graveler",40],["golem","Golem",80],["ponyta","Ponyta",20],["rapidash","Rapidash",80],["brave_blastoise","Brave Blastoise",150],["tribal_feraligatr","Tribal Feraligatr",150],["ancient_meganium","Ancient Meganium",150],["brave_venusaur","Brave Venusaur",150],["war_heracross","War Heracross",150],["furious_scyther","Furious Scyther",150],["enigmatic_girafarig","Enigmatic Girafarig",150],["charged_raichu","Charged Raichu",150],["furious_ampharos","Furious Ampharos",150],["magnetic_electabuzz","Magnetic Electabuzz",150],["ancient_dragonair","Ancient Dragonair",150],["evil_cloyster","Evil Cloyster",150],["freezing_dewgong","Freezing Dewgong",150],["psy_jynx","Psy Jynx",150],["heavy_piloswine","Heavy Piloswine",150],["milch_miltank","Milch Miltank",150],["roll_donphan","Roll Donphan",150],["furious_sandslash","Furious Sandslash",150],["hard_golem","Hard Golem",150],["brute_rhydon","Brute Rhydon",150],["brave_charizard","Brave Charizard",150],["enraged_typhlosion","Enraged Typhlosion",150],["brave_nidoking","Brave Nidoking",150],["brave_nidoqueen","Brave Nidoqueen",150],["dark_crobat","Dark Crobat",150],["trickmaster_gengar","Trickmaster Gengar",150],["banshee_misdreavus","Banshee Misdreavus",150],["slowpoke","Slowpoke",10],["slowbro","Slowbro",60],["magnemite","Magnemite",10],["magneton","Magneton",80],["farfetch_d","Farfetch'D",50],["doduo","Doduo",10],["dodrio","Dodrio",60],["seel","Seel",20],["dewgong","Dewgong",60],["grimer","Grimer",10],["muk","Muk",80],["shellder","Shellder",10],["cloyster","Cloyster",60],["gastly","Gastly",20],["haunter","Haunter",50],["gengar","Gengar",100],["onix","Onix",60],["drowzee","Drowzee",30],["hypno","Hypno",60],["krabby","Krabby",10],["kingler","Kingler",60],["voltorb","Voltorb",10],["electrode","Electrode",40],["exeggcute","Exeggcute",10],["exeggutor","Exeggutor",100],["cubone","Cubone",20],["marowak","Marowak",50],["hitmonlee","Hitmonlee",60],["hitmonchan","Hitmonchan",60],["lickitung","Lickitung",60],["koffing","Koffing",10],["weezing","Weezing",60],["rhyhorn","Rhyhorn",30],["rhydon","Rhydon",80],["tangela","Tangela",50],["kangaskhan","Kangaskhan",80],["staryu","Staryu",20],["starmie","Starmie",80],["mr_mime","Mr. Mime",80],["scyther","Scyther",100],["jynx","Jynx",100],["electabuzz","Electabuzz",100],["magmar","Magmar",100],["pinsir","Pinsir",100],["tauros","Tauros",60],["gyarados","Gyarados",100],["lapras","Lapras",100],["omanyte","Omanyte",20],["omastar","Omastar",80],["kabuto","Kabuto",20],["kabutops","Kabutops",80],["aerodactyl","Aerodactyl",100],["snorlax","Snorlax",100],["dratini","Dratini",30],["dragonair","Dragonair",80],["dragonite","Dragonite",100],["chikorita","Chikorita",20],["bayleef","Bayleef",40],["meganium","Meganium",80],["cyndaquil","Cyndaquil",20],["quilava","Quilava",40],["typhlosion","Typhlosion",80],["totodile","Totodile",20],["croconaw","Croconaw",40],["feraligatr","Feraligatr",80],["noctowl","Noctowl",60],["crobat","Crobat",80],["chinchou","Chinchou",10],["lanturn","Lanturn",80],["pichu","Pichu",20],["cleffa","Cleffa",20],["igglybuff","Igglybuff",20],["natu","Natu",30],["xatu","Xatu",80],["mareep","Mareep",20],["flaaffy","Flaaffy",40],["ampharos","Ampharos",80],["bellossom","Bellossom",50],["marill","Marill",20],["azumarill","Azumarill",60],["politoed","Politoed",70],["sunflora","Sunflora",30],["quagsire","Quagsire",60],["misdreavus","Misdreavus",100],["wobbuffet","Wobbuffet",100],["girafarig","Girafarig",80],["pineco","Pineco",10],["forretress","Forretress",80],["gligar","Gligar",40],["steelix","Steelix",100],["snubbull","Snubbull",30],["granbull","Granbull",80],["scizor","Scizor",100],["heracross","Heracross",100],["teddiursa","Teddiursa",30],["ursaring","Ursaring",100],["slugma","Slugma",10],["magcargo","Magcargo",80],["swinub","Swinub",10],["piloswine","Piloswine",80],["mantine","Mantine",100],["skarmory","Skarmory",100],["houndour","Houndour",20],["houndoom","Houndoom",100],["kingdra","Kingdra",100],["phanpy","Phanpy",20],["donphan","Donphan",80],["tyrogue","Tyrogue",30],["hitmontop","Hitmontop",60],["smoochum","Smoochum",30],["elekid","Elekid",30],["magby","Magby",30],["miltank","Miltank",80],["larvitar","Larvitar",30],["pupitar","Pupitar",60],["tyranitar","Tyranitar",100],["taekwondo_hitmonchan","Taekwondo Hitmonchan",150],["taekwondo_hitmonlee","Taekwondo Hitmonlee",150],["taekwondo_hitmontop","Taekwondo Hitmontop",150],["brave_arcanine","Brave Arcanine",150],["furious_magmar","Furious Magmar",150],["ancient_pupitar","Ancient Pupitar",150],["brave_steelix","Brave Steelix",150],["furious_wigglytuff","Furious Wigglytuff",150],["ancient_xatu","Ancient Xatu",150],["brave_alakazam","Brave Alakazam",150],["ancient_hypno","Ancient Hypno",150],["furious_gyarados","Furious Gyarados",150],["brave_mantine","Brave Mantine",150],["ancient_pinsir","Ancient Pinsir",150],["brave_clefable","Brave Clefable",150],["ancient_granbull","Ancient Granbull",150],["furious_skarmory","Furious Skarmory",150],["brave_noctowl","Brave Noctowl",150],["furious_pidgeot","Furious Pidgeot",150],["ancient_marowak","Ancient Marowak",150],["chansey","Chansey",60],["horsea","Horsea",10],["seadra","Seadra",50],["goldeen","Goldeen",10],["seaking","Seaking",50],["sentret","Sentret",10],["furret","Furret",40],["hoothoot","Hoothoot",20],["ledyba","Ledyba",10],["ledian","Ledian",40],["spinarak","Spinarak",10],["ariados","Ariados",40],["togepi","Togepi",1],["togetic","Togetic",80],["hoppip","Hoppip",1],["skiploom","Skiploom",30],["jumpluff","Jumpluff",50],["aipom","Aipom",40],["sunkern","Sunkern",1],["yanma","Yanma",50],["wooper","Wooper",20],["dunsparce","Dunsparce",30],["qwilfish","Qwilfish",50],["shuckle","Shuckle",40],["sneasel","Sneasel",50],["corsola","Corsola",50],["remoraid","Remoraid",10],["octillery","Octillery",70],["delibird","Delibird",40],["stantler","Stantler",50],["treecko","Treecko",520],["grovyle","Grovyle",540],["sceptile","Sceptile",580],["torchic","Torchic",520],["combusken","Combusken",540],["blaziken","Blaziken",580],["mudkip","Mudkip",520],["marshtomp","Marshtomp",540],["swampert","Swampert",580],["seedot","Seedot",510],["nuzleaf","Nuzleaf",530],["shiftry","Shiftry",580],["wingull","Wingull",530],["pelipper","Pelipper",580],["ralts","Ralts",530],["kirlia","Kirlia",560],["gardevoir","Gardevoir",600],["whismur","Whismur",520],["loudred","Loudred",550],["exploud","Exploud",600],["makuhita","Makuhita",540],["sableye","Sableye",560],["mawile","Mawile",580],["lairon","Liron",560],["aggron","Aggron",600],["meditite","Meditite",530],["medicham","Medicham",580],["electrike","Electrike",530],["manectric","Manectric",580],["numel","Numel",530],["camerupt","Camerupt",580],["torkoal","Torkoal",600],["spoink","Spoink",520],["grumpig","Grumpig",580],["vibrava","Vibrava",550],["flygon","Flygon",600],["cacturne","Cacturne",600],["seviper","Seviper",600],["corphish","Corphish",530],["crawdaunt","Crawdaunt",580],["claydol","Claydol",580],["duskull","Duskull",540],["snorunt","Snorunt",530],["glalie","Glalie",580],["spheal","Spheal",530],["sealeo","Sealeo",560],["walrein","Walrein",600],["bagon","Bagon",540],["shelgon","Shelgon",560],["beldum","Beldum",520],["metang","Metang",580],["poochyena","Poochyena",530],["mightyena","Mightyena",600],["lotad","Lotad",520],["lombre","Lombre",550],["ludicolo","Ludicolo",600],["taillow","Taillow",530],["swellow","Swellow",580],["slakoth","Slakoth",540],["vigoroth","Vigoroth",560],["aron","Aron",530],["trapinch","Trapinch",520],["swablu","Swablu",540],["altaria","Altaria",580],["zangoose","Zangoose",600],["baltoy","Baltoy",530],["banette","Banette",580],["dusclops","Dusclops",600],["tropius","Tropius",600],["absol","Absol",600],["riolu","Riolu",530],["lucario","Lucario",580]].map(([sl,name,level])=>({sl,name,level,ar:getHuntRegion({sl,name,level})}));
 
   function populateDispatchHunts() {
     if (!dispatchHuntSelect) return;
@@ -2698,8 +2925,22 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     const curVal = dispatchHuntSelect.value;
     const opts = ['<option value="">Selecione a hunt de destino...</option>'];
     sortedHunts.forEach(h => {
-      const lv = h.level ? `[Nv ${h.level}] ` : '';
-      opts.push(`<option value="${esc(h.sl || h.name)}">${lv}${esc(h.name)}</option>`);
+      const isOut = isOutlandHunt(h);
+      const reg = getHuntRegion(h);
+      let prefix = '';
+      if (isOut) {
+        const tInfo = OUTLAND_TIERS.find(t => t.tier === selectedOutlandTier) || OUTLAND_TIERS[0];
+        prefix = `[Outland ${tInfo.tier} · Nv ${tInfo.nivel.toLocaleString('pt-BR')}] `;
+      } else if (reg === 'city') {
+        prefix = `[Cidade] `;
+      } else if (reg === 'johto') {
+        prefix = `[Johto · Nv ${h.level}] `;
+      } else if (reg === 'orre') {
+        prefix = `[Orre · Nv ${h.level}] `;
+      } else {
+        prefix = `[Kanto · Nv ${h.level}] `;
+      }
+      opts.push(`<option value="${esc(h.sl || h.name)}">${prefix}${esc(h.name)}</option>`);
     });
     dispatchHuntSelect.innerHTML = opts.join('');
     if (curVal && sortedHunts.some(h => (h.sl || h.name) === curVal)) {
@@ -2747,8 +2988,9 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     updateDispatchButtonState();
   }
 
-  const DISPATCH_JS = (slug) => `(() => {
+  const DISPATCH_JS = (slug, outlandTier) => `(() => {
     const sl = ${JSON.stringify(slug)};
+    const ot = ${JSON.stringify(outlandTier || null)};
     if (!sl) return 'sem_slug';
     const getSock = () => (window.__poke && window.__poke.sock) || (window.estado && window.estado.ws);
     const sock = getSock();
@@ -2760,7 +3002,17 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       try {
         const curSock = getSock();
         if (curSock && curSock.readyState === 1) {
+          if (ot) {
+            curSock.send(JSON.stringify({ t: 'outland.tier', tier: Number(ot) }));
+          }
           curSock.send(JSON.stringify({ type: 'enter-hunt', t: 'hunt.select', slug: sl }));
+        }
+        if (ot) {
+          const domOutland = document.querySelector('#f-outland, select[name="outland_tier"]');
+          if (domOutland) {
+            domOutland.value = String(ot);
+            domOutland.dispatchEvent(new Event('change', { bubbles: true }));
+          }
         }
         const domBtn = document.querySelector('[data-slug="' + sl + '"], [data-hunt="' + sl + '"]');
         if (domBtn && typeof domBtn.click === 'function') domBtn.click();
@@ -2792,7 +3044,21 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     if (!targetSlug || !targets.length) return;
     if (dispatchConfirm) dispatchConfirm.disabled = true;
     if (dispatchStatusBar) dispatchStatusBar.style.display = 'block';
-    const huntLabel = prettyHunt(targetSlug);
+    const isOut = isOutlandHunt(targetSlug);
+    const reg = getHuntRegion(targetSlug);
+    const tInfo = isOut ? (OUTLAND_TIERS.find(t => t.tier === selectedOutlandTier) || OUTLAND_TIERS[0]) : null;
+    let huntDetails = '';
+    if (isOut) {
+      huntDetails = ` (Outland ${selectedOutlandTier} · Nv ${tInfo.nivel.toLocaleString('pt-BR')})`;
+    } else if (reg === 'city') {
+      huntDetails = ` (Cidade)`;
+    } else {
+      const allHunts = getHuntsList();
+      const selHunt = allHunts.find(h => (h.sl || h.name) === targetSlug);
+      const regLabel = reg === 'johto' ? 'Johto' : (reg === 'orre' ? 'Orre' : 'Kanto');
+      if (selHunt && selHunt.level) huntDetails = ` (${regLabel} · Nv ${selHunt.level})`;
+    }
+    const huntLabel = prettyHunt(targetSlug) + huntDetails;
     if (dispatchStatusText) dispatchStatusText.textContent = `Despachando ${targets.length} conta${targets.length > 1 ? 's' : ''} para ${huntLabel}...`;
 
     let successCount = 0;
@@ -2801,7 +3067,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       const wv = webviews[idx];
       if (wv && !off[idx]) {
         try {
-          const res = await wv.executeJavaScript(DISPATCH_JS(targetSlug));
+          const res = await wv.executeJavaScript(DISPATCH_JS(targetSlug, isOut ? selectedOutlandTier : null));
           if (res === 'enviado') {
             successCount++;
           } else if (res === 'sem_sock') {
@@ -3762,11 +4028,11 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
   }).filter(Boolean);
   let lifeShiny = [], lifeCatch = [];
   try { lifeShiny = saneiaLog(lsArr('lifeShiny'), (e, x) => { e.cap = x.cap ? 1 : 0; e.def = x.def ? 1 : 0; }); } catch {}
-  try { lifeCatch = saneiaLog(lsArr('lifeCatch'), (e, x) => { e.iv = +x.iv || 0; e.q = +x.q || 0; e.sh = !!x.sh; e.fx = !!x.fx; }); } catch {}
+  try { lifeCatch = saneiaLog(lsArr('lifeCatch'), (e, x) => { e.id = x.id || null; e.iv = +x.iv || 0; e.ivs = x.ivs && typeof x.ivs === 'object' ? { hp: +x.ivs.hp || 0, atk: +x.ivs.atk || 0, def: +x.ivs.def || 0, spAtk: +x.ivs.spAtk || 0, spDef: +x.ivs.spDef || 0, speed: +x.ivs.speed || 0 } : null; e.q = +x.q || 0; e.sh = !!x.sh; e.fx = !!x.fx; }); } catch {}
   // chave de dedupe inclui o painel (indice, nao o nome: o nome comeca padrao e muda ao carregar,
   // o que duplicaria a entrada e o aviso). Assim duas contas com a mesma especie no mesmo ms nao colidem.
   const kSh = (p, x) => 's' + p + '_' + x.t + '_' + (x.sid || x.n);
-  const kCa = (p, x) => 'c' + p + '_' + x.t + '_' + x.n;
+  const kCa = (p, x) => 'c' + p + '_' + x.t + '_' + (x.id || x.n);
   const seenLog = {}; lifeShiny.forEach(x => seenLog[kSh(x.p, x)] = 1); lifeCatch.forEach(x => seenLog[kCa(x.p, x)] = 1);
   const mergedOnce = []; // 1o merge do painel: backfill silencioso (shiny de antes nao e novidade nem rajada de webhook)
   function mergeLogs(i, r) {
@@ -3780,11 +4046,46 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       if (avisa && whCfg.shiny) webhookSend((whCfg.mention ? '<@' + whCfg.mention + '> ' : '') + '✨ ' + acc + ': shiny ' + (x.n || ('#' + (+x.sid || '?'))) + ' ' + (x.cap ? t('whCaught') : t('whSeen'))); // o shiny e derrotado ANTES de ficar capturavel: na hora nao da pra dizer que foi perdido; se pegar, vem o CAPTURADO
       if (avisa && x.cap) { // CAPTUROU: aviso grande na tela, som de festa e notificacao propria
         const c = (r.catchLog || []).filter(y => y.sh).sort((p, q2) => Math.abs((+p.t || 0) - (+x.t || 0)) - Math.abs((+q2.t || 0) - (+x.t || 0)))[0]; // pega IV/qualidade da captura correspondente
-        festaShiny({ n: x.n || (c && c.n), sid: x.sid, acc, dot, iv: c && c.iv, q: c && c.q, t: x.t });
+        festaShiny({ n: x.n || (c && c.n), sid: x.sid, acc, dot, iv: c && c.iv, ivs: c && c.ivs, q: c && c.q, t: x.t });
         if (alertsOn) alerta(i, 'msgShinyCap');
       }
     });
-    (r.catchLog || []).forEach(x => { const key = kCa(i, x); if (seenLog[key]) return; seenLog[key] = 1; dirty = true; lifeCatch.push({ n: String(x.n || '').slice(0, 40), iv: +x.iv || 0, q: +x.q || 0, sh: !!x.sh, fx: !!x.fx, t: +x.t || 0, p: i, acc, dot }); });
+    (r.catchLog || []).forEach(x => {
+      const key = kCa(i, x);
+      const ivsClean = x.ivs && typeof x.ivs === 'object' ? { hp: +x.ivs.hp || 0, atk: +x.ivs.atk || 0, def: +x.ivs.def || 0, spAtk: +x.ivs.spAtk || 0, spDef: +x.ivs.spDef || 0, speed: +x.ivs.speed || 0 } : null;
+      if (seenLog[key]) {
+        const exist = lifeCatch.find(lc => lc.p === i && (lc.id && x.id ? lc.id === x.id : (lc.t === +x.t && lc.n === String(x.n || '').slice(0, 40))));
+        if (exist) {
+          if (+x.iv > 0 && (!exist.iv || exist.iv === 0)) {
+            exist.iv = +x.iv;
+            dirty = true;
+          }
+          if (ivsClean && !exist.ivs) {
+            exist.ivs = ivsClean;
+            dirty = true;
+          }
+          if (x.id && !exist.id) {
+            exist.id = x.id;
+            dirty = true;
+          }
+        }
+        return;
+      }
+      seenLog[key] = 1; dirty = true;
+      lifeCatch.push({ id: x.id || null, n: String(x.n || '').slice(0, 40), iv: +x.iv || 0, ivs: ivsClean, q: +x.q || 0, sh: !!x.sh, fx: !!x.fx, t: +x.t || 0, p: i, acc, dot });
+    });
+    if (r.allPokes && r.allPokes.length) {
+      lifeCatch.forEach(lc => {
+        if (lc.p === i && ((!lc.iv || lc.iv === 0) || !lc.ivs)) {
+          const match = r.allPokes.find(p => (+p.ivt > 0 || p.ivs) && p.name === lc.n && Math.abs((+p.q || 0) - (+lc.q || 0)) < 0.02 && (!lc.sh || p.shiny));
+          if (match) {
+            if (match.ivt != null && (!lc.iv || lc.iv === 0)) { lc.iv = +match.ivt; dirty = true; }
+            if (match.ivs && !lc.ivs) { lc.ivs = match.ivs; dirty = true; }
+            if (match.id && !lc.id) { lc.id = match.id; dirty = true; }
+          }
+        }
+      });
+    }
     if (dirty) {
       if (lifeShiny.length > 500) lifeShiny = lifeShiny.slice(-500);
       if (lifeCatch.length > 300) lifeCatch = lifeCatch.slice(-300);
@@ -4088,7 +4389,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     const xpC = n => n<=1?0:Math.round(50/3*(n**3-6*n**2+17*n-12));
     const xpNv = n => { n = Math.floor(n); if (n <= 150) return xpC(n); const t = n - 150; if (t <= 100) return Math.round(xpC(150) + .5*(t*(t+1)/2)**2 + t*(t+1)*(2*t+1)/6*197.5 + t*(t+1)/2*25629 + 1087900*t); return Math.round(xpNv(250) + 2*(xpC(n) - xpC(250))); };
     const team = ((ws.pokes && ws.pokes.list)||[]).filter(p=>p.team).sort((x,y)=>(x.slot||0)-(y.slot||0)).map(p=>({id:p.id!=null?String(p.id).slice(0,40):'',name:p.name,level:p.level,shiny:!!p.shiny,t1:p.type1||'',t2:p.type2||'',ld:!!p.leader,q:nL(p.quality),ivt:p.ivTotal!=null?nL(p.ivTotal):null,dt:!!p.isDitto,tms:(Array.isArray(p.tms)?p.tms:[]).slice(0,24).map(x=>String(x).toUpperCase().slice(0,12)),sid:+p.speciesId||+p.pokeId||0,hp:+p.hp||0,hm:+p.maxHp||+p.hpMax||+p.totalHp||0,xpp:(+p.xp>0&&+p.level>0?(X=>{const a=X(+p.level),b=X(+p.level+1);return b>a?Math.round((+p.xp-a)/(b-a)*100):null})(xpNv):null)}));
-    const allPokes = ((ws.pokes && ws.pokes.list)||[]).slice(0, 1000).map(p=>({id:p.id!=null?String(p.id).slice(0,40):'',name:String(p.name||'').slice(0,30),speciesId:+p.speciesId||+p.pokeId||0,level:+p.level||0,shiny:!!p.shiny,team:!!p.team,slot:p.slot}));
+    const allPokes = ((ws.pokes && ws.pokes.list)||[]).slice(0, 1000).map(p=>({id:p.id!=null?String(p.id).slice(0,40):'',name:String(p.name||'').slice(0,30),speciesId:+p.speciesId||+p.pokeId||0,level:+p.level||0,shiny:!!p.shiny,team:!!p.team,slot:p.slot,q:nL(p.quality),ivt:p.ivTotal!=null?nL(p.ivTotal):null,ivs:p.ivs||null}));
     let hunt = (ws['field-init'] && ws['field-init'].slug) || '';
     hunt = hunt.replace(/[_-]+/g,' ').replace(/\\b\\w/g, m=>m.toUpperCase());
     const mail = ws['mail-badge'] || {};
@@ -4657,6 +4958,42 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
   // raridade pela qualidade: mesmos limites e cores da funcao qualityInfo do jogo
   const RARO = (q) => q >= 4 ? ['Divina', '#dbefff'] : q >= 3 ? ['Anciã', '#b8860b'] : q >= 2 ? ['Mítica', '#6a0dad'] : q >= 1.7 ? ['Lendária', '#ff8c3c'] : q >= 1.5 ? ['Épica', '#f0c040'] : q >= 1.3 ? ['Rara', '#b06cff'] : q >= 1.1 ? ['Incomum', '#7fd4ff'] : q >= 1 ? ['Comum', '#63d873'] : ['Fraca', '#9aa6b3'];
   const raroHtml = (q) => { if (!q) return ''; const r = RARO(q); return ' <b style="color:' + r[1] + '">' + r[0] + '</b>'; };
+  const ivsFmt = (ivs) => {
+    if (!ivs || typeof ivs !== 'object') return '';
+    const h = +ivs.hp || 0, a = +ivs.atk || 0, d = +ivs.def || 0,
+          sa = +ivs.spAtk || 0, sd = +ivs.spDef || 0, sp = +ivs.speed || 0;
+    if (!h && !a && !d && !sa && !sd && !sp) return '';
+    return 'HP: ' + h + '/32 · ATK: ' + a + '/32 · DEF: ' + d + '/32 · SP.ATK: ' + sa + '/32 · SP.DEF: ' + sd + '/32 · SPEED: ' + sp + '/32';
+  };
+  const ivsHtml = (ivs) => {
+    if (!ivs || typeof ivs !== 'object') return '';
+    const h = +ivs.hp || 0, a = +ivs.atk || 0, d = +ivs.def || 0,
+          sa = +ivs.spAtk || 0, sd = +ivs.spDef || 0, sp = +ivs.speed || 0;
+    if (!h && !a && !d && !sa && !sd && !sp) return '';
+    const title = ivsFmt(ivs);
+    const st = (lbl, val, col) => '<span style="color:' + col + (val >= 31 ? ';font-weight:700;text-decoration:underline' : '') + '" title="' + lbl + ': ' + val + '/32">' + lbl + '<b>' + val + '</b></span>';
+    return '<span class="cd-ivs-pills" style="display:inline-flex;gap:4px;align-items:center;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;font-size:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:-0.2px" title="' + title + '">'
+      + st('H', h, '#3fb950')
+      + st('A', a, '#f0883e')
+      + st('D', d, '#f2c665')
+      + st('SA', sa, '#58a6ff')
+      + st('SD', sd, '#55e6d3')
+      + st('S', sp, '#f778ba')
+      + '</span>';
+  };
+  const passStat = (x, stat, minVal) => {
+    const v = +minVal || 0;
+    if (v <= 0) return true;
+    const ivs = x.ivs;
+    if (!ivs) return false;
+    if (stat === 'hp') return (+ivs.hp || 0) >= v;
+    if (stat === 'atk') return (+ivs.atk || 0) >= v;
+    if (stat === 'def') return (+ivs.def || 0) >= v;
+    if (stat === 'spAtk') return (+ivs.spAtk || 0) >= v;
+    if (stat === 'spDef') return (+ivs.spDef || 0) >= v;
+    if (stat === 'speed') return (+ivs.speed || 0) >= v;
+    return Math.max(+ivs.hp || 0, +ivs.atk || 0, +ivs.def || 0, +ivs.spAtk || 0, +ivs.spDef || 0, +ivs.speed || 0) >= v;
+  };
   // ranking de hunts: tabela de efetividade do proprio jogo (dano do MEU tipo no tipo da hunt)
   const CHART = {NORMAL:{ROCK:.5,GHOST:0,STEEL:.5},FIRE:{FIRE:.5,WATER:.5,GRASS:2,ICE:2,BUG:2,ROCK:.5,DRAGON:.5,STEEL:2},WATER:{FIRE:2,WATER:.5,GRASS:.5,GROUND:2,ROCK:2,DRAGON:.5},ELECTRIC:{WATER:2,ELECTRIC:.5,GRASS:.5,GROUND:0,FLYING:2,DRAGON:.5},GRASS:{FIRE:.5,WATER:2,GRASS:.5,POISON:.5,GROUND:2,FLYING:.5,BUG:.5,ROCK:2,DRAGON:.5,STEEL:.5},ICE:{FIRE:.5,WATER:.5,GRASS:2,ICE:.5,GROUND:2,FLYING:2,DRAGON:2,STEEL:.5},FIGHTING:{NORMAL:2,ICE:2,POISON:.5,FLYING:.5,PSYCHIC:.5,BUG:.5,ROCK:2,GHOST:0,DARK:2,STEEL:2,FAIRY:.5},POISON:{GRASS:2,POISON:.5,GROUND:.5,ROCK:.5,GHOST:.5,STEEL:0,FAIRY:2},GROUND:{FIRE:2,ELECTRIC:2,GRASS:.5,POISON:2,FLYING:0,BUG:.5,ROCK:2,STEEL:2},FLYING:{ELECTRIC:.5,GRASS:2,FIGHTING:2,BUG:2,ROCK:.5,STEEL:.5},PSYCHIC:{FIGHTING:2,POISON:2,PSYCHIC:.5,DARK:0,STEEL:.5},BUG:{FIRE:.5,GRASS:2,FIGHTING:.5,POISON:.5,FLYING:.5,PSYCHIC:2,GHOST:.5,DARK:2,STEEL:.5,FAIRY:.5},ROCK:{FIRE:2,ICE:2,FIGHTING:.5,GROUND:.5,FLYING:2,BUG:2,STEEL:.5},GHOST:{NORMAL:0,PSYCHIC:2,GHOST:2,DARK:.5},DRAGON:{DRAGON:2,STEEL:.5,FAIRY:0},DARK:{FIGHTING:.5,PSYCHIC:2,GHOST:2,DARK:.5,FAIRY:.5},STEEL:{FIRE:.5,WATER:.5,ELECTRIC:.5,ICE:2,ROCK:2,STEEL:.5,FAIRY:2},FAIRY:{FIRE:.5,FIGHTING:2,POISON:.5,DRAGON:2,DARK:2,STEEL:.5}};
   const effVs = (lead, h2) => {
@@ -4944,8 +5281,8 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
   const utBase = []; // baseline de tentativas por conta: o que veio antes da sessao nao conta no modo sessao
   let cardsCfg = { order: CDSECTS.slice(), hide: {}, w: {}, h: {} }, cardsCfgOpen = false, cdBusy = 0;
   // larguras padrão (colunas de 12): linhas fecham certinho em tela cheia (12 | 12 | 4+4+4 | 6+3+3)
-  let cdFC = { p: -1, n: '', sh: 0, q: 0, iv: 0, per: 0 }; // filtros das capturas (conta, nome, shiny, qualidade, IV, periodo)
-  try { const c0 = lsObj('cdFC'); cdFC = { p: +c0.p >= 0 ? +c0.p : -1, n: String(c0.n || '').slice(0, 30).toLowerCase(), sh: c0.sh ? 1 : 0, q: +c0.q || 0, iv: +c0.iv || 0, per: +c0.per || 0 }; } catch {}
+  let cdFC = { p: -1, n: '', sh: 0, q: 0, iv: 0, per: 0, stat: '', statV: 0 }; // filtros das capturas (conta, nome, shiny, qualidade, IV total, periodo, stat ind.)
+  try { const c0 = lsObj('cdFC'); cdFC = { p: +c0.p >= 0 ? +c0.p : -1, n: String(c0.n || '').slice(0, 30).toLowerCase(), sh: c0.sh ? 1 : 0, q: +c0.q || 0, iv: +c0.iv || 0, per: +c0.per || 0, stat: String(c0.stat || '').slice(0, 10), statV: +c0.statV || 0 }; } catch {}
   const CDW_DEF = { kpis: 12, today: 12, table: 12, hunts: 4, catches: 4, shinies: 4, shinyTried: 6, trend: 3, shared: 3, team: 12, inv: 6 };
   const cdW = (s) => Math.max(3, Math.min(12, +(cardsCfg.w[s]) || CDW_DEF[s] || 6));
   try { const c = lsObj('cardsCfg'); if (Array.isArray(c.order)) cardsCfg.order = c.order.filter(x => CDSECTS.includes(x)); CDSECTS.forEach(s => { if (!cardsCfg.order.includes(s)) cardsCfg.order.push(s); }); cardsCfg.hide = c.hide || {}; if (c.w && typeof c.w === 'object') cardsCfg.w = c.w; if (c.h && typeof c.h === 'object') cardsCfg.h = c.h; } catch {}
@@ -5011,7 +5348,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
   }, 30000);
   // junta os marcadores do mapa com o catalogo de criaturas (tudo dado que o jogo ja entrega ao cliente)
   // fin (pode aprender TM): estagio final ou a lista TM_STAGE_EXEMPT do jogo (build de 25/09/2026, que pos a Misdreavus 200)
-  const HUNTS_JS = `(async()=>{try{const fJ=async(urls)=>{for(const u of urls){try{const r=await fetch(u);if(r&&(r.ok||r.ok===undefined||r.status===200)){const d=await r.json();if(d&&(Array.isArray(d)?d.length:Object.keys(d).length))return d;}}catch(e){}}return null;};let [mk,cr,itj]=await Promise.all([fJ(['/assets/world/map-markers.json','/api/game/map-markers','/assets/map-markers.json']),fJ(['/assets/creatures.json','/game/creatures.json']),fJ(['/assets/items.json','/game/items.json'])]);if(!mk&&typeof window!=='undefined'){const P=window.__poke,est=window.estado;if(P&&P.hunts&&Array.isArray(P.hunts))mk={hunts:P.hunts};else if(est&&est.hunts&&Array.isArray(est.hunts))mk={hunts:est.hunts};else if(P&&P.ws&&P.ws.welcome&&Array.isArray(P.ws.welcome.hunts))mk={hunts:P.ws.welcome.hunts};}const pr={},prL={};((itj&&itj.items)||[]).forEach(i=>{if(i&&i.name){pr[String(i.name)]=+i.npcPrice||0;const lk=String(i.name).toLowerCase();if(prL[lk]==null)prL[lk]=+i.npcPrice||0;}});const gkDe=c=>(c.loot||[]).reduce((s,l)=>{if(!l||!(+l.chance>0))return s;const nm=String(l.name||'');const p=pr[nm]!=null?pr[nm]:(prL[nm.toLowerCase()]||0);return s+(+l.chance/1e5)*((+l.minCount||1)+(+l.maxCount||+l.minCount||1))/2*p;},0);const limpa=s=>String(s||'').toLowerCase().replace(/\\[.*?\\]/g,'').replace(/\\(.*?\\)/g,'').replace(/[_-]+/g,' ').replace(/\\s+/g,' ').trim();const chave=s=>limpa(s).replace(/female/g,'fe').replace(/male/g,'ma').replace(/[^a-z0-9]/g,'');const cs={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&c.name&&!(cs[chave(c.name)]&&!c.area&&+c.pokeId>=10000))cs[chave(c.name)]={nm0:c.name.toLowerCase().trim(),t1:c.type1||'',t2:c.type2||'',sv:c.sellValue||c.priceNpc||0,xp:c.experience||c.xp||0,lvl:c.huntLevel||0,loot:(c.loot||[]).map(l=>(l&&l.name)||l).filter(x=>typeof x==='string'),ar:String(c.area||'')||((+c.pokeId>=10000&&+c.pokeId<11000)?'outland':''),xm:+c.orreXpMul||0,tr:+c.orreTier||0,gk:gkDe(c)};});const acha=nm=>{const k=chave(nm);if(cs[k])return cs[k];const pt=limpa(nm).split(/ e | and /);if(pt.length>1){const k2=chave(pt[0]);if(cs[k2])return cs[k2];}const w=limpa(nm).split(' ');for(let i=0;i<w.length;i++){const suf=chave(w.slice(i).join(' '));if(suf&&cs[suf])return cs[suf];}for(let i=0;i<w.length;i++){const kk=chave(w[i]);if(kk&&cs[kk])return cs[kk];}return null;};const ml={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&c.pokeId!=null)ml[c.pokeId]=+c.huntLevel||0;});for(let it=0;it<4;it++)((cr&&cr.creatures)||[]).forEach(c=>{const e=c?(+c.evolvesToId||0):0;if(!e||ml[e]==null)return;const v=Math.max(ml[c.pokeId]||0,+c.evolveLevel||0);if(v<ml[e])ml[e]=v;});const byId={},bs={},mv={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&c.pokeId!=null&&c.name){byId[c.pokeId]=c.name;const pMv=mv[String(c.name).toLowerCase()];if(bs[String(c.name).toLowerCase()]&&!c.area&&+c.pokeId>=10000)return;bs[String(c.name).toLowerCase()]=[+c.baseHp||0,+c.baseAtk||0,+c.baseDef||0,+c.baseSpAtk||0,+c.baseSpDef||0,+c.baseSpeed||0];mv[String(c.name).toLowerCase()]={hl:+c.huntLevel||0,ml:(ml[c.pokeId]!=null?ml[c.pokeId]:(+c.huntLevel||0)),id:(pMv&&pMv.id&&pMv.id<(+c.pokeId||0))?pMv.id:(+c.pokeId||0),t:[String(c.type1||'').toUpperCase(),String(c.type2||'').toUpperCase()],fin:(!c.evolvesToId||[123,112,114,125,126,356,375,372,200].indexOf(+c.pokeId)>=0)?1:0,a:(c.attacks||[]).slice(0,24).map(g=>[String((g&&g.name)||'').slice(0,24),+(g&&g.power)||0,String((g&&g.type)||'').toUpperCase(),String((g&&g.category)||'').toUpperCase()==='PHYSICAL'?'P':'S',+(g&&g.cooldownMs)||0,+(g&&g.learnLevel)||0,String((g&&g.tm)||'').toUpperCase().slice(0,12)])};}});const nat={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&+c.pokeId>=1&&+c.pokeId<1026)nat[chave(c.name)]=+c.pokeId;});const EXTRA={darumaka:554,darmanitan:555,pyroar:668};const dex={};((cr&&cr.creatures)||[]).forEach(c=>{if(!c||!((+c.pokeId>=10000&&+c.pokeId<11000)||(+c.pokeId>=50000&&+c.pokeId<51000)))return;const k=limpa(c.name);let d=nat[chave(k)];const w=k.split(' ');for(let i=0;i<w.length&&!d;i++)d=nat[chave(w.slice(i).join(' '))];for(let i=0;i<w.length&&!d;i++)d=nat[chave(w[i])]||EXTRA[chave(w[i])];if(d)dex[+c.pokeId]=d;});const ms=Array.isArray(mk)?mk:((mk&&(mk.markers||mk.hunts))||[]);const mlN={};ms.forEach(m2=>{const c=acha(m2.hunt||m2.name||m2.slug||m2.title||'');const lv=+(m2.level||m2.lvl||m2.minLevel)||0;if(c&&lv>0&&(mlN[c.nm0]==null||lv<mlN[c.nm0]))mlN[c.nm0]=lv;});for(let it=0;it<4;it++)((cr&&cr.creatures)||[]).forEach(c=>{if(!c)return;const e=+c.evolvesToId||0;if(!e)return;const de=String(c.name||'').toLowerCase(),pa=String(byId[e]||'').toLowerCase();if(!pa||mlN[de]==null)return;const v=Math.max(mlN[de],+c.evolveLevel||0);if(mlN[pa]==null||v<mlN[pa])mlN[pa]=v;});for(const k in mv){if(mlN[k]!=null)mv[k].ml=mlN[k];}const out=[];ms.forEach(m2=>{const nm=m2.hunt||m2.name||m2.slug||m2.title||'';if(!nm)return;const c=acha(nm);out.push({sl:String(m2.slug||''),name:String(nm).replace(/[_-]+/g,' ').trim(),level:m2.level||m2.lvl||m2.minLevel||(c?c.lvl:0)||0,t1:c?c.t1:'',t2:c?c.t2:'',sv:c?c.sv:0,xp:c?Math.round((+c.xp||0)*((c.ar==='orre'&&c.xm>0)?c.xm:1)):0,loot:c?c.loot:[],sp:c?c.nm0:'',ar:c?c.ar:'',tr:c?c.tr:0,gk:c?Math.round(c.gk):0});});return {h:out,byId:byId,bs:bs,mv:mv,dex:dex};}catch(e){return null}})()`;
+  const HUNTS_JS = `(async()=>{try{const fJ=async(urls)=>{for(const u of urls){try{const r=await fetch(u);if(r&&(r.ok||r.ok===undefined||r.status===200)){const d=await r.json();if(d&&(Array.isArray(d)?d.length:Object.keys(d).length))return d;}}catch(e){}}return null;};let [mk,cr,itj]=await Promise.all([fJ(['/assets/world/map-markers.json','/api/game/map-markers','/assets/map-markers.json']),fJ(['/assets/creatures.json','/game/creatures.json']),fJ(['/assets/items.json','/game/items.json'])]);if(!mk&&typeof window!=='undefined'){const P=window.__poke,est=window.estado;if(P&&P.hunts&&Array.isArray(P.hunts))mk={hunts:P.hunts};else if(est&&est.hunts&&Array.isArray(est.hunts))mk={hunts:est.hunts};else if(P&&P.ws&&P.ws.welcome&&Array.isArray(P.ws.welcome.hunts))mk={hunts:P.ws.welcome.hunts};}const pr={},prL={};((itj&&itj.items)||[]).forEach(i=>{if(i&&i.name){pr[String(i.name)]=+i.npcPrice||0;const lk=String(i.name).toLowerCase();if(prL[lk]==null)prL[lk]=+i.npcPrice||0;}});const gkDe=c=>(c.loot||[]).reduce((s,l)=>{if(!l||!(+l.chance>0))return s;const nm=String(l.name||'');const p=pr[nm]!=null?pr[nm]:(prL[nm.toLowerCase()]||0);return s+(+l.chance/1e5)*((+l.minCount||1)+(+l.maxCount||+l.minCount||1))/2*p;},0);const limpa=s=>String(s||'').toLowerCase().replace(/\\[.*?\\]/g,'').replace(/\\(.*?\\)/g,'').replace(/[_-]+/g,' ').replace(/\\s+/g,' ').trim();const chave=s=>limpa(s).replace(/female/g,'fe').replace(/male/g,'ma').replace(/[^a-z0-9]/g,'');const cs={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&c.name&&!(cs[chave(c.name)]&&!c.area&&+c.pokeId>=10000))cs[chave(c.name)]={nm0:c.name.toLowerCase().trim(),t1:c.type1||'',t2:c.type2||'',sv:c.sellValue||c.priceNpc||0,xp:c.experience||c.xp||0,lvl:c.huntLevel||0,loot:(c.loot||[]).map(l=>(l&&l.name)||l).filter(x=>typeof x==='string'),ar:String(c.area||'')||((+c.pokeId>=10000&&+c.pokeId<11000)?'outland':''),xm:+c.orreXpMul||0,tr:+c.orreTier||0,gk:gkDe(c)};});const acha=nm=>{const k=chave(nm);if(cs[k])return cs[k];const pt=limpa(nm).split(/ e | and /);if(pt.length>1){const k2=chave(pt[0]);if(cs[k2])return cs[k2];}const w=limpa(nm).split(' ');for(let i=0;i<w.length;i++){const suf=chave(w.slice(i).join(' '));if(suf&&cs[suf])return cs[suf];}for(let i=0;i<w.length;i++){const kk=chave(w[i]);if(kk&&cs[kk])return cs[kk];}return null;};const ml={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&c.pokeId!=null)ml[c.pokeId]=+c.huntLevel||0;});for(let it=0;it<4;it++)((cr&&cr.creatures)||[]).forEach(c=>{const e=c?(+c.evolvesToId||0):0;if(!e||ml[e]==null)return;const v=Math.max(ml[c.pokeId]||0,+c.evolveLevel||0);if(v<ml[e])ml[e]=v;});const byId={},bs={},mv={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&c.pokeId!=null&&c.name){byId[c.pokeId]=c.name;const pMv=mv[String(c.name).toLowerCase()];if(bs[String(c.name).toLowerCase()]&&!c.area&&+c.pokeId>=10000)return;bs[String(c.name).toLowerCase()]=[+c.baseHp||0,+c.baseAtk||0,+c.baseDef||0,+c.baseSpAtk||0,+c.baseSpDef||0,+c.baseSpeed||0];mv[String(c.name).toLowerCase()]={hl:+c.huntLevel||0,ml:(ml[c.pokeId]!=null?ml[c.pokeId]:(+c.huntLevel||0)),id:(pMv&&pMv.id&&pMv.id<(+c.pokeId||0))?pMv.id:(+c.pokeId||0),t:[String(c.type1||'').toUpperCase(),String(c.type2||'').toUpperCase()],fin:(!c.evolvesToId||[123,112,114,125,126,356,375,372,200].indexOf(+c.pokeId)>=0)?1:0,a:(c.attacks||[]).slice(0,24).map(g=>[String((g&&g.name)||'').slice(0,24),+(g&&g.power)||0,String((g&&g.type)||'').toUpperCase(),String((g&&g.category)||'').toUpperCase()==='PHYSICAL'?'P':'S',+(g&&g.cooldownMs)||0,+(g&&g.learnLevel)||0,String((g&&g.tm)||'').toUpperCase().slice(0,12)])};}});const nat={};((cr&&cr.creatures)||[]).forEach(c=>{if(c&&+c.pokeId>=1&&+c.pokeId<1026)nat[chave(c.name)]=+c.pokeId;});const EXTRA={darumaka:554,darmanitan:555,pyroar:668};const dex={};((cr&&cr.creatures)||[]).forEach(c=>{if(!c||!((+c.pokeId>=10000&&+c.pokeId<11000)||(+c.pokeId>=50000&&+c.pokeId<51000)))return;const k=limpa(c.name);let d=nat[chave(k)];const w=k.split(' ');for(let i=0;i<w.length&&!d;i++)d=nat[chave(w.slice(i).join(' '))];for(let i=0;i<w.length&&!d;i++)d=nat[chave(w[i])]||EXTRA[chave(w[i])];if(d)dex[+c.pokeId]=d;});const ms=Array.isArray(mk)?mk:((mk&&(mk.markers||mk.hunts))||[]);const mlN={};ms.forEach(m2=>{const c=acha(m2.hunt||m2.name||m2.slug||m2.title||'');const lv=+(m2.level||m2.lvl||m2.minLevel)||0;if(c&&lv>0&&(mlN[c.nm0]==null||lv<mlN[c.nm0]))mlN[c.nm0]=lv;});for(let it=0;it<4;it++)((cr&&cr.creatures)||[]).forEach(c=>{if(!c)return;const e=+c.evolvesToId||0;if(!e)return;const de=String(c.name||'').toLowerCase(),pa=String(byId[e]||'').toLowerCase();if(!pa||mlN[de]==null)return;const v=Math.max(mlN[de],+c.evolveLevel||0);if(mlN[pa]==null||v<mlN[pa])mlN[pa]=v;});for(const k in mv){if(mlN[k]!=null)mv[k].ml=mlN[k];}const out=[];ms.forEach(m2=>{const nm=m2.hunt||m2.name||m2.slug||m2.title||'';if(!nm)return;const c=acha(nm);out.push({sl:String(m2.slug||''),name:String(nm).replace(/[_-]+/g,' ').trim(),level:m2.level||m2.lvl||m2.minLevel||(c?c.lvl:0)||0,t1:c?c.t1:'',t2:c?c.t2:'',sv:c?c.sv:0,xp:c?Math.round((+c.xp||0)*((c.ar==='orre'&&c.xm>0)?c.xm:1)):0,loot:c?c.loot:[],sp:c?c.nm0:'',ar:(c&&c.ar)||m2.area||'',tr:c?c.tr:0,gk:c?Math.round(c.gk):0});});return {h:out,byId:byId,bs:bs,mv:mv,dex:dex};}catch(e){return null}})()`;
   let creaturesById = {};
   let basesByName = {}; // bases do creatures.json, por nome minusculo (poder do time)
   let movesByName = {}; // golpes compactos e nivel de hunt por especie (sugestao de onde cacar)
@@ -5564,7 +5901,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
           + '<td>' + (r.st === 'on' ? nf(r.kph) : '—') + '</td>'
           + '<td>' + (r.st === 'on' ? nf(r.caps) : '—') + '</td>'
           + '<td style="color:' + ((r.sh || 0) > 0 ? '#f778ba' : '#8b949e') + '">' + (r.st === 'on' ? nf(r.sh) : '—') + '</td>'
-          + '<td>' + (r.best ? '<span style="color:' + (r.best.q ? RARO(+r.best.q)[1] : '#e6edf3') + '">' + esc(r.best.n) + '</span> <span style="color:#55e6d3">' + (+r.best.iv || 0) + '/192</span>' + (+r.best.q ? ' <span style="color:#f2c665">×' + (+r.best.q).toFixed(2) + '</span>' : '') : '—') + '</td>'
+          + '<td>' + (r.best ? '<span style="color:' + (r.best.q ? RARO(+r.best.q)[1] : '#e6edf3') + '">' + esc(r.best.n) + '</span>' + (+r.best.iv > 0 ? ' <span style="color:#55e6d3" title="' + (r.best.ivs ? esc(ivsFmt(r.best.ivs)) : '') + '">' + (+r.best.iv) + '/192</span>' : '') + (r.best.ivs ? ' ' + ivsHtml(r.best.ivs) : '') + (+r.best.q ? ' <span style="color:#f2c665">×' + (+r.best.q).toFixed(2) + '</span>' : '') : '—') + '</td>'
           + '<td>' + (r.last ? '<span style="color:' + (r.last.q ? RARO(r.last.q)[1] : '#e6edf3') + '">' + esc(r.last.n) + '</span> <span style="color:#6e7681">' + fmtHM(r.last.t) + '</span>' + (r.since ? ' <span style="color:#f0883e">· ' + nf(r.since) + ' ' + ballIco + '</span>' : '') : '—') + '</td>'
           + '<td>' + stTxt + '</td></tr>';
       });
@@ -5594,17 +5931,35 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
         (!f.sh || x.sh) &&
         numLivre(x.iv) >= f.iv &&
         numLivre(x.q) >= f.q &&
+        passStat(x, f.stat, f.statV) &&
         (+x.t || 0) >= corte).slice(-40).reverse();
+      const optStat = [
+        ['', 'Stat Ind.'],
+        ['any', 'Qualquer'],
+        ['hp', 'HP'],
+        ['atk', 'ATK'],
+        ['def', 'DEF'],
+        ['spAtk', 'SP.ATK'],
+        ['spDef', 'SP.DEF'],
+        ['speed', 'SPEED']
+      ].map(o => '<option value="' + o[0] + '"' + (f.stat === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('');
       return '<div class="cd-sec"><div class="cd-h">' + t('cdCatches') + '</div>'
         + '<div class="cd-cfg-row" style="flex-wrap:wrap;gap:4px;margin-bottom:6px">'
         + '<select id="cdFcP" class="cd-inp">' + optConta + '</select>'
         + '<input id="cdFcN" type="text" class="cd-inp" style="width:88px" placeholder="🔎" value="' + esc(f.n) + '">'
         + '<select id="cdFcT" class="cd-inp">' + [[0, t('cdFAll')], [1, '1h'], [6, '6h'], [24, '24h']].map(p2 => '<option value="' + p2[0] + '"' + (f.per === p2[0] ? ' selected' : '') + '>' + p2[1] + '</option>').join('') + '</select>'
-        + '<input id="cdFcIv" type="number" min="0" max="192" class="cd-inp" style="width:58px" title="IV ≥" placeholder="IV≥" value="' + (f.iv || '') + '">'
+        + '<input id="cdFcIv" type="number" min="0" max="192" class="cd-inp" style="width:58px" title="IV Total ≥" placeholder="IV≥" value="' + (f.iv || '') + '">'
+        + '<select id="cdFcStat" class="cd-inp" style="width:78px" title="Filtrar por stat individual">' + optStat + '</select>'
+        + '<input id="cdFcStatV" type="number" min="0" max="32" class="cd-inp" style="width:48px" title="Mínimo do stat individual (0-32)" placeholder="Ind≥" value="' + (f.statV || '') + '">'
         + '<input id="cdFcQ" type="number" min="0" max="2" step="0.1" class="cd-inp" style="width:52px" title="× ≥" placeholder="×≥" value="' + (f.q || '') + '">'
         + '<label class="cd-inp" style="cursor:pointer" title="shiny">✨<input id="cdFcSh" type="checkbox" style="margin-left:3px"' + (f.sh ? ' checked' : '') + '></label>'
         + '</div>'
-        + (catches.length ? catches.map(x => '<div class="cd-row"><span class="cd-dot" style="background:' + x.dot + '"></span><span class="rn">' + (x.fx ? '<span title="' + t('cdFirst') + '">🆕</span> ' : '') + (x.sh ? '✨ ' : '') + esc(x.n) + raroHtml(x.q) + ' <span style="color:#7d8590">· ' + esc(x.acc) + '</span></span><span style="color:#55e6d3">' + (+x.iv || 0) + '/192</span>' + (+x.q ? '<span style="color:#f2c665">×' + (+x.q).toFixed(2) + '</span>' : '') + '<span class="rt">' + fmtDT(x.t) + '</span></div>').join('') : '<div class="cd-empty">' + t('cdNone') + '</div>') + '</div>'; };
+        + (catches.length ? catches.map(x => {
+            const ivStr = (+x.iv > 0 ? (+x.iv) + '/192' : '—');
+            const pills = x.ivs ? ivsHtml(x.ivs) : '';
+            const tFull = x.ivs ? (' · ' + ivsFmt(x.ivs)) : '';
+            return '<div class="cd-row"><span class="cd-dot" style="background:' + x.dot + '"></span><span class="rn">' + (x.fx ? '<span title="' + t('cdFirst') + '">🆕</span> ' : '') + (x.sh ? '✨ ' : '') + esc(x.n) + raroHtml(x.q) + ' <span style="color:#7d8590">· ' + esc(x.acc) + '</span></span><span style="color:#55e6d3;font-weight:600" title="' + esc(ivStr + tFull) + '">' + ivStr + '</span>' + (pills ? ' ' + pills : '') + (+x.q ? '<span style="color:#f2c665">×' + (+x.q).toFixed(2) + '</span>' : '') + '<span class="rt">' + fmtDT(x.t) + '</span></div>';
+          }).join('') : '<div class="cd-empty">' + t('cdNone') + '</div>') + '</div>'; };
     SB.team = () => { // chave 'team', a mesma do CDSECTS e do cardsCfg.order (SB.teams nunca era desenhado)
       const M = window.PokeGridIvMath;
       const alvo = Math.max(1, Math.min(tlMax(), +(lsGet('cdPjLv') || 500)));
@@ -5796,6 +6151,8 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     const fcN = cardsEl.querySelector('#cdFcN'); if (fcN) fcN.onchange = () => { cdFC.n = String(fcN.value || '').slice(0, 30).toLowerCase(); fcN.blur(); fcSave(); };
     const fcT = cardsEl.querySelector('#cdFcT'); if (fcT) fcT.onchange = () => { cdFC.per = +fcT.value || 0; fcT.blur(); fcSave(); };
     const fcIv = cardsEl.querySelector('#cdFcIv'); if (fcIv) fcIv.onchange = () => { cdFC.iv = Math.max(0, numLivre(fcIv.value)); fcIv.blur(); fcSave(); };
+    const fcStat = cardsEl.querySelector('#cdFcStat'); if (fcStat) fcStat.onchange = () => { cdFC.stat = fcStat.value; fcStat.blur(); fcSave(); };
+    const fcStatV = cardsEl.querySelector('#cdFcStatV'); if (fcStatV) fcStatV.onchange = () => { cdFC.statV = Math.max(0, Math.min(32, numLivre(fcStatV.value))); fcStatV.blur(); fcSave(); };
     const fcQ = cardsEl.querySelector('#cdFcQ'); if (fcQ) fcQ.onchange = () => { cdFC.q = Math.max(0, numLivre(fcQ.value)); fcQ.blur(); fcSave(); };
     const fcSh = cardsEl.querySelector('#cdFcSh'); if (fcSh) fcSh.onchange = () => { cdFC.sh = fcSh.checked ? 1 : 0; fcSave(); };
     const pjLv = cardsEl.querySelector('#cdPjLv'); if (pjLv) pjLv.onchange = () => { try { lsSet('cdPjLv', String(Math.max(1, Math.min(tlMax(), +pjLv.value || 500)))); } catch {} pjLv.blur(); cdHtmlAnt = ''; refreshCards(true); };
