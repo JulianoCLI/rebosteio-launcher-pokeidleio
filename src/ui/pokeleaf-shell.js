@@ -62,7 +62,7 @@
     <a class="leaf-skip" href="#leafMain">Pular para conteúdo</a>
     <header class="leaf-topbar">
       <div class="leaf-brand">
-        <div class="leaf-brand-copy"><div class="leaf-brand-title leaf-brand-logos" aria-label="PokeIdle by Reboste.io"><img class="leaf-pokeidle-logo" src="src/ui/assets/pokeidle-logo-smooth.png" alt="PokeIdle"><span class="leaf-brand-by">by</span><img class="leaf-rebosteio-logo leaf-nailo-logo" src="src/ui/assets/rebosteio-logo.png" alt="Reboste.io"></div></div>
+        <div class="leaf-brand-copy"><div class="leaf-brand-title leaf-brand-logos" aria-label="PokeIdle by Reboste.io"><img class="leaf-pokeidle-logo" src="src/ui/assets/pokeidle-logo-smooth.png" alt="PokeIdle"><span class="leaf-brand-by">by</span><img class="leaf-rebosteio-logo" src="src/ui/assets/rebosteio-logo.png" alt="Reboste.io"></div></div>
       </div>
       <div class="leaf-top-center">
         <div class="leaf-segment" id="leafViewTabs">

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/ui/assets/nailo-logo.png" width="180" alt="Nailo">
+<img src="src/ui/assets/rebosteio-by-nailo.png" width="240" alt="PIO Rebosteio by Nailo">
 
 # Como Usar o PIO Rebosteio (Passo a Passo)
 

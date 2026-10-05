@@ -2,7 +2,7 @@
 
 <img src="src/ui/assets/pokeidle-logo-smooth.png" width="320" alt="PokeIdle IO">
 <br>
-<img src="src/ui/assets/rebosteio-logo.png" width="240" alt="PIO Rebosteio">
+<img src="src/ui/assets/rebosteio-by-nailo.png" width="280" alt="PIO Rebosteio by Nailo">
 
 # PIO Rebosteio — Multi-Account Launcher
 

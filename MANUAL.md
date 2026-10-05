@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="src/ui/assets/pokeidle-logo-smooth.png" width="260" alt="PokeIdle">
+<img src="src/ui/assets/pokeidle-logo-smooth.png" width="260" alt="PokeIdle IO">
 <br>
-<img src="src/ui/assets/nailo-logo.png" width="180" alt="Nailo">
+<img src="src/ui/assets/rebosteio-by-nailo.png" width="240" alt="PIO Rebosteio by Nailo">
 
 # Manual do Usuário — PIO Rebosteio
 
