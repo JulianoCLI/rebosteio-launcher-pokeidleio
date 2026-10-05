@@ -16,12 +16,12 @@ if exist ".runtime\node\node.exe" (
   set "NPM_CMD=%~dp0.runtime\node\npm.cmd"
   set "PATH=%~dp0.runtime\node;%PATH%"
 ) else (
-  rem 2. Verifica se o Node.js esta instalado no sistema e se a versao e >= 22.0
+  rem 2. Verifica se o Node.js esta instalado no sistema e se a versao e >= 22.12
   where node >nul 2>nul
   if not errorlevel 1 (
     where npm >nul 2>nul
     if not errorlevel 1 (
-      node -e "const [a]=process.versions.node.split('.').map(Number);process.exit(a>=22?0:1)" >nul 2>nul
+      node -e "const [M,m]=process.versions.node.split('.').map(Number);process.exit(M>22||(M===22&&m>=12)?0:1)" >nul 2>nul
       if not errorlevel 1 (
         set "NODE_CMD=node"
         set "NPM_CMD=npm"
@@ -98,7 +98,11 @@ if defined PG_FALTA (
   echo Na primeira vez isso pode levar alguns minutos. Nao feche esta janela...
   call "!NPM_CMD!" install --no-audit --no-fund
   echo Baixando o Electron...
-  "!NODE_CMD!" -e "require('electron')"
+  if exist "node_modules\electron\install.js" (
+    "!NODE_CMD!" "node_modules\electron\install.js"
+  ) else (
+    "!NODE_CMD!" -e "require('electron')"
+  )
 )
 
 if not exist "node_modules\electron\dist\electron.exe" (
