@@ -4,6 +4,8 @@
   const STORAGE_KEY = 'piw_theme';
   const POKEMON_LOCK_KEY = 'piw_pokemon_lock';
   const HEADER_ART = {
+    'kuromi-xp': true,
+    'kuromi-xp-light': true,
     'pkmn-corsola': true,
     'pkmn-alakazam': true,
     'pkmn-espeon': '<path d="M8 11C4 10 3 7 4 4c4 0 6 2 7 5M21 11c4-1 5-4 4-7-4 0-6 2-7 5"/><ellipse cx="14.5" cy="15" rx="5" ry="7"/><path d="M13 11l-1 3m8 8c3 2 5 1 6-1M9 22c-3 2-5 1-6-1"/>',
@@ -144,6 +146,45 @@
       category: 'standard',
       pokemon: 'Umbreon, Darkrai, Giratina',
       swatches: ['#09090c', '#1a1a21', '#fbbf24']
+    },
+    // Temas webcore Kuromi XP: estilos em src/ui/kuromi-xp.css (+ cursor nos painéis via kuromi-xp.js)
+    {
+      id: 'kuromi-xp',
+      name: 'Kuromi XP Noite',
+      tone: 'dark',
+      toneLabel: 'Webcore',
+      category: 'standard',
+      glyph: '☠',
+      brandTitle: 'KUROMI <span>XP</span>',
+      brandSub: '｡･:*:･ﾟ★ WEBCORE ★･ﾟ:*:･｡',
+      quote: '☆ bem-vinde ao meu<br>cantinho sombrio ☆',
+      pokemon: 'Kuromi · Win XP · modo escuro',
+      sideKicker: '☠ KUROMI.EXE ☠',
+      sideQuote: 'fofa, sombria\ne sempre online ♡',
+      footerQuote: '｡･:*:･ﾟ★ FEITO COM ♡ E PIXELS ★･ﾟ:*:･｡',
+      swatches: ['#150c1f', '#6d44a0', '#ff8fd2'],
+      assets: {
+        cutout: 'src/ui/assets/kuromi-xp/kuromi.gif'
+      }
+    },
+    {
+      id: 'kuromi-xp-light',
+      name: 'Kuromi XP Dia',
+      tone: 'light',
+      toneLabel: 'Webcore',
+      category: 'standard',
+      glyph: '♡',
+      brandTitle: 'KUROMI <span>XP</span>',
+      brandSub: '｡･:*:･ﾟ☆ WEBCORE ☆･ﾟ:*:･｡',
+      quote: '♡ bem-vinde ao meu<br>cantinho fofinho ♡',
+      pokemon: 'Kuromi · Win XP · modo claro',
+      sideKicker: '♡ KUROMI.EXE ♡',
+      sideQuote: 'fofa de dia,\nsombria de noite ☆',
+      footerQuote: '｡･:*:･ﾟ☆ FEITO COM ♡ E PIXELS ☆･ﾟ:*:･｡',
+      swatches: ['#f3e6fb', '#b48ae0', '#ff7ac8'],
+      assets: {
+        cutout: 'src/ui/assets/kuromi-xp/kuromi.gif'
+      }
     }
   ];
 
@@ -398,7 +439,7 @@
       <button type="button" class="leaf-theme-filter-btn" data-filter="FAIRY">Fada</button>
       <button type="button" class="leaf-theme-filter-btn" data-filter="NORMAL">Normal</button>
       <button type="button" class="leaf-theme-filter-btn" data-filter="exclusive">Artes exclusivas</button>
-      <button type="button" class="leaf-theme-filter-btn" data-filter="standard">🎨 Paletas (12)</button>
+      <button type="button" class="leaf-theme-filter-btn" data-filter="standard">🎨 Paletas (${STANDARD_THEMES.length})</button>
     `;
     wrap.appendChild(filtersWrap);
 
