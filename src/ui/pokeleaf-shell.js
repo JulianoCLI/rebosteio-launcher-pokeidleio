@@ -146,7 +146,7 @@
     <div class="leaf-tool-sep"></div>
     <button class="leaf-tool-item" data-old="hunt"><span class="ico">◎</span><span>Hunt Analyzer</span></button>
     <div class="leaf-tool-sep"></div>
-    <button class="leaf-tool-item" id="leafToolsThemeBtn"><span class="ico">🎨</span><span>Temas & Cores (12)</span></button>
+    <button class="leaf-tool-item" id="leafToolsThemeBtn"><span class="ico">🎨</span><span>Temas & Cores (14)</span></button>
     <button class="leaf-tool-item" data-old="statsBtn"><span class="ico">↗</span><span>Resumo da conta</span></button>
     <button class="leaf-tool-item" data-old="accounts"><span class="ico">○</span><span>Treinadores</span></button>
     <div class="leaf-tool-sep"></div>
@@ -160,7 +160,7 @@
   drawer.id = 'leafSettingsDrawer';
   drawer.setAttribute('aria-label', 'Configurações');
   drawer.innerHTML = `<div class="leaf-drawer-head"><div><h2>Configurações</h2><div class="leaf-drawer-subtitle">Ajustes de interface, temas e execução.</div></div><button class="leaf-drawer-close" id="leafDrawerClose" aria-label="Fechar configurações">×</button></div>
-    <div class="leaf-setting-section"><div class="leaf-setting-title">Temas & Aparência (12 Paletas)</div><div id="leafThemeSelectorContainer"></div></div>
+    <div class="leaf-setting-section"><div class="leaf-setting-title">Temas & Aparência (14 Paletas)</div><div id="leafThemeSelectorContainer"></div></div>
     <div class="leaf-setting-section"><div class="leaf-setting-title">Interface</div><div class="leaf-setting-grid">
       <button class="leaf-setting-btn leaf-privacy-setting" id="leafHideNames" type="button" aria-pressed="false">Ocultar nomes das contas</button>
       <div class="leaf-window-count-setting"><span>Janelas abertas</span><div class="leaf-window-count-options" id="leafWindowCountOptions" role="group" aria-label="Quantidade de janelas abertas">
@@ -447,10 +447,10 @@
           </div>
           <div class="leaf-hunt-row"><span class="leaf-hunt-glyph">${ico('hunt')}</span><span class="leaf-hunt-name">Em caça <b>${escH(hunt)}</b></span><span class="leaf-hunt-time">${a.seconds?Math.floor(a.seconds/3600)+'h '+String(Math.floor(a.seconds%3600/60)).padStart(2,'0')+'m':'—'}</span></div>
           <div class="leaf-account-metrics">
-            <div class="leaf-metric"><div class="mk">Bolas</div><div class="mv">${(+r.balls||0)>=999999?'∞':fmtCompact(r.balls)}</div></div>
-            <div class="leaf-metric"><div class="mk">Shiny</div><div class="mv">${a.shinyFound!=null?fmtCompact(a.shinyFound):'—'}</div></div>
-            <div class="leaf-metric"><div class="mk">EXP</div><div class="mv">${a.xpg!=null?fmtCompact(a.xpg):'—'}</div></div>
-            <div class="leaf-metric"><div class="mk">Kills/h</div><div class="mv">${a.kph!=null?fmtCompact(a.kph):'—'}</div></div>
+            <div class="leaf-metric" title="Bolas"><div class="mk">Bolas</div><div class="mv">${(+r.balls||0)>=999999?'∞':fmtCompact(r.balls)}</div></div>
+            <div class="leaf-metric" title="Shiny"><div class="mk">Shiny</div><div class="mv">${a.shinyFound!=null?fmtCompact(a.shinyFound):'—'}</div></div>
+            <div class="leaf-metric" title="EXP"><div class="mk">EXP</div><div class="mv">${a.xpg!=null?fmtCompact(a.xpg):'—'}</div></div>
+            <div class="leaf-metric" title="Kills/h"><div class="mk">Kills/h</div><div class="mv">${a.kph!=null?fmtCompact(a.kph):'—'}</div></div>
           </div>
           <div class="leaf-account-actions"><button class="leaf-open-account" data-open="${r.i}" aria-pressed="${selected}"><span aria-hidden="true">${selected?'▦':'▶'}</span>${selected?'Voltar à grade':'Abrir janela'}</button><button class="leaf-reload-account" data-reload="${r.i}" title="Recarregar ${escH(displayName(r))}" aria-label="Recarregar ${escH(displayName(r))}">${ico('reload')}<span class="leaf-reload-label">Recarregar</span></button></div>
           <div class="leaf-account-footnote"><span>${a.gph!=null?'Gold/h '+fmtCompact(a.gph):'Aguardando rendimento'}</span><span>${a.xph!=null?'XP/h '+fmtCompact(a.xph):'Sessão em andamento'}</span></div>
