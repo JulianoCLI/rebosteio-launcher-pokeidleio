@@ -4,7 +4,7 @@
 <br>
 <img src="src/ui/assets/nailo-logo.png" width="210" alt="by Nailo">
 
-# PIO Nailo — Absol Launcher
+# PIO Rebosteio — Pokemon Theme Based Launcher
 
 **Trainer Workspace de alta densidade e multi-contas para Poke Idle World.**
 
