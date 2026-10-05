@@ -98,7 +98,9 @@ if defined PG_FALTA (
   echo Na primeira vez isso pode levar alguns minutos. Nao feche esta janela...
   call "!NPM_CMD!" install --no-audit --no-fund
   echo Baixando o Electron...
-  if exist "node_modules\electron\install.js" (
+  if exist "tools\ensure-electron.js" (
+    "!NODE_CMD!" "tools\ensure-electron.js"
+  ) else if exist "node_modules\electron\install.js" (
     "!NODE_CMD!" "node_modules\electron\install.js"
   ) else (
     "!NODE_CMD!" -e "require('electron')"
@@ -106,8 +108,18 @@ if defined PG_FALTA (
 )
 
 if not exist "node_modules\electron\dist\electron.exe" (
+  if exist "tools\ensure-electron.js" (
+    echo Tentando recuperacao automatica da instalacao...
+    "!NODE_CMD!" "tools\ensure-electron.js"
+  )
+)
+
+if not exist "node_modules\electron\dist\electron.exe" (
   echo.
   echo A instalacao nao terminou. Confira a conexao com a internet e abra novamente.
+  echo Se o erro persistir, instale o Microsoft Visual C++ Redistributable em:
+  echo https://aka.ms/vs/17/release/vc_redist.x64.exe
+  echo.
   pause
   exit /b 1
 )
