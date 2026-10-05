@@ -6,7 +6,7 @@
 
 # PIO Rebosteio — Pokemon Theme Based Launcher
 
-**Trainer Workspace de alta densidade e multi-contas para Poke Idle World.**
+**Trainer Workspace de alta densidade e multi-contas para Poke Idle IO.**
 
 ![Plataforma](https://img.shields.io/badge/Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-0078D6?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-43-47848F?style=flat-square)
