@@ -1,39 +1,26 @@
 =======================================================
-   PIO NAILO (ABSOL LAUNCHER) - COMO USAR (passo a passo)
+   PIO REBOSTEIO - COMO USAR (passo a passo)
 =======================================================
 
 Guia para quem nunca mexeu com isso.
-Esta versao roda direto do codigo-fonte. Sao 3 passos, e a parte
+Esta versao roda direto do codigo-fonte. Sao passos simples, e a parte
 de preparacao voce so precisa fazer UMA unica vez.
 
 
-PASSO 1 - INSTALAR O NODE.JS (so na primeira vez)
---------------------------------------------------
-O Node.js e o motor que faz o launcher funcionar no computador.
+PASSO 1 - ABRIR O APLICATIVO (TUDO AUTOMATICO NO WINDOWS)
+---------------------------------------------------------
+No Windows, voce NAO precisa instalar o Node.js manualmente:
 
-  1. Entre no site oficial:  https://nodejs.org
-  2. Clique no botao verde grande escrito  LTS  (versao estavel).
-  3. Abra o arquivo baixado e va clicando em "Avancar / Next"
-     ate o "Concluir / Finish". Nao precisa alterar nada.
+  1. Na pasta do projeto, de DOIS CLIQUES no arquivo:
+     Abrir Poke Idle IO.bat
 
-Pronto. Isso nunca mais precisa ser feito.
+  2. Se voce nao tiver o Node.js instalado, o proprio arquivo .bat
+     vai baixar a versao oficial portatil do Node e instalar todas
+     as bibliotecas necessarias sozinho!
 
-
-PASSO 2 - BAIXAR O PROJETO
---------------------------
-  1. Na pagina do projeto no GitHub, clique no botao verde  Code
-  2. Clique em  Download ZIP
-  3. Va na sua pasta Downloads, clique com o BOTAO DIREITO no arquivo
-     .zip e escolha "Extrair tudo". Vai aparecer a pasta do launcher.
-
-
-PASSO 3 - ABRIR O APLICATIVO
-----------------------------
-  1. Entre na pasta que apareceu extraida.
-  2. De DOIS CLIQUES no arquivo:  Abrir Poke Idle IO.bat
-  3. Na primeira vez ele demora 1 ou 2 minutos numa janela preta
-     (esta baixando o necessario) e abre a janela do launcher sozinho.
-     Nas proximas vezes a janela so pisca e o app abre na hora.
+  3. Na primeira vez ele demora 1 ou 2 minutos enquanto baixa o
+     necessario e em seguida abre a janela do launcher automaticamente.
+     Nas proximas vezes o app abre na hora!
 
   * Se o Windows mostrar uma tela azul ("O Windows protegeu seu
     computador"), clique em "Mais informacoes" e depois em
@@ -44,21 +31,17 @@ PASSO 3 - ABRIR O APLICATIVO
   Clique com o botao direito no arquivo "Abrir Poke Idle IO.bat" e escolha:
   Enviar para > Area de trabalho (criar atalho).
 
-  * O arquivo "iniciar.bat" tambem funciona, mas mantem uma janela
-    preta aberta: se fechar aquela janela, o app fecha junto.
-    Pelo "Abrir Poke Idle IO.bat" isso nao acontece.
-
-  No Mac ou Linux: abra o Terminal na pasta e digite:  bash iniciar.sh
+  No Mac ou Linux: instale o Node.js LTS (https://nodejs.org),
+  abra o Terminal na pasta e digite:  bash iniciar.sh
 
 
-PASSO 4 - USAR E CONECTAR
+PASSO 2 - USAR E CONECTAR
 -------------------------
-  1. Em cada quadrante, entre na sua conta do Poke Idle World
-     (ou crie uma).
-  2. O "Confirme que e humano" (captcha) e SEMPRE voce que resolve
-     manualmente na tela da respectiva conta.
-  3. Clique no botao "Treinadores" no topo, preencha o e-mail e a
-     senha das suas contas e clique em Salvar.
+  1. No painel, entre na sua conta do Poke Idle IO (ou crie uma).
+  2. O launcher abre exatamente o numero de janelas correspondente
+     as contas que voce configurar (de 1 a 4 contas).
+  3. Clique no botao "Treinadores" (ou no icone de Treinadores),
+     preencha o e-mail e a senha das suas contas e clique em Salvar.
   4. Pronto! Da proxima vez, basta clicar em "Logar equipe" e todas
      as contas desconectadas entram automaticamente.
 
@@ -69,14 +52,6 @@ Baixe o ZIP de novo e substitua os arquivos da pasta antiga.
 Suas contas e configuracoes continuam salvas intactas no PC.
 
 
-DEU ALGUM PROBLEMA?
--------------------
-- O arquivo abre e fecha e o app nao aparece:
-  Confira se o seu Node.js e a versao 22.12 ou mais nova.
-  No Windows 11, confira se o Controle Inteligente de Aplicativos
-  esta barrando o Electron.
-- Uma conta nao entra sozinha:
-  Abra "Treinadores" e confira se o e-mail e a senha estao certos.
-- Travando ou consumo alto de CPU:
-  Ligue o "Modo Simples" (botao Simples no topo) ou ative o Modo Eco.
-- Dúvidas detalhadas: consulte o MANUAL.md e o FAQ.md na pasta.
+DUVIDAS OU AJUDA
+----------------
+Consulte o arquivo FAQ.md ou MANUAL.md para explicacoes detalhadas.

@@ -2,9 +2,9 @@
 
 <img src="src/ui/assets/nailo-logo.png" width="180" alt="Nailo">
 
-# Como Usar o PIO Nailo (Passo a Passo)
+# Como Usar o PIO Rebosteio (Passo a Passo)
 
-**Absol Launcher · Guia para rodar direto do código-fonte**
+**Guia para rodar direto do código-fonte**
 
 </div>
 
@@ -12,15 +12,13 @@ Este guia é feito para quem nunca mexeu com programação ou execução de cód
 
 ---
 
-## 📦 Passo 1: Instalar o Node.js (Apenas na 1ª vez)
+## 📦 Passo 1: Node.js (Automático no Windows!)
 
-O Node.js é o motor de execução que permite ao launcher funcionar em seu computador.
+No Windows, você **não precisa instalar nada manualmente**: ao dar dois cliques em `Abrir Poke Idle IO.bat`, o inicializador verifica e baixa a versão oficial portátil do Node.js LTS automaticamente caso você não tenha!
 
+Caso utilize Linux/macOS ou prefira instalar o Node.js manualmente no sistema:
 1. Acesse o site oficial: **[nodejs.org](https://nodejs.org)**
-2. Clique no botão verde com a inscrição **LTS** (versão recomendada e estável).
-3. Abra o instalador baixado e vá clicando em **Next (Avançar)** até o final. Não é necessário alterar nenhuma opção padrão.
-
-> Uma vez instalado o Node.js, você nunca mais precisará repetir este passo.
+2. Baixe e instale a versão **LTS** (versão 22 ou superior).
 
 ---
 
@@ -55,7 +53,7 @@ bash iniciar.sh
 
 ## 🎯 Passo 4: Entrar nas Contas e Farmar
 
-1. No quadrante de cada conta, faça login normalmente com sua conta do Poke Idle World (ou crie uma nova).
+1. No quadrante de cada conta, faça login normalmente com sua conta do Poke Idle IO (ou crie uma nova).
 2. O desafio de verificação (**"Confirme que é humano"**) é sempre resolvido manualmente por você na tela da conta.
 3. Clique no botão **👤 Treinadores** no topo, preencha o e-mail e senha das suas contas e clique em **Salvar**.
 4. A partir de agora, sempre que abrir o launcher, basta clicar em **▶ Logar equipe** e todas as suas contas entrarão automaticamente!

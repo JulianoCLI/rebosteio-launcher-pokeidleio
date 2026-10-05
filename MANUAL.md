@@ -4,9 +4,9 @@
 <br>
 <img src="src/ui/assets/nailo-logo.png" width="180" alt="Nailo">
 
-# Manual do Usuário — PIO Nailo
+# Manual do Usuário — PIO Rebosteio
 
-**Absol Launcher · Trainer Workspace para Poke Idle World**
+**Launcher Multi-Contas para Poke Idle IO**
 
 </div>
 

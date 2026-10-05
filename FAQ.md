@@ -4,7 +4,7 @@
 
 # FAQ — Perguntas Frequentes
 
-**PIO Nailo · Absol Launcher para Poke Idle World**
+**PIO Rebosteio · Launcher para Poke Idle IO**
 
 </div>
 
@@ -79,7 +79,7 @@ O launcher lê as métricas oficiais diretamente da telemetria do servidor. Lemb
 ## 🔒 Segurança e Fair Play
 
 ### O launcher resolve captchas automaticamente?
-**Não.** O PIO Nailo respeita rigorosamente as diretrizes da comunidade: o captcha (*"Confirme que é humano"*) deve ser sempre resolvido manualmente pelo jogador na respectiva janela. O app não utiliza automação de cliques para burlar segurança ou detecção de bot.
+**Não.** O PIO Rebosteio respeita rigorosamente as diretrizes da comunidade: o captcha (*"Confirme que é humano"*) deve ser sempre resolvido pelo jogador caso solicitado. O app não utiliza automação de cliques para burlar jogabilidade ativa.
 
 ### Minha conta utiliza autenticação de dois fatores (2FA). Como funciona?
 Funciona perfeitamente. O launcher preenche automaticamente o login e senha e aguarda; o jogo então solicitará o código do seu autenticador no painel para você digitar manualmente.

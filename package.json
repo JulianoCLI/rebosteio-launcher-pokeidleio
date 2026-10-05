@@ -1,7 +1,7 @@
 {
-  "name": "pionailo",
+  "name": "piorebosteio",
   "version": "1.5.27",
-  "description": "Rode 4 contas de Poke Idle World ao mesmo tempo, em uma janela so / Run 4 Poke Idle World accounts at once, in a single window",
+  "description": "Rode de 1 a 4 contas de Poke Idle IO ao mesmo tempo, em uma janela so / Run 1 to 4 Poke Idle IO accounts at once, in a single window",
   "main": "main.js",
   "author": "soufoka",
   "scripts": {
@@ -10,7 +10,7 @@
   "keywords": [
     "electron",
     "multi-account",
-    "poke-idle-world",
+    "poke-idle-io",
     "idle-game"
   ],
   "license": "MIT",

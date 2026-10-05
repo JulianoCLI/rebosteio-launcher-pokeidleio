@@ -32,6 +32,7 @@ dom-dump.txt
 *.crt
 
 # Runtime, Logs & Temporary Files
+.runtime/
 *.log
 logs/
 *.tmp

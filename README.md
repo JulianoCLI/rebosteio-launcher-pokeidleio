@@ -1,16 +1,16 @@
 <div align="center">
 
-<img src="src/ui/assets/pokeidle-logo-smooth.png" width="320" alt="PokeIdle">
+<img src="src/ui/assets/pokeidle-logo-smooth.png" width="320" alt="PokeIdle IO">
 <br>
-<img src="src/ui/assets/nailo-logo.png" width="210" alt="by Nailo">
+<img src="src/ui/assets/rebosteio-logo.png" width="240" alt="PIO Rebosteio">
 
-# PIO Rebosteio — Pokemon Theme Based Launcher
+# PIO Rebosteio — Launcher Multi-Contas
 
 **Trainer Workspace de alta densidade e multi-contas para Poke Idle IO.**
 
 ![Plataforma](https://img.shields.io/badge/Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-0078D6?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-43-47848F?style=flat-square)
-![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A522.12-339933?style=flat-square)
+![Node.js](https://img.shields.io/badge/Node.js-Auto--Setup%20%7C%20LTS-339933?style=flat-square)
 [![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue?style=flat-square)](LICENSE)
 
 [English](README.en.md) · [Manual](MANUAL.md) · [FAQ](FAQ.md) · [Tutorial](TUTORIAL.md) · [Mudanças](CHANGELOG.md)
@@ -19,7 +19,7 @@
 
 > Esta é a versão que roda a partir do código-fonte. Não há executáveis proprietários ou opacos: você tem acesso total ao código, audita o que ele faz e roda diretamente na sua máquina com total transparência e segurança.
 
-> 🔰 **Nunca mexeu com isso?** Veja nosso guia passo a passo ilustrado: **[TUTORIAL.md](TUTORIAL.md)** (ou abra o arquivo `COMO USAR.txt` na pasta raiz).
+> 🔰 **Nunca mexeu com isso?** Não se preocupe! O inicializador `Abrir Poke Idle IO.bat` baixa tudo o que você precisa sozinho. Veja também nosso passo a passo em: **[TUTORIAL.md](TUTORIAL.md)**.
 
 > ### 🔒 Seus dados de login ficam apenas no seu computador
 > Login e senha são criptografados localmente pelo próprio sistema operacional (via `safeStorage` do Electron / DPAPI no Windows) e nunca trafegam para nenhum servidor ou repositório.
@@ -28,51 +28,46 @@
 
 ## O que é
 
-O **PIO Nailo (Absol Launcher)** é uma central operacional para gerenciar e monitorar até **quatro contas simultâneas** de Poke Idle World em uma única janela. Cada conta roda isolada em sua própria partição de sandbox do Electron (`persist:conta1` até `conta4`), mantendo cookies, sessões e configurações individuais.
+O **PIO Rebosteio** é uma central operacional moderna projetada para gerenciar e monitorar de **1 a 4 contas simultâneas** de **Poke Idle IO** em uma única interface inteligente. Cada conta roda isolada em sua própria partição de sandbox do Electron (`persist:conta1` até `conta4`), mantendo cookies, sessões, cache e configurações completamente independentes.
 
-Se a conexão cair durante a caçada ou após uma manutenção do jogo, o assistente reloga automaticamente com as credenciais salvas sem necessidade de intervenção manual. O launcher respeita as regras do jogo: não joga por você, não automatiza caças e não resolve captchas — apenas fornece uma interface unificada, métricas consolidadas e recursos de qualidade de vida.
+O launcher se adapta à quantidade de contas que você usa: se tiver 1 conta cadastrada, abre apenas 1 janela ampla em tela cheia; se tiver 2 contas, organiza 2 janelas lado a lado; e se tiver 3 ou 4, expande a grade harmoniosamente. Se a conexão cair durante a caçada ou após manutenção dos servidores do jogo, o assistente reloga e reconecta automaticamente suas contas.
 
 ---
 
 ## Recursos Principais
 
-### 🎮 Operação e Conectividade
-* **Multi-Contas Isoladas**: Gerencie de 1 a 4 contas com partições limpas e isoladas.
-* **▶ Logar Equipe**: Loga todas as contas desconectadas de uma só vez, preservando as contas que já estiverem farmando.
-* **Auto-Reconexão**: Recupera sessões expiradas ou quedas de conexão automaticamente.
-* **Bandeja e Janela Oculta**: Minimize para a bandeja do sistema (Tray) com consumo mínimo de recursos.
-* **Atalhos Rápidos**: Atalhos de teclado dedicados para cada ferramenta operacional.
+### 🎮 Operação & Multi-Contas Dinâmico
+* **Layout Dinâmico (1 a 4 contas)**: O aplicativo abre exatamente a quantidade de janelas correspondente às contas preenchidas no menu de Treinadores (1 conta = 1 janela cheia, 2 contas = 2 janelas lado a lado, até 4 contas).
+* **Partições Isoladas**: Sandbox individual para cada conta (`persist:conta1` a `conta4`), sem vazamento de cookies ou sessões.
+* **▶ Logar Equipe**: Autentica todas as contas desconectadas de uma só vez, preservando as que já estiverem farmando ativamente.
+* **🦊 Autenticação com Camoufox**: Solucionador inteligente integrado em segundo plano para desafios do Cloudflare Turnstile, garantindo logins suaves e sem travamentos.
+* **Auto-Reconexão Resiliente**: Recupera quedas temporárias de rede e reconecta após manutenções automaticamente.
 
-### 🍃 Economia e Desempenho
-* **Modo Simples**: Pausa a renderização gráfica 3D/2D do mapa (caindo para 1 FPS de telemetria) e apresenta apenas números, drops, metas e inventário, liberando até 80% de CPU.
-* **Modo Eco Automático**: Limita laços desnecessários de animação (`requestAnimationFrame`) mantendo estabilidade térmica para longas horas de caçada.
-* **Otimização em Segundo Plano**: Ao minimizar ou fechar para a bandeja, os jogos entram automaticamente em modo leve sem interromper o farm no servidor.
+### 🎯 Ferramentas Operacionais
+* **🎯 Despachar Contas (Hunt Dispatcher)**: Selecione contas individuais ou a equipe inteira e envie para qualquer hunt do jogo com filtros ágeis de área e nível.
+* **📦 Auto Supply**: Monitoramento contínuo de Pokébolas e Poções com reposição automática e verificação inteligente de saldo em ouro para evitar gastos excessivos.
+* **💰 Venda Automática (Auto Sell Loot)**: Vende o loot acumulado das caçadas no servidor para manter a mochila desobstruída e maximizar o rendimento de Gold por hora.
+* **◎ Hunt Analyzer**: Leitura em tempo real de estatísticas de combate, EXP/h, Gold/h, kills/h, contagem de shinies encontrados/capturados e tempo em caça.
+* **👤 Menu de Treinadores**: Gerenciador simplificado de contas com limpeza de credenciais, limpeza de dados de partição e suporte a proxies dedicados por família.
 
-### 🎨 Temas e Identidade Visual Absol
-* **Absol Midnight (Padrão)**: Interface atmosférica em tons de noite, azul profundo e prata, com panorama e arte de cutout dedicados.
+### 🎨 Temas & Identidade Visual Rebosteio
 * **12 Paletas de Estilo**: Absol Midnight, Creme Baunilha, Branco Puro, Branco Gelo, Chá Verde, Cinza Ardósia, Âmbar Crepúsculo, Oceano Profundo, Névoa Lavanda, Bruma Carmim, Floresta Esmeralda e Eclipse Ônix.
-* **Temas Exclusivos Integrados**: Artes exclusivas e ambientações para Pokémon como Gengar, Mewtwo, Meganium, Alakazam, Banette, Arcanine, Umbreon, Espeon, Corsola, Eevee, Charizard e Rayquaza, além de suporte a biomas dinâmicos.
+* **Ambientações & Biomas Pokémon**: Artes exclusivas e panoramas dedicados para Pokémon temáticos como Gengar, Mewtwo, Meganium, Alakazam, Banette, Arcanine, Umbreon, Espeon, Corsola, Eevee, Charizard e Rayquaza.
 
-### 📊 Ferramentas e Análises
-* **🏆 Tierlist Analítica**: Avaliação em tempo real de todas as espécies por **XP/h** ou **Gold/h** (loot calculado a preço de NPC), com filtros de nível, qualidade, IVs e suporte a TMs elementais e AoE.
-* **✨ Calculadora de Ditto**: Recomendações precisas de melhores hunts e transformações ideais para Ditto Comum e Shiny Ditto.
-* **📐 Calculadora de IVs**: Integração com JustPokédex para leitura rápida ao passar o mouse sobre o Pokémon.
-* **🎒 Auto-Supply Offline**: Monitoramento e abastecimento de pokébolas e poções com sprites offline empacotados localmente.
-* **🛡 Venda Protegida**: Cadeado de segurança para evitar venda acidental de shinies, itens raros ou Pokémon valiosos.
-* **🔔 Alertas Inteligentes**: Notificações no Windows e webhooks para Discord quando shinies aparecem, suprimentos acabam ou sessões caem.
+### 🍃 Economia & Desempenho
+* **Modo Eco Automático**: Limita laços de animação (`requestAnimationFrame`), mantendo estabilidade térmica e consumo baixo em longas maratonas.
+* **Interface Limpa (Clean HUD)**: Oculta elementos visuais dispensáveis do mapa, revelando controles apenas ao passar o mouse.
+* **Minimizar para a Bandeja**: Envie para a barra de tarefas ou bandeja do Windows (Tray) mantendo o farm ativo no servidor com impacto mínimo na máquina.
+* **Prevenção de Suspensão (Awake)**: Evita que o computador entre em modo de suspensão durante caçadas noturnas.
 
 ---
 
 ## Como Rodar
 
-### Pré-requisito
-Você precisa ter o **Node.js** (versão LTS recomendada: 22.12 ou superior) instalado em seu computador.
-Baixe gratuitamente em: **[nodejs.org](https://nodejs.org)**
-
-### No Windows
-1. Baixe o código pelo botão verde **Code → Download ZIP** e extraia a pasta onde preferir.
+### No Windows (Instalação 1-Clique)
+1. Baixe o projeto pelo botão verde **Code → Download ZIP** (ou clone via Git) e extraia para onde preferir.
 2. Dê dois cliques em **`Abrir Poke Idle IO.bat`**.
-3. Na primeira execução, ele verificará o ambiente, instalará as dependências necessárias e abrirá a janela do launcher automaticamente.
+3. **Pronto!** O inicializador verificará se o Node.js está presente. Se você não tiver o Node instalado, **ele baixará a versão oficial portátil LTS automaticamente**, instalará as dependências do Electron e abrirá o jogo direto.
 4. *(Opcional)* Clique com o botão direito em `Abrir Poke Idle IO.bat` e selecione **Enviar para → Área de trabalho (criar atalho)**.
 
 ### No Linux ou macOS
@@ -95,10 +90,10 @@ npm start
 
 | Documento | Conteúdo |
 |---|---|
-| **[Manual](MANUAL.md)** | Explicação detalhada de todos os botões, seções e recursos da interface |
-| **[FAQ](FAQ.md)** | Perguntas frequentes, dicas de performance, migração e resolução de dúvidas |
-| **[Tutorial](TUTORIAL.md)** | Passo a passo didático para quem nunca utilizou apps via código |
-| **[Mudanças](CHANGELOG.md)** | Histórico de novidades e correções de cada versão |
+| **[Manual](MANUAL.md)** | Explicação detalhada de todos os botões, menus e atalhos da interface |
+| **[FAQ](FAQ.md)** | Perguntas frequentes, dicas de performance, proxies e resolução de dúvidas |
+| **[Tutorial](TUTORIAL.md)** | Passo a passo ilustrado para quem nunca utilizou o aplicativo |
+| **[Mudanças](CHANGELOG.md)** | Histórico de novidades e atualizações de cada versão |
 
 ---
 
@@ -106,11 +101,11 @@ npm start
 
 1. **Criptografia Local**: Credenciais salvas no formulário de Treinadores são protegidas pela API DPAPI nativa do Windows através do `safeStorage` do Electron.
 2. **Sandbox Fechado**: Webviews rodam isoladas, restringindo navegação exclusivamente aos domínios oficiais do jogo (`pokeidle.io` e `poke.idleworld.online`).
-3. **Privacidade**: O launcher não coleta dados de usuário, não possui telemetria de marketing e não possui servidores intermediários.
+3. **Privacidade**: O launcher não coleta dados de usuário, não possui telemetria invasiva e não possui servidores intermediários.
 
 ---
 
 ## Licença
 
 Distribuído sob a licença **MIT**. Consulte o arquivo [LICENSE](LICENSE) para mais informações.  
-*Este é um projeto independente de código aberto desenvolvido pela comunidade e não possui afiliação oficial com a equipe do Poke Idle World.*
+*Este é um projeto independente de código aberto desenvolvido pela comunidade e não possui afiliação oficial com a equipe do Poke Idle IO.*
