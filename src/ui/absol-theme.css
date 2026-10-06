@@ -156,16 +156,16 @@ html,body {background:#081224!important;color:var(--leaf-text)!important}
 .leaf-drawer-close {width:32px;height:32px;font-size:20px}.leaf-setting-btn {font-size:11px;min-height:44px;transition:background-color var(--motion-fast) var(--ease-standard),border-color var(--motion-fast) var(--ease-standard),transform var(--motion-fast) var(--ease-standard)}.leaf-setting-btn:hover,.leaf-setting-btn.is-on {background:#29496c;border-color:#82a6d0;color:white}
 #leafSettingsDrawer {transition:transform var(--motion-slow) var(--ease-enter)}
 .leaf-settings-open #leafSettingsDrawer {box-shadow:var(--shadow-overlay)}
-#overlay,#scOverlay,#tlOverlay,#dtOverlay,#atOverlay,#autoSupplyOverlay {background:#030a19d9!important;backdrop-filter:none!important}
-#modal,#scModal,#tlModal,#dtModal,#atModal,#autoSupplyModal,#stats {background:#e8eef7!important;color:#1c304d!important;border-color:#b6c7dc!important}
+#overlay,#scOverlay,#tlOverlay,#dtOverlay,#atOverlay,#autoSupplyOverlay,#indivSupplyOverlay {background:#030a19d9!important;backdrop-filter:none!important}
+#modal,#scModal,#tlModal,#dtModal,#atModal,#autoSupplyModal,#indivSupplyModal,#stats {background:#e8eef7!important;color:#1c304d!important;border-color:#b6c7dc!important}
 #ivCard {background:#101f35!important;color:#e8f1fd!important;border-color:#6e91bb!important}
 #ivCard .iv-hd {border-color:#405a7d}
 #ivCard .iv-hd button:hover {border-color:#9fc3ef;color:#fff}
 #ivCard .iv-inp:focus,#ivCard .iv-st-l input:focus {border-color:#9fc3ef}
 #stats {left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;width:min(var(--statsw,390px),calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;height:min(760px,calc(100vh - 96px))!important;max-height:calc(100vh - 32px)!important;transform:translate(-50%,-50%) scale(.98)!important;opacity:0;pointer-events:none;transition:transform var(--motion-slow) var(--ease-enter),opacity var(--motion-normal) var(--ease-standard)!important}
 #stats.show {transform:translate(-50%,-50%) scale(1)!important;opacity:1;pointer-events:auto}
-#modal h2,#scModal h2,#tlModal h2,#dtModal h2,#atModal h2,#autoSupplyModal h2 {color:#294667!important}
-#modal .hint,#scModal .hint,#tlModal .hint,#dtModal .hint,#atModal .hint,#autoSupplyModal .hint {color:#48607b!important}
+#modal h2,#scModal h2,#tlModal h2,#dtModal h2,#atModal h2,#autoSupplyModal h2,#indivSupplyModal h2 {color:#294667!important}
+#modal .hint,#scModal .hint,#tlModal .hint,#dtModal .hint,#atModal .hint,#autoSupplyModal .hint,#indivSupplyModal .hint {color:#48607b!important}
 #modal input,#scModal input,#scModal textarea,#tlModal input,#tlModal select,#dtModal input,#dtModal select,#atModal input,#atModal select {background:#f7faff!important;color:#1b304d!important;border-color:#aabed7!important}
 #modal input:focus,#scModal input:focus,#scModal textarea:focus,#tlModal input:focus,#dtModal input:focus,#atModal input:focus {border-color:#5e88b7!important;box-shadow:0 0 0 3px #709ed52b!important}
 #modal button,#scModal button,#tlModal button,#dtModal button,#atModal button {background:#dce7f4!important;color:#294568!important;border-color:#acc0d9!important}

@@ -460,6 +460,7 @@
         <button id="scriptsBtn" title="Rode userscripts (IV calc e os seus) nos painéis">🧩 Scripts</button>
         <button id="autoSellBtn" title="Ativa a venda automática de loot no servidor para todas as contas">💰 Venda Automática</button>
         <button id="autoSupplyBtn" title="Reabastecimento automático de Pokébolas e Poções com verificação de saldo">📦 Auto Supply</button>
+        <button id="indivSupplyBtn" title="Reabastecimento individual e personalizado de Pokébolas, Poções e Revives por conta">🛒 Resupply por Contas</button>
         <button id="dispatchHuntBtn" title="Despacha contas selecionadas direto para a Hunt (sem sair do Modo Eco)">🎯 Despachar Contas</button>
         <button id="awake" title="Impede o PC de dormir enquanto farma (a tela ainda pode desligar)">💤 Dormir</button>
         <button id="minTray" title="O que o botão minimizar faz: esconder na bandeja ou minimizar normal na barra de tarefas">📥 Minimiza p/ bandeja</button>
@@ -610,7 +611,9 @@
               <option value="1">Apenas Conta 2</option>
               <option value="2">Apenas Conta 3</option>
               <option value="3">Apenas Conta 4</option>
+              <option value="custom" style="display:none">Contas Selecionadas Individualmente</option>
             </select>
+            <button type="button" id="autoSupplyOpenIndiv" class="supply-btn-scope-indiv" title="Abre a janela de seleção e reabastecimento individual por contas">🎯 Seleção Individual</button>
           </div>
         </div>
 
@@ -705,10 +708,152 @@
       </div>
 
       <div class="modal-actions">
+        <button type="button" id="autoSupplyOpenIndivModal" class="supply-btn-scope-indiv" title="Abre a tela de reabastecimento individual e personalizado por contas">🎯 Resupply por Contas</button>
         <button type="button" id="autoSupplyShopInGame" title="Abre a tela de loja dentro dos jogos ativos">🏪 Abrir Loja no Jogo</button>
         <button type="button" id="autoSupplyBuyNow" class="supply-btn-restock" title="Executa a compra imediatamente para as contas que precisam">🛒 Reabastecer Agora</button>
         <button type="button" id="autoSupplyCancel">Cancelar</button>
         <button type="button" id="autoSupplySave" class="primary">💾 Salvar Configurações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Resupply Individual por Contas -->
+  <div id="indivSupplyOverlay">
+    <div id="indivSupplyModal">
+      <div class="indiv-head">
+        <h2>
+          <span class="indiv-head-icon">🛒</span>
+          <span>Resupply Individual por Contas</span>
+        </h2>
+        <span class="indiv-close" id="indivSupplyCloseBtn" title="Fechar">&times;</span>
+      </div>
+      <p class="hint">Selecione uma ou mais contas para reabastecer Pokébolas, Poções e Revives sob demanda. Veja em tempo real o saldo em gold, estoques atuais na mochila e o orçamento da compra.</p>
+
+      <div class="indiv-content">
+        <!-- 1. Seção de Seleção das Contas -->
+        <div class="indiv-section indiv-accounts-section">
+          <div class="indiv-sec-header">
+            <div class="indiv-sec-title">
+              <span class="indiv-sec-badge">👥</span>
+              <h3>Suas Contas</h3>
+              <span class="indiv-selected-badge" id="indivSelectedCount">0 selecionadas</span>
+            </div>
+            <div class="indiv-select-actions">
+              <button type="button" class="indiv-mini-btn" id="indivSelectAll" title="Selecionar todas as contas ativas">☑️ Todas</button>
+              <button type="button" class="indiv-mini-btn" id="indivDeselectAll" title="Desmarcar todas">◻️ Nenhuma</button>
+              <button type="button" class="indiv-mini-btn indiv-mini-btn-warn" id="indivSelectLowOnly" title="Seleciona apenas contas que estão com suprimentos baixos">⚠️ Apenas c/ Falta</button>
+            </div>
+          </div>
+          <div class="indiv-accounts-grid" id="indivAccountsGrid"></div>
+        </div>
+
+        <!-- 2. Modo de Operação & Configurações de Compra -->
+        <div class="indiv-section indiv-config-section">
+          <div class="indiv-sec-header">
+            <div class="indiv-sec-title">
+              <span class="indiv-sec-badge">⚙️</span>
+              <h3>Pacote & Modo de Compra</h3>
+            </div>
+            <div class="indiv-mode-pills">
+              <button type="button" class="indiv-mode-pill active" id="indivModeFixedBtn" title="Comprar quantia fixa para cada conta selecionada">📦 Pacote Fixo</button>
+              <button type="button" class="indiv-mode-pill" id="indivModeTargetBtn" title="Comprar apenas a quantidade faltante para atingir a meta">🎯 Completar Estoque</button>
+            </div>
+          </div>
+
+          <div class="indiv-global-toggles">
+            <label class="supply-toggle-label supply-budget-label" title="Se faltar gold em alguma conta, compra o máximo que o saldo dela permitir sem falhar o pedido">
+              <input type="checkbox" id="indivSupplyBuyPartial" checked>
+              <span class="supply-toggle-text"><b>Compra Parcial Segura</b> (se faltar dinheiro na conta, compra o máximo que o saldo permitir)</span>
+            </label>
+          </div>
+
+          <!-- Item 1: Pokébolas -->
+          <div class="indiv-item-block">
+            <div class="indiv-item-header">
+              <label class="indiv-item-enable">
+                <input type="checkbox" id="indivBallsEnable" checked>
+                <span><b>🔴 Pokébolas</b></span>
+              </label>
+              <div class="indiv-qty-controls">
+                <span class="indiv-qty-label" id="indivBallsQtyLabel">Qtd por conta:</span>
+                <input type="number" id="indivBallsQty" min="1" max="50000" step="50" value="200">
+                <div class="indiv-qty-presets">
+                  <button type="button" data-val="50">+50</button>
+                  <button type="button" data-val="100">+100</button>
+                  <button type="button" data-val="250">+250</button>
+                  <button type="button" data-val="500">+500</button>
+                  <button type="button" data-val="1000">+1000</button>
+                </div>
+              </div>
+            </div>
+            <div class="supply-cards-grid" id="indivBallsGrid"></div>
+          </div>
+
+          <!-- Item 2: Poções de Cura -->
+          <div class="indiv-item-block">
+            <div class="indiv-item-header">
+              <label class="indiv-item-enable">
+                <input type="checkbox" id="indivPotionsEnable" checked>
+                <span><b>🧪 Poções de Cura</b></span>
+              </label>
+              <div class="indiv-qty-controls">
+                <span class="indiv-qty-label" id="indivPotionsQtyLabel">Qtd por conta:</span>
+                <input type="number" id="indivPotionsQty" min="1" max="10000" step="10" value="50">
+                <div class="indiv-qty-presets">
+                  <button type="button" data-val="20">+20</button>
+                  <button type="button" data-val="50">+50</button>
+                  <button type="button" data-val="100">+100</button>
+                  <button type="button" data-val="200">+200</button>
+                </div>
+              </div>
+            </div>
+            <div class="supply-cards-grid" id="indivPotionsGrid"></div>
+          </div>
+
+          <!-- Item 3: Revives -->
+          <div class="indiv-item-block">
+            <div class="indiv-item-header">
+              <label class="indiv-item-enable">
+                <input type="checkbox" id="indivRevivesEnable" checked>
+                <span><b>✨ Revives</b></span>
+              </label>
+              <div class="indiv-qty-controls">
+                <span class="indiv-qty-label" id="indivRevivesQtyLabel">Qtd por conta:</span>
+                <input type="number" id="indivRevivesQty" min="1" max="2000" step="5" value="10">
+                <div class="indiv-qty-presets">
+                  <button type="button" data-val="5">+5</button>
+                  <button type="button" data-val="10">+10</button>
+                  <button type="button" data-val="25">+25</button>
+                  <button type="button" data-val="50">+50</button>
+                </div>
+              </div>
+            </div>
+            <div class="supply-cards-grid" id="indivRevivesGrid"></div>
+          </div>
+        </div>
+
+        <!-- 3. Resumo Financeiro & Orçamento em Tempo Real -->
+        <div class="indiv-cost-summary-card">
+          <div class="indiv-cost-header">
+            <span class="indiv-cost-title">📊 Orçamento & Saldo em Tempo Real</span>
+            <span class="indiv-cost-total" id="indivCostTotalDisplay">Total Geral: 🪙 0 gold</span>
+          </div>
+          <div class="indiv-cost-details" id="indivCostDetails">
+            <span class="indiv-cost-empty">Selecione contas e itens para calcular o orçamento.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Status / Feedback -->
+      <div class="supply-status-bar" id="indivSupplyStatusBar" style="display:none">
+        <span id="indivSupplyStatusText"></span>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="indivSupplyOpenShop" title="Abre a tela de loja dentro dos jogos das contas selecionadas">🏪 Abrir Loja no Jogo</button>
+        <button type="button" id="indivSupplySaveAsScope" title="Salva as contas selecionadas como escopo monitorado pelo Auto Supply contínuo">💾 Salvar p/ Auto Supply</button>
+        <button type="button" id="indivSupplyCancel">Cancelar</button>
+        <button type="button" id="indivSupplyConfirmBtn" class="supply-btn-restock" disabled>🛒 Reabastecer Selecionadas</button>
       </div>
     </div>
   </div>
@@ -832,6 +977,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       scHint:'Rode userscripts (estilo Tampermonkey) dentro de cada painel do jogo. O IV calc já vem pronto. Você pode colar os seus. <b>Só adicione scripts em que você confia</b>, eles têm acesso total à página do jogo.',
       scDrop:'Solte o arquivo .user.js aqui', scUrlPh:'Link do script no GitHub (.user.js)', scOuCole:'ou cole o código', scNamePh:'Nome do script', scCodePh:'Cole aqui o código do userscript (@grant none)', scAddBtn:'+ Adicionar script',
       autoSupplyBtn:'📦 Auto Supply', autoSupplyTitle:'Reabastecimento automático de Pokébolas e Poções com verificação de saldo',
+      indivSupplyBtn:'🛒 Resupply por Contas', indivSupplyTitle:'Reabastecimento individual e personalizado por conta',
     },
     en: {
       loginAll:'▶ Log in all', accounts:'👤 Accounts', reloadAll:'⟳ Reload all', layout:'▦ Grid', layoutCol:'▤ Single column', propOn:'🖼 Original aspect', asOn:'🚀 Opens with Windows', asOff:'🚀 Open with Windows', asTitle:'Creates a PokeGrid shortcut in the Windows Startup folder, the same place you would put one by hand. It does not touch the registry and you can remove it via Win+R > shell:startup.', propOff:'🖼 Stretch to fill', propTitle:'Keeps the game original aspect ratio instead of stretching the image. Dark bars appear when the panel does not match the ratio; turned off, the image fills everything but gets distorted.', layoutRow:'▥ Single row', layoutTitle:'How the panels are arranged. Click to cycle: grid, single column (stacked) or single row (side by side).',
@@ -880,6 +1026,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       scHint:'Run userscripts (Tampermonkey style) inside each game panel. The IV calc comes built in. You can paste your own. <b>Only add scripts you trust</b>, they get full access to the game page.',
       scDrop:'Drop the .user.js file here', scUrlPh:'Script link on GitHub (.user.js)', scOuCole:'or paste the code', scNamePh:'Script name', scCodePh:'Paste the userscript code here (@grant none)', scAddBtn:'+ Add script',
       autoSupplyBtn:'📦 Auto Supply', autoSupplyTitle:'Automatic restock of Pokéballs and Potions with budget check',
+      indivSupplyBtn:'🛒 Account Resupply', indivSupplyTitle:'Individual and customized restock per account',
     },
     es: {
       loginAll:'▶ Iniciar equipo', accounts:'👤 Entrenadores', reloadAll:'⟳ Recargar todo', layout:'▦ Cuadrícula', layoutCol:'▤ Una columna', propOn:'🖼 Proporción original', asOn:'🚀 Abre con Windows', asOff:'🚀 Abrir con Windows', asTitle:'Crea un acceso directo de PokeGrid en la carpeta Inicio de Windows, el mismo lugar donde lo pondrías a mano. No toca el registro y puedes quitarlo con Win+R > shell:startup.', propOff:'🖼 Estirar en pantalla', propTitle:'Mantiene la proporción original del juego, sin estirar la imagen. Queda fondo oscuro cuando el panel no coincide con la proporción; apagado, la imagen llena todo pero se distorsiona.', layoutRow:'▥ Una fila', layoutTitle:'Cómo se organizan los paneles. Clic para alternar: cuadrícula, una columna (apilado) o una fila (lado a lado).',
@@ -927,6 +1074,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       scHint:'Ejecuta userscripts (estilo Tampermonkey) dentro de cada panel del juego. La calculadora de IV ya viene lista. Puedes pegar los tuyos. <b>Añade solo scripts en los que confías</b>, tienen acceso total a la página del juego.',
       scDrop:'Suelta el archivo .user.js aquí', scUrlPh:'Enlace del script en GitHub (.user.js)', scOuCole:'o pega el código', scNamePh:'Nombre del script', scCodePh:'Pega aquí el código del userscript (@grant none)', scAddBtn:'+ Añadir script',
       autoSupplyBtn:'📦 Auto Supply', autoSupplyTitle:'Reabastecimiento automático de Pokébolas y Pociones con control de saldo',
+      indivSupplyBtn:'🛒 Resupply por Cuenta', indivSupplyTitle:'Reabastecimiento individual y personalizado por cuenta',
     }
   };
   let lang = ['en', 'es'].includes(lsGet('lang')) ? lsGet('lang') : 'pt';
@@ -3414,7 +3562,18 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     const partialChk = document.getElementById('autoSupplyBuyPartial');
     if (partialChk) partialChk.checked = Boolean(autoSupplyCfg.buyPartial);
     const scopeSel = document.getElementById('autoSupplyScopeSelect');
-    if (scopeSel) scopeSel.value = autoSupplyCfg.scope || 'all';
+    if (scopeSel) {
+      if (Array.isArray(autoSupplyCfg.scope)) {
+        let opt = scopeSel.querySelector('option[value="custom"]');
+        if (opt) {
+          opt.style.display = '';
+          opt.textContent = `Personalizado (${autoSupplyCfg.scope.map(x => `Conta ${x + 1}`).join(', ')})`;
+        }
+        scopeSel.value = 'custom';
+      } else {
+        scopeSel.value = autoSupplyCfg.scope || 'all';
+      }
+    }
 
     const bEn = document.getElementById('supplyBallsEnable');
     if (bEn) bEn.checked = Boolean(autoSupplyCfg.balls.enabled);
@@ -3453,7 +3612,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     const partialChk = document.getElementById('autoSupplyBuyPartial');
     if (partialChk) cfg.buyPartial = partialChk.checked;
     const scopeSel = document.getElementById('autoSupplyScopeSelect');
-    if (scopeSel) cfg.scope = scopeSel.value;
+    if (scopeSel && scopeSel.value !== 'custom') cfg.scope = scopeSel.value;
 
     const bEn = document.getElementById('supplyBallsEnable');
     if (bEn) cfg.balls.enabled = bEn.checked;
@@ -3703,6 +3862,726 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
   setInterval(() => {
     if (autoSupplyOn) executeAutoSupply(false);
   }, 20000);
+
+  // Botões de transição para o Resupply Individual dentro do Auto Supply
+  const autoSupplyOpenIndiv = document.getElementById('autoSupplyOpenIndiv');
+  if (autoSupplyOpenIndiv) {
+    autoSupplyOpenIndiv.onclick = () => {
+      closeAutoSupplyModal();
+      openIndivSupplyModal();
+    };
+  }
+  const autoSupplyOpenIndivModal = document.getElementById('autoSupplyOpenIndivModal');
+  if (autoSupplyOpenIndivModal) {
+    autoSupplyOpenIndivModal.onclick = () => {
+      closeAutoSupplyModal();
+      openIndivSupplyModal();
+    };
+  }
+
+  // ===== Resupply Individual por Contas =====
+  const indivSupplyBtn = document.getElementById('indivSupplyBtn');
+  const indivSupplyOverlay = document.getElementById('indivSupplyOverlay');
+  const indivSupplyModal = document.getElementById('indivSupplyModal');
+  const indivSupplyCloseBtn = document.getElementById('indivSupplyCloseBtn');
+  const indivSupplyCancel = document.getElementById('indivSupplyCancel');
+  const indivSupplyConfirmBtn = document.getElementById('indivSupplyConfirmBtn');
+  const indivSupplyOpenShop = document.getElementById('indivSupplyOpenShop');
+  const indivSupplySaveAsScope = document.getElementById('indivSupplySaveAsScope');
+  const indivSelectAll = document.getElementById('indivSelectAll');
+  const indivDeselectAll = document.getElementById('indivDeselectAll');
+  const indivSelectLowOnly = document.getElementById('indivSelectLowOnly');
+  const indivModeFixedBtn = document.getElementById('indivModeFixedBtn');
+  const indivModeTargetBtn = document.getElementById('indivModeTargetBtn');
+  const indivSupplyBuyPartial = document.getElementById('indivSupplyBuyPartial');
+  const indivAccountsGrid = document.getElementById('indivAccountsGrid');
+  const indivSelectedCount = document.getElementById('indivSelectedCount');
+  const indivCostTotalDisplay = document.getElementById('indivCostTotalDisplay');
+  const indivCostDetails = document.getElementById('indivCostDetails');
+  const indivSupplyStatusBar = document.getElementById('indivSupplyStatusBar');
+  const indivSupplyStatusText = document.getElementById('indivSupplyStatusText');
+
+  const indivBallsEnable = document.getElementById('indivBallsEnable');
+  const indivBallsQty = document.getElementById('indivBallsQty');
+  const indivBallsQtyLabel = document.getElementById('indivBallsQtyLabel');
+  const indivBallsGrid = document.getElementById('indivBallsGrid');
+
+  const indivPotionsEnable = document.getElementById('indivPotionsEnable');
+  const indivPotionsQty = document.getElementById('indivPotionsQty');
+  const indivPotionsQtyLabel = document.getElementById('indivPotionsQtyLabel');
+  const indivPotionsGrid = document.getElementById('indivPotionsGrid');
+
+  const indivRevivesEnable = document.getElementById('indivRevivesEnable');
+  const indivRevivesQty = document.getElementById('indivRevivesQty');
+  const indivRevivesQtyLabel = document.getElementById('indivRevivesQtyLabel');
+  const indivRevivesGrid = document.getElementById('indivRevivesGrid');
+
+  let selectedIndivAccounts = new Set();
+  let indivSupplyMode = 'fixed'; // 'fixed' | 'target'
+
+  const DEFAULT_INDIV_SUPPLY_CFG = {
+    mode: 'fixed',
+    buyPartial: true,
+    balls: { enabled: true, selectedId: 1, fixedQty: 200, targetQty: 1000 },
+    potions: { enabled: true, selectedId: 200, fixedQty: 50, targetQty: 200 },
+    revives: { enabled: true, selectedId: 205, fixedQty: 10, targetQty: 50 }
+  };
+
+  function loadIndivSupplyCfg() {
+    try {
+      const raw = lsGet('indivSupplyCfg');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return Object.assign({}, DEFAULT_INDIV_SUPPLY_CFG, parsed, {
+          balls: Object.assign({}, DEFAULT_INDIV_SUPPLY_CFG.balls, parsed.balls),
+          potions: Object.assign({}, DEFAULT_INDIV_SUPPLY_CFG.potions, parsed.potions),
+          revives: Object.assign({}, DEFAULT_INDIV_SUPPLY_CFG.revives, parsed.revives)
+        });
+      }
+    } catch(e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_INDIV_SUPPLY_CFG));
+  }
+
+  let indivSupplyCfg = loadIndivSupplyCfg();
+
+  function saveIndivSupplyCfg() {
+    try {
+      lsSet('indivSupplyCfg', JSON.stringify(indivSupplyCfg));
+    } catch(e) {}
+  }
+
+  function showIndivSupplyFeedback(msg) {
+    if (indivSupplyStatusBar && indivSupplyStatusText) {
+      indivSupplyStatusText.textContent = msg;
+      indivSupplyStatusBar.style.display = 'flex';
+    }
+  }
+
+  function openIndivSupplyModal() {
+    indivSupplyCfg = loadIndivSupplyCfg();
+    indivSupplyMode = indivSupplyCfg.mode || 'fixed';
+    refreshLiveSupplyPrices();
+
+    if (indivModeFixedBtn && indivModeTargetBtn) {
+      indivModeFixedBtn.classList.toggle('active', indivSupplyMode === 'fixed');
+      indivModeTargetBtn.classList.toggle('active', indivSupplyMode === 'target');
+    }
+    updateIndivModeLabels();
+
+    if (indivSupplyBuyPartial) {
+      indivSupplyBuyPartial.checked = indivSupplyCfg.buyPartial !== false;
+    }
+
+    if (indivBallsEnable) indivBallsEnable.checked = Boolean(indivSupplyCfg.balls.enabled);
+    if (indivBallsQty) indivBallsQty.value = indivSupplyMode === 'fixed' ? (indivSupplyCfg.balls.fixedQty || 200) : (indivSupplyCfg.balls.targetQty || 1000);
+
+    if (indivPotionsEnable) indivPotionsEnable.checked = Boolean(indivSupplyCfg.potions.enabled);
+    if (indivPotionsQty) indivPotionsQty.value = indivSupplyMode === 'fixed' ? (indivSupplyCfg.potions.fixedQty || 50) : (indivSupplyCfg.potions.targetQty || 200);
+
+    if (indivRevivesEnable) indivRevivesEnable.checked = Boolean(indivSupplyCfg.revives.enabled);
+    if (indivRevivesQty) indivRevivesQty.value = indivSupplyMode === 'fixed' ? (indivSupplyCfg.revives.fixedQty || 10) : (indivSupplyCfg.revives.targetQty || 50);
+
+    if (selectedIndivAccounts.size === 0) {
+      const total = Math.max(4, typeof count === 'number' ? count : 4);
+      for (let i = 0; i < total; i++) {
+        if (!off[i] && webviews[i]) selectedIndivAccounts.add(i);
+      }
+      if (selectedIndivAccounts.size === 0) {
+        for (let i = 0; i < total; i++) selectedIndivAccounts.add(i);
+      }
+    }
+
+    renderIndivAccounts();
+    renderIndivItemCards();
+    updateIndivCalculations();
+
+    if (indivSupplyStatusBar) indivSupplyStatusBar.style.display = 'none';
+    if (indivSupplyOverlay) indivSupplyOverlay.classList.add('show');
+  }
+
+  function closeIndivSupplyModal() {
+    if (indivSupplyOverlay) indivSupplyOverlay.classList.remove('show');
+  }
+
+  function updateIndivModeLabels() {
+    const isFixed = indivSupplyMode === 'fixed';
+    if (indivBallsQtyLabel) indivBallsQtyLabel.textContent = isFixed ? 'Qtd por conta:' : 'Estoque Alvo:';
+    if (indivPotionsQtyLabel) indivPotionsQtyLabel.textContent = isFixed ? 'Qtd por conta:' : 'Estoque Alvo:';
+    if (indivRevivesQtyLabel) indivRevivesQtyLabel.textContent = isFixed ? 'Qtd por conta:' : 'Estoque Alvo:';
+  }
+
+  function renderIndivAccounts() {
+    if (!indivAccountsGrid) return;
+    let html = '';
+    const total = Math.max(4, typeof count === 'number' ? count : 4);
+    const bItem = SUPPLY_BALLS.find(x => x.id === +indivSupplyCfg.balls.selectedId) || SUPPLY_BALLS[0];
+    const pItem = SUPPLY_POTIONS.find(x => x.id === +indivSupplyCfg.potions.selectedId) || SUPPLY_POTIONS[0];
+    const rItem = SUPPLY_REVIVES.find(x => x.id === +indivSupplyCfg.revives.selectedId) || SUPPLY_REVIVES[0];
+
+    for (let i = 0; i < total; i++) {
+      const isOff = Boolean(off[i] || !webviews[i]);
+      const st = stCache[i];
+      const d = st && (st.d || st);
+      const accName = (typeof stName === 'function' ? stName(i) : null) || (accounts[i] && accounts[i].name) || `Conta ${i + 1}`;
+      const gold = (d && +d.gold) || 0;
+      const leadPoke = (d && d.team && d.team[0]) ? d.team[0] : null;
+      const isSelected = selectedIndivAccounts.has(i);
+      const accColor = ACOR[i % ACOR.length] || '#38bdf8';
+
+      const curBalls = (d && d.ballMap && d.ballMap[bItem.id] != null) ? (+d.ballMap[bItem.id] || 0) : ((d && +d.balls) || 0);
+      const isInfBalls = d && d.ballMap && d.ballMap[bItem.id] === '∞';
+      const curPots = (d && d.invMap && d.invMap[pItem.id] != null) ? (+d.invMap[pItem.id] || 0) : ((d && +d.potions) || 0);
+      const curRev = (d && d.invMap && d.invMap[rItem.id] != null) ? (+d.invMap[rItem.id] || 0) : ((d && +d.revives) || 0);
+
+      const ballsLow = !isInfBalls && curBalls < 100;
+      const potsLow = curPots < 20;
+      const revLow = curRev < 5;
+      const isLowAny = !isOff && d && d.ok && (ballsLow || potsLow || revLow);
+
+      let statusTag = '';
+      if (isOff || !d || !d.ok) {
+        statusTag = `<span class="indiv-stock-badge is-off">💤 Offline</span>`;
+      } else if (isLowAny) {
+        statusTag = `<span class="indiv-stock-badge is-warn">⚠️ Falta Estoque</span>`;
+      } else {
+        statusTag = `<span class="indiv-stock-badge is-ok">✓ Abastecida</span>`;
+      }
+
+      let spriteUrl = null;
+      if (leadPoke) {
+        spriteUrl = getPokemonSpriteUrl(leadPoke.name, leadPoke.speciesId || leadPoke.pokeId, leadPoke.shiny);
+      }
+
+      html += `
+        <div class="indiv-acc-card ${isSelected ? 'is-selected' : ''} ${isOff ? 'is-off' : ''}" data-idx="${i}">
+          <div class="indiv-acc-accent" style="background:${accColor}"></div>
+          <div class="indiv-acc-checkbox-wrap">
+            <input type="checkbox" class="indiv-acc-checkbox" data-idx="${i}" ${isSelected ? 'checked' : ''} ${isOff ? 'disabled' : ''}>
+          </div>
+          <div class="indiv-acc-avatar-wrap">
+            ${spriteUrl ? `<img src="${esc(spriteUrl)}" alt="${esc(leadPoke.name || '')}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block';"><span class="indiv-acc-avatar-placeholder" style="display:none">🎮</span>` : `<span class="indiv-acc-avatar-placeholder">${isOff ? '💤' : '🎮'}</span>`}
+          </div>
+          <div class="indiv-acc-body">
+            <div class="indiv-acc-top">
+              <span class="indiv-acc-title">Conta ${i + 1}: ${esc(accName)}</span>
+              <div class="indiv-acc-badges">
+                <span class="indiv-acc-badge ${isOff ? 'off' : 'on'}">${isOff ? 'Off' : 'On'}</span>
+                ${statusTag}
+              </div>
+            </div>
+            <div class="indiv-acc-sub">
+              <span class="indiv-acc-gold">💰 ${nf(gold)} gold</span>
+              ${leadPoke ? `<span class="indiv-acc-lead">⚔️ ${esc(leadPoke.name || '')}${leadPoke.level ? ` Lv ${leadPoke.level}` : ''}</span>` : ''}
+            </div>
+            <div class="indiv-acc-stocks">
+              <span class="indiv-stock-chip ${ballsLow ? 'is-low' : ''}" title="Pokébolas">🔴 ${isInfBalls ? '∞' : nf(curBalls)}</span>
+              <span class="indiv-stock-chip ${potsLow ? 'is-low' : ''}" title="Poções de Cura">🧪 ${nf(curPots)}</span>
+              <span class="indiv-stock-chip ${revLow ? 'is-low' : ''}" title="Revives">✨ ${nf(curRev)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    indivAccountsGrid.innerHTML = html;
+
+    if (indivSelectedCount) {
+      const sel = selectedIndivAccounts.size;
+      indivSelectedCount.textContent = `${sel} de ${total} selecionada${sel !== 1 ? 's' : ''}`;
+    }
+
+    indivAccountsGrid.querySelectorAll('.indiv-acc-card').forEach(card => {
+      card.onclick = () => {
+        const idx = +card.dataset.idx;
+        if (off[idx] || !webviews[idx]) return;
+        if (selectedIndivAccounts.has(idx)) selectedIndivAccounts.delete(idx);
+        else selectedIndivAccounts.add(idx);
+        renderIndivAccounts();
+        updateIndivCalculations();
+      };
+      const cb = card.querySelector('.indiv-acc-checkbox');
+      if (cb) {
+        cb.onclick = (e) => { e.stopPropagation(); };
+        cb.onchange = (e) => {
+          const idx = +cb.dataset.idx;
+          if (cb.checked) selectedIndivAccounts.add(idx);
+          else selectedIndivAccounts.delete(idx);
+          renderIndivAccounts();
+          updateIndivCalculations();
+        };
+      }
+    });
+  }
+
+  function renderIndivItemCards() {
+    refreshLiveSupplyPrices();
+    const cfg = indivSupplyCfg;
+
+    if (indivBallsGrid) {
+      indivBallsGrid.innerHTML = SUPPLY_BALLS.map(b => {
+        const isSel = (cfg.balls && +cfg.balls.selectedId === b.id);
+        return `<div class="supply-card ${isSel ? 'active' : ''}" data-type="balls" data-id="${b.id}" tabindex="0" role="button">
+          <img class="supply-sprite" src="${b.sprite}" alt="${esc(b.name)}" onerror="this.src='${b.fallback}'">
+          <div class="supply-card-name">${esc(b.name)}</div>
+          <div class="supply-card-price">🪙 ${nf(b.price)} gold</div>
+          <div class="supply-card-desc">${esc(b.desc)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    if (indivPotionsGrid) {
+      indivPotionsGrid.innerHTML = SUPPLY_POTIONS.map(p => {
+        const isSel = (cfg.potions && +cfg.potions.selectedId === p.id);
+        return `<div class="supply-card ${isSel ? 'active' : ''}" data-type="potions" data-id="${p.id}" tabindex="0" role="button">
+          <img class="supply-sprite" src="${p.sprite}" alt="${esc(p.name)}" onerror="this.src='${p.fallback}'">
+          <div class="supply-card-name">${esc(p.name)}</div>
+          <div class="supply-card-price">🪙 ${nf(p.price)} gold</div>
+          <div class="supply-card-desc">${esc(p.desc)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    if (indivRevivesGrid) {
+      indivRevivesGrid.innerHTML = SUPPLY_REVIVES.map(r => {
+        const isSel = (cfg.revives && +cfg.revives.selectedId === r.id);
+        return `<div class="supply-card ${isSel ? 'active' : ''}" data-type="revives" data-id="${r.id}" tabindex="0" role="button">
+          <img class="supply-sprite" src="${r.sprite}" alt="${esc(r.name)}" onerror="this.src='${r.fallback}'">
+          <div class="supply-card-name">${esc(r.name)}</div>
+          <div class="supply-card-price">🪙 ${nf(r.price)} gold</div>
+          <div class="supply-card-desc">${esc(r.desc)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    [indivBallsGrid, indivPotionsGrid, indivRevivesGrid].forEach(grid => {
+      if (!grid) return;
+      grid.querySelectorAll('.supply-card').forEach(card => {
+        card.onclick = () => {
+          const type = card.dataset.type;
+          const id = +card.dataset.id;
+          if (type && id && indivSupplyCfg[type]) {
+            indivSupplyCfg[type].selectedId = id;
+            grid.querySelectorAll('.supply-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            saveIndivSupplyCfg();
+            renderIndivAccounts();
+            updateIndivCalculations();
+          }
+        };
+        card.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            card.click();
+          }
+        };
+      });
+    });
+  }
+
+  function updateIndivCalculations() {
+    refreshLiveSupplyPrices();
+    const bEn = indivBallsEnable ? indivBallsEnable.checked : true;
+    const pEn = indivPotionsEnable ? indivPotionsEnable.checked : true;
+    const rEn = indivRevivesEnable ? indivRevivesEnable.checked : true;
+
+    const bItem = SUPPLY_BALLS.find(x => x.id === +indivSupplyCfg.balls.selectedId) || SUPPLY_BALLS[0];
+    const pItem = SUPPLY_POTIONS.find(x => x.id === +indivSupplyCfg.potions.selectedId) || SUPPLY_POTIONS[0];
+    const rItem = SUPPLY_REVIVES.find(x => x.id === +indivSupplyCfg.revives.selectedId) || SUPPLY_REVIVES[0];
+
+    const bVal = Math.max(1, parseInt(indivBallsQty?.value, 10) || (indivSupplyMode === 'fixed' ? 200 : 1000));
+    const pVal = Math.max(1, parseInt(indivPotionsQty?.value, 10) || (indivSupplyMode === 'fixed' ? 50 : 200));
+    const rVal = Math.max(1, parseInt(indivRevivesQty?.value, 10) || (indivSupplyMode === 'fixed' ? 10 : 50));
+
+    if (indivSupplyMode === 'fixed') {
+      indivSupplyCfg.balls.fixedQty = bVal;
+      indivSupplyCfg.potions.fixedQty = pVal;
+      indivSupplyCfg.revives.fixedQty = rVal;
+    } else {
+      indivSupplyCfg.balls.targetQty = bVal;
+      indivSupplyCfg.potions.targetQty = pVal;
+      indivSupplyCfg.revives.targetQty = rVal;
+    }
+    indivSupplyCfg.balls.enabled = bEn;
+    indivSupplyCfg.potions.enabled = pEn;
+    indivSupplyCfg.revives.enabled = rEn;
+    indivSupplyCfg.buyPartial = indivSupplyBuyPartial ? indivSupplyBuyPartial.checked : true;
+    indivSupplyCfg.mode = indivSupplyMode;
+    saveIndivSupplyCfg();
+
+    if (selectedIndivAccounts.size === 0 || (!bEn && !pEn && !rEn)) {
+      if (indivCostDetails) indivCostDetails.innerHTML = '<span class="indiv-cost-empty">Selecione ao menos uma conta e um suprimento para calcular o orçamento.</span>';
+      if (indivCostTotalDisplay) indivCostTotalDisplay.textContent = 'Total Geral: 🪙 0 gold';
+      if (indivSupplyConfirmBtn) indivSupplyConfirmBtn.disabled = true;
+      return;
+    }
+
+    let totalGrandCost = 0;
+    let rowsHtml = '';
+    const sortedAccounts = Array.from(selectedIndivAccounts).sort((a, b) => a - b);
+
+    for (const idx of sortedAccounts) {
+      const isOff = off[idx] || !webviews[idx];
+      const st = stCache[idx];
+      const d = st && (st.d || st);
+      const accName = (typeof stName === 'function' ? stName(idx) : null) || (accounts[idx] && accounts[idx].name) || `Conta ${idx + 1}`;
+      const gold = (d && +d.gold) || 0;
+
+      if (isOff || !d || !d.ok) {
+        rowsHtml += `<div class="indiv-cost-row indiv-cost-row-off">
+          <div class="indiv-cost-row-main">
+            <span class="indiv-cost-row-name">Conta ${idx + 1}: ${esc(accName)}</span>
+            <span class="indiv-cost-row-items" style="color:#7d8590">Offline / sem conexão com o jogo</span>
+          </div>
+          <div class="indiv-cost-row-finance">
+            <span class="indiv-cost-row-gold">🪙 0</span>
+          </div>
+        </div>`;
+        continue;
+      }
+
+      let bNeed = 0, pNeed = 0, rNeed = 0;
+      const curBalls = (d.ballMap && d.ballMap[bItem.id] != null) ? (+d.ballMap[bItem.id] || 0) : (+d.balls || 0);
+      const isInf = d.ballMap && d.ballMap[bItem.id] === '∞';
+      const curPots = (d.invMap && d.invMap[pItem.id] != null) ? (+d.invMap[pItem.id] || 0) : (+d.potions || 0);
+      const curRev = (d.invMap && d.invMap[rItem.id] != null) ? (+d.invMap[rItem.id] || 0) : (+d.revives || 0);
+
+      if (bEn && !isInf) {
+        bNeed = indivSupplyMode === 'fixed' ? bVal : Math.max(0, bVal - curBalls);
+      }
+      if (pEn) {
+        pNeed = indivSupplyMode === 'fixed' ? pVal : Math.max(0, pVal - curPots);
+      }
+      if (rEn) {
+        rNeed = indivSupplyMode === 'fixed' ? rVal : Math.max(0, rVal - curRev);
+      }
+
+      const bCost = bNeed * bItem.price;
+      const pCost = pNeed * pItem.price;
+      const rCost = rNeed * rItem.price;
+      const accTotalCost = bCost + pCost + rCost;
+      totalGrandCost += accTotalCost;
+
+      const itemsSummaryParts = [];
+      if (bNeed > 0) itemsSummaryParts.push(`${nf(bNeed)}x ${bItem.name}`);
+      if (pNeed > 0) itemsSummaryParts.push(`${nf(pNeed)}x ${pItem.name}`);
+      if (rNeed > 0) itemsSummaryParts.push(`${nf(rNeed)}x ${rItem.name}`);
+
+      const hasEnough = gold >= accTotalCost;
+      const isPartialSafe = !hasEnough && (indivSupplyBuyPartial && indivSupplyBuyPartial.checked);
+
+      let statusHtml = '';
+      if (accTotalCost === 0) {
+        statusHtml = `<span style="color:#3fb950;font-size:11px;font-weight:600">✓ Estoque já na meta</span>`;
+      } else if (hasEnough) {
+        statusHtml = `<span style="color:#3fb950;font-size:11px;font-weight:600">✓ Saldo OK (resta ${nf(gold - accTotalCost)}g)</span>`;
+      } else if (isPartialSafe) {
+        statusHtml = `<span style="color:#f2c665;font-size:11px;font-weight:600">⚠️ Pouco saldo (compra parcial segura)</span>`;
+      } else {
+        statusHtml = `<span style="color:#f85149;font-size:11px;font-weight:600">❌ Saldo insuficiente</span>`;
+      }
+
+      rowsHtml += `<div class="indiv-cost-row">
+        <div class="indiv-cost-row-main">
+          <span class="indiv-cost-row-name">Conta ${idx + 1}: ${esc(accName)}</span>
+          <span class="indiv-cost-row-items">${itemsSummaryParts.length > 0 ? itemsSummaryParts.join(' · ') : 'Nenhum item necessário'}</span>
+        </div>
+        <div class="indiv-cost-row-finance">
+          <span class="indiv-cost-row-gold">🪙 ${nf(accTotalCost)} gold</span>
+          ${statusHtml}
+        </div>
+      </div>`;
+    }
+
+    if (indivCostDetails) indivCostDetails.innerHTML = rowsHtml || '<span class="indiv-cost-empty">Nenhuma conta com compras pendentes.</span>';
+    if (indivCostTotalDisplay) indivCostTotalDisplay.innerHTML = `Total Geral: <b>🪙 ${nf(totalGrandCost)} gold</b> <span style="font-size:11px;color:#8faabe">(${sortedAccounts.length} conta${sortedAccounts.length !== 1 ? 's' : ''})</span>`;
+    if (indivSupplyConfirmBtn) indivSupplyConfirmBtn.disabled = false;
+  }
+
+  async function executeIndivSupply() {
+    if (selectedIndivAccounts.size === 0) return;
+    const sortedAccounts = Array.from(selectedIndivAccounts).sort((a, b) => a - b);
+    const bEn = indivBallsEnable ? indivBallsEnable.checked : true;
+    const pEn = indivPotionsEnable ? indivPotionsEnable.checked : true;
+    const rEn = indivRevivesEnable ? indivRevivesEnable.checked : true;
+
+    if (!bEn && !pEn && !rEn) {
+      showIndivSupplyFeedback('⚠️ Marque ao menos um tipo de item (Pokébolas, Poções ou Revives) para comprar.');
+      return;
+    }
+
+    const bItem = SUPPLY_BALLS.find(x => x.id === +indivSupplyCfg.balls.selectedId) || SUPPLY_BALLS[0];
+    const pItem = SUPPLY_POTIONS.find(x => x.id === +indivSupplyCfg.potions.selectedId) || SUPPLY_POTIONS[0];
+    const rItem = SUPPLY_REVIVES.find(x => x.id === +indivSupplyCfg.revives.selectedId) || SUPPLY_REVIVES[0];
+
+    const bVal = Math.max(1, parseInt(indivBallsQty?.value, 10) || 200);
+    const pVal = Math.max(1, parseInt(indivPotionsQty?.value, 10) || 50);
+    const rVal = Math.max(1, parseInt(indivRevivesQty?.value, 10) || 10);
+    const buyPartial = indivSupplyBuyPartial ? indivSupplyBuyPartial.checked : true;
+
+    if (indivSupplyConfirmBtn) {
+      indivSupplyConfirmBtn.disabled = true;
+      indivSupplyConfirmBtn.textContent = '⏳ Comprando...';
+    }
+    showIndivSupplyFeedback('⏳ Enviando ordens de compra para as contas selecionadas...');
+
+    const reports = [];
+
+    try {
+      for (const idx of sortedAccounts) {
+        if (off[idx] || !webviews[idx]) continue;
+        const st = stCache[idx];
+        const d = st && (st.d || st);
+        if (!d || !d.ok) continue;
+
+        let gold = +d.gold || 0;
+        const orders = [];
+
+        const curBalls = (d.ballMap && d.ballMap[bItem.id] != null) ? (+d.ballMap[bItem.id] || 0) : (+d.balls || 0);
+        const isInf = d.ballMap && d.ballMap[bItem.id] === '∞';
+        const curPots = (d.invMap && d.invMap[pItem.id] != null) ? (+d.invMap[pItem.id] || 0) : (+d.potions || 0);
+        const curRev = (d.invMap && d.invMap[rItem.id] != null) ? (+d.invMap[rItem.id] || 0) : (+d.revives || 0);
+
+        // 1. Balls
+        if (bEn && !isInf) {
+          const needed = indivSupplyMode === 'fixed' ? bVal : Math.max(0, bVal - curBalls);
+          if (needed > 0) {
+            const cost = needed * bItem.price;
+            if (gold >= cost) {
+              orders.push({ kind: 'ball', id: bItem.id, qty: needed, name: bItem.name, cost });
+              gold -= cost;
+            } else if (buyPartial) {
+              const affordable = Math.floor(gold / bItem.price);
+              if (affordable > 0) {
+                const partCost = affordable * bItem.price;
+                orders.push({ kind: 'ball', id: bItem.id, qty: affordable, name: bItem.name, cost: partCost, partial: true });
+                gold -= partCost;
+              }
+            }
+          }
+        }
+
+        // 2. Potions
+        if (pEn) {
+          const needed = indivSupplyMode === 'fixed' ? pVal : Math.max(0, pVal - curPots);
+          if (needed > 0) {
+            const cost = needed * pItem.price;
+            if (gold >= cost) {
+              orders.push({ kind: 'item', id: pItem.id, qty: needed, name: pItem.name, cost });
+              gold -= cost;
+            } else if (buyPartial) {
+              const affordable = Math.floor(gold / pItem.price);
+              if (affordable > 0) {
+                const partCost = affordable * pItem.price;
+                orders.push({ kind: 'item', id: pItem.id, qty: affordable, name: pItem.name, cost: partCost, partial: true });
+                gold -= partCost;
+              }
+            }
+          }
+        }
+
+        // 3. Revives
+        if (rEn) {
+          const needed = indivSupplyMode === 'fixed' ? rVal : Math.max(0, rVal - curRev);
+          if (needed > 0) {
+            const cost = needed * rItem.price;
+            if (gold >= cost) {
+              orders.push({ kind: 'item', id: rItem.id, qty: needed, name: rItem.name, cost });
+              gold -= cost;
+            } else if (buyPartial) {
+              const affordable = Math.floor(gold / rItem.price);
+              if (affordable > 0) {
+                const partCost = affordable * rItem.price;
+                orders.push({ kind: 'item', id: rItem.id, qty: affordable, name: rItem.name, cost: partCost, partial: true });
+                gold -= partCost;
+              }
+            }
+          }
+        }
+
+        if (orders.length > 0) {
+          try {
+            await webviews[idx].executeJavaScript(SUPPLY_BUY_JS(JSON.stringify(orders)));
+            const accName = (typeof stName === 'function' ? stName(idx) : null) || (accounts[idx] && accounts[idx].name) || `Conta ${idx + 1}`;
+            const summary = orders.map(o => `${nf(o.qty)}x ${o.name}${o.partial ? ' (parcial)' : ''}`).join(', ');
+            reports.push(`${accName}: ${summary}`);
+          } catch(e) {}
+        }
+      }
+
+      if (reports.length > 0) {
+        const msg = '✅ ' + reports.join(' · ');
+        showIndivSupplyFeedback(msg);
+        try { window.pokeAPI.logError('supply-indiv', msg); } catch {}
+      } else {
+        showIndivSupplyFeedback('ℹ️ Nenhuma compra necessária (contas já estão abastecidas ou sem saldo).');
+      }
+      renderIndivAccounts();
+      updateIndivCalculations();
+    } finally {
+      if (indivSupplyConfirmBtn) {
+        indivSupplyConfirmBtn.disabled = false;
+        indivSupplyConfirmBtn.textContent = '🛒 Reabastecer Selecionadas';
+      }
+    }
+  }
+
+  // Event handlers do Modal Indiv Supply
+  if (indivSupplyBtn) indivSupplyBtn.onclick = () => openIndivSupplyModal();
+  if (indivSupplyCloseBtn) indivSupplyCloseBtn.onclick = () => closeIndivSupplyModal();
+  if (indivSupplyCancel) indivSupplyCancel.onclick = () => closeIndivSupplyModal();
+  if (indivSupplyConfirmBtn) indivSupplyConfirmBtn.onclick = () => executeIndivSupply();
+
+  if (indivModeFixedBtn) {
+    indivModeFixedBtn.onclick = () => {
+      indivSupplyMode = 'fixed';
+      indivModeFixedBtn.classList.add('active');
+      if (indivModeTargetBtn) indivModeTargetBtn.classList.remove('active');
+      updateIndivModeLabels();
+      if (indivBallsQty) indivBallsQty.value = indivSupplyCfg.balls.fixedQty || 200;
+      if (indivPotionsQty) indivPotionsQty.value = indivSupplyCfg.potions.fixedQty || 50;
+      if (indivRevivesQty) indivRevivesQty.value = indivSupplyCfg.revives.fixedQty || 10;
+      updateIndivCalculations();
+    };
+  }
+
+  if (indivModeTargetBtn) {
+    indivModeTargetBtn.onclick = () => {
+      indivSupplyMode = 'target';
+      indivModeTargetBtn.classList.add('active');
+      if (indivModeFixedBtn) indivModeFixedBtn.classList.remove('active');
+      updateIndivModeLabels();
+      if (indivBallsQty) indivBallsQty.value = indivSupplyCfg.balls.targetQty || 1000;
+      if (indivPotionsQty) indivPotionsQty.value = indivSupplyCfg.potions.targetQty || 200;
+      if (indivRevivesQty) indivRevivesQty.value = indivSupplyCfg.revives.targetQty || 50;
+      updateIndivCalculations();
+    };
+  }
+
+  if (indivSelectAll) {
+    indivSelectAll.onclick = () => {
+      const total = Math.max(4, typeof count === 'number' ? count : 4);
+      for (let i = 0; i < total; i++) {
+        if (!off[i] && webviews[i]) selectedIndivAccounts.add(i);
+      }
+      renderIndivAccounts();
+      updateIndivCalculations();
+    };
+  }
+
+  if (indivDeselectAll) {
+    indivDeselectAll.onclick = () => {
+      selectedIndivAccounts.clear();
+      renderIndivAccounts();
+      updateIndivCalculations();
+    };
+  }
+
+  if (indivSelectLowOnly) {
+    indivSelectLowOnly.onclick = () => {
+      selectedIndivAccounts.clear();
+      const total = Math.max(4, typeof count === 'number' ? count : 4);
+      const bItem = SUPPLY_BALLS.find(x => x.id === +indivSupplyCfg.balls.selectedId) || SUPPLY_BALLS[0];
+      const pItem = SUPPLY_POTIONS.find(x => x.id === +indivSupplyCfg.potions.selectedId) || SUPPLY_POTIONS[0];
+      const rItem = SUPPLY_REVIVES.find(x => x.id === +indivSupplyCfg.revives.selectedId) || SUPPLY_REVIVES[0];
+      for (let i = 0; i < total; i++) {
+        if (off[i] || !webviews[i]) continue;
+        const st = stCache[i];
+        const d = st && (st.d || st);
+        if (!d || !d.ok) continue;
+        const curBalls = (d.ballMap && d.ballMap[bItem.id] != null) ? (+d.ballMap[bItem.id] || 0) : (+d.balls || 0);
+        const isInfBalls = d.ballMap && d.ballMap[bItem.id] === '∞';
+        const curPots = (d.invMap && d.invMap[pItem.id] != null) ? (+d.invMap[pItem.id] || 0) : (+d.potions || 0);
+        const curRev = (d.invMap && d.invMap[rItem.id] != null) ? (+d.invMap[rItem.id] || 0) : (+d.revives || 0);
+        if ((!isInfBalls && curBalls < 100) || curPots < 20 || curRev < 5) {
+          selectedIndivAccounts.add(i);
+        }
+      }
+      renderIndivAccounts();
+      updateIndivCalculations();
+    };
+  }
+
+  if (indivSupplyOpenShop) {
+    indivSupplyOpenShop.onclick = () => {
+      if (selectedIndivAccounts.size === 0) {
+        showIndivSupplyFeedback('⚠️ Selecione ao menos uma conta.');
+        return;
+      }
+      selectedIndivAccounts.forEach(idx => {
+        if (!off[idx] && webviews[idx]) {
+          webviews[idx].executeJavaScript(OPEN_INGAME_SHOP_JS).catch(() => {});
+        }
+      });
+      showIndivSupplyFeedback('🏪 Comando para abrir a loja do jogo enviado.');
+    };
+  }
+
+  if (indivSupplySaveAsScope) {
+    indivSupplySaveAsScope.onclick = () => {
+      if (selectedIndivAccounts.size === 0) {
+        showIndivSupplyFeedback('⚠️ Selecione ao menos uma conta antes de salvar como escopo.');
+        return;
+      }
+      const scopeArr = Array.from(selectedIndivAccounts).sort((a, b) => a - b);
+      autoSupplyCfg = loadAutoSupplyCfg();
+      autoSupplyCfg.scope = scopeArr;
+      if (indivSupplyCfg.balls.enabled) {
+        autoSupplyCfg.balls.selectedId = indivSupplyCfg.balls.selectedId;
+        if (indivSupplyMode === 'target') autoSupplyCfg.balls.target = indivSupplyCfg.balls.targetQty;
+      }
+      if (indivSupplyCfg.potions.enabled) {
+        autoSupplyCfg.potions.selectedId = indivSupplyCfg.potions.selectedId;
+        if (indivSupplyMode === 'target') autoSupplyCfg.potions.target = indivSupplyCfg.potions.targetQty;
+      }
+      if (indivSupplyCfg.revives.enabled) {
+        autoSupplyCfg.revives.selectedId = indivSupplyCfg.revives.selectedId;
+        if (indivSupplyMode === 'target') autoSupplyCfg.revives.target = indivSupplyCfg.revives.targetQty;
+      }
+      saveAutoSupplyCfg(autoSupplyCfg);
+      showIndivSupplyFeedback(`✅ Contas ${scopeArr.map(x => x + 1).join(', ')} salvas como escopo no Auto Supply!`);
+    };
+  }
+
+  if (indivSupplyOverlay) {
+    indivSupplyOverlay.onclick = (e) => {
+      if (e.target === indivSupplyOverlay) closeIndivSupplyModal();
+    };
+  }
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && indivSupplyOverlay && indivSupplyOverlay.classList.contains('show')) {
+        e.preventDefault();
+        closeIndivSupplyModal();
+      }
+    });
+  }
+
+  // Presets de quantidade
+  document.querySelectorAll('.indiv-qty-presets button').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const wrap = btn.closest('.indiv-item-header');
+      const inp = wrap ? wrap.querySelector('input[type="number"]') : null;
+      const addVal = parseInt(btn.dataset.val, 10) || 0;
+      if (inp) {
+        const cur = parseInt(inp.value, 10) || 0;
+        inp.value = cur + addVal;
+        updateIndivCalculations();
+      }
+    };
+  });
+
+  [indivBallsQty, indivPotionsQty, indivRevivesQty].forEach(inp => {
+    if (inp) {
+      inp.oninput = updateIndivCalculations;
+      inp.onchange = updateIndivCalculations;
+    }
+  });
+
+  [indivBallsEnable, indivPotionsEnable, indivRevivesEnable, indivSupplyBuyPartial].forEach(chk => {
+    if (chk) chk.onchange = updateIndivCalculations;
+  });
 
   // ----- Anti-sono: impede o PC de dormir enquanto farma -----
   const awakeBtn = document.getElementById('awake');
@@ -4213,6 +5092,8 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     const bi = document.getElementById('bkImp'); bi.textContent = t('bkImp'); bi.title = t('bkImpTitle');
     const fq = document.getElementById('faqBtn'); fq.textContent = t('faq'); fq.title = t('faqTitle');
     const mb = document.getElementById('manBtn'); mb.textContent = t('manual'); mb.title = t('manualTitle');
+    const asb = document.getElementById('autoSupplyBtn'); if (asb) { asb.textContent = t('autoSupplyBtn'); asb.title = t('autoSupplyTitle'); }
+    const isb = document.getElementById('indivSupplyBtn'); if (isb) { isb.textContent = t('indivSupplyBtn') || '🛒 Resupply por Contas'; isb.title = t('indivSupplyTitle') || 'Reabastecimento individual e personalizado por conta'; }
     donTop.textContent = t('donTitle'); donTop.title = t('donText');
     langBtns.forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
     refBtn.title = t('refTitle');
@@ -6751,7 +7632,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
   };
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.altKey || e.metaKey) return; // combos (Ctrl+M etc) seguem intactos
-    if (document.querySelector('#overlay.show, #dispatchOverlay.show, #autoSupplyOverlay.show')) return; // janela aberta: digitar antes de clicar no campo recarregava os paineis ('r') e desligava os alertas ('a')
+    if (document.querySelector('#overlay.show, #dispatchOverlay.show, #autoSupplyOverlay.show, #indivSupplyOverlay.show')) return; // janela aberta: digitar antes de clicar no campo recarregava os paineis ('r') e desligava os alertas ('a')
     const ae = document.activeElement;
     if (ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return;
     const fn = TECLAS_ATALHO[String(e.key || '').toLowerCase()];
