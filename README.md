@@ -99,6 +99,13 @@ npm start
 
 ---
 
+## Atualizações e Versionamento
+
+* **Incremento de Versão no `package.json`**: Sempre que enviar uma atualização, correção ou novidade para o repositório, incremente a versão no [`package.json`](package.json) (ex.: de `1.5.27` para `1.5.28`). O launcher e o inicializador automático utilizam essa numeração para detectar novas versões e sincronizar os arquivos para os usuários.
+* **Changelog**: Registre as novidades da versão no [`CHANGELOG.md`](CHANGELOG.md).
+
+---
+
 ## Licença
 
 Distribuído sob a licença **MIT**. Consulte o arquivo [LICENSE](LICENSE) para mais informações.  
