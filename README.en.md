@@ -74,12 +74,6 @@ The launcher dynamically adapts to your configuration: if you configure 1 accoun
 Open your terminal inside the project folder and execute:
 
 ```bash
-bash iniciar.sh
-```
-
-Or directly via Node/NPM:
-
-```bash
 npm install
 npm start
 ```

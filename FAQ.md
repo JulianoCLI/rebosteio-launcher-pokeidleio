@@ -24,7 +24,15 @@ São avisos comuns de segurança do ecossistema Windows:
 2. **"Download não seguro / falso positivo"**: Scripts `.bat` ou executáveis de Electron que realizam downloads locais de pacotes podem ocasionalmente gerar alertas de heurística (falsos positivos). Os arquivos deste projeto têm taxa zero de detecção real em motores de verificação de integridade.
 
 ### No Linux o app avisa sobre sandbox do Chromium
-Distribuições recentes (como Ubuntu 24.04+) limitam o namespace de usuário para o sandbox do Chromium. Ao executar pelo terminal com `bash iniciar.sh`, o script automaticamente detecta essa restrição e oferece a aplicação das permissões recomendadas ao `chrome-sandbox`.
+Distribuições recentes (como Ubuntu 24.04+) limitam o namespace de usuário para o sandbox do Chromium. Se o Electron relatar erro de sandbox, aplique as permissões recomendadas ao `chrome-sandbox`:
+```bash
+sudo chown root:root node_modules/electron/dist/chrome-sandbox
+sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
+```
+Ou, como último recurso:
+```bash
+npm start -- --no-sandbox
+```
 
 ### O `Abrir Poke Idle IO.bat` abre e fecha rapidamente e a janela não aparece
 Siga este diagnóstico passo a passo:

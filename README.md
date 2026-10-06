@@ -74,12 +74,6 @@ O launcher se adapta à quantidade de contas que você usa: se tiver 1 conta cad
 Abra o terminal na pasta do projeto e execute:
 
 ```bash
-bash iniciar.sh
-```
-
-Ou diretamente via Node/NPM:
-
-```bash
 npm install
 npm start
 ```

@@ -32,7 +32,7 @@ No Windows, voce NAO precisa instalar o Node.js manualmente:
   Enviar para > Area de trabalho (criar atalho).
 
   No Mac ou Linux: instale o Node.js LTS (https://nodejs.org),
-  abra o Terminal na pasta e digite:  bash iniciar.sh
+  abra o Terminal na pasta e digite:  npm install && npm start
 
 
 PASSO 2 - USAR E CONECTAR
