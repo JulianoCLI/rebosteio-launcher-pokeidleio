@@ -7,7 +7,8 @@
   "scripts": {
     "start": "electron .",
     "test:panels": "electron test/panel-controls.test.js",
-    "test:performance": "node test/runtime-performance.test.js"
+    "test:performance": "node test/runtime-performance.test.js",
+    "test:sync": "node test/upstream-sync.test.js"
   },
   "keywords": [
     "electron",

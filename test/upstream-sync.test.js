@@ -1,0 +1,92 @@
+// Exercise the actual injected reader and shell with offline, synthetic game state.
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const runtime = require('../src/ui/runtime-performance');
+const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const shell = fs.readFileSync(path.join(__dirname, '..', 'src/ui/pokeleaf-shell.js'), 'utf8');
+
+function injectedLiteral(marker, ending) {
+  const pos = html.indexOf(marker);
+  assert.ok(pos >= 0, 'injected source exists: ' + marker);
+  const start = html.indexOf('`', pos), end = html.indexOf(ending, start + 1);
+  assert.ok(end > start, 'injected literal has an ending');
+  return vm.runInNewContext(html.slice(start, end + 1));
+}
+const collector = injectedLiteral('wv.executeJavaScript(`(()=>{if(window.__poke)return;', '`).catch');
+new vm.Script(collector); // The original collector failed here with Unexpected token catch.
+const reader = injectedLiteral('  const READ_STATE =', '`;');
+new vm.Script(reader);
+
+const state = {
+  cid: 'trainer-fixture', nick: 'Conta fictícia', level: 113, gold: 500,
+  automation: { ballIds: [4] }, sock: { readyState: 1 },
+  api: { '/game/items.json': { items: [
+    { id: 10, name: 'Poção', category: 'potion' },
+    { id: 11, name: 'Revive', category: 'revive' },
+    { id: 20, name: 'Loot', category: 'loot', npcPrice: 5 }
+  ] } },
+  ws: {
+    balls: { counts: { 1: 100, 4: 25, 900: 1 }, catalog: [
+      { id: 1, name: 'Poké Ball' }, { id: 4, name: 'Ultra Ball' },
+      { id: 900, name: 'Bola infinita', infinite: true }
+    ] },
+    inventory: { items: [{ itemId: 10, quantity: 14 }, { itemId: 11, quantity: 5 }] },
+    pokes: { list: [{ id: 'pokemon-fixture', name: 'Venusaur', level: 113, team: true, leader: true, hp: 82, maxHp: 100 }] },
+    'field-init': { slug: 'pupitar' }
+  },
+  sess: { start: Date.now() - 60000, kills: 10, xp: 100, captures: 3,
+    drops: { 20: { qty: 4, name: 'Loot' } }, sellG: 10, supGold: 2 }
+};
+const guest = vm.createContext({ window: { __poke: state }, document: { getElementById: () => null, querySelector: () => null } });
+let result = vm.runInContext(reader, guest);
+assert.equal(result.live, true, 'socket state identifies a connected account without the character HTTP response');
+assert.equal(result.cid, 'trainer-fixture'); assert.equal(result.name, 'Conta fictícia');
+assert.equal(result.level, 113); assert.equal(result.gold, 500);
+assert.equal(result.hunt, 'Pupitar'); assert.equal(result.team[0].name, 'Venusaur');
+assert.equal(result.team[0].hp, 82); assert.equal(result.team[0].hm, 100);
+assert.equal(result.balls, 25, 'supplies show the selected ball rather than all ball types combined');
+assert.equal(result.equippedBall.name, 'Ultra Ball'); assert.equal(result.equippedBall.infinite, false);
+assert.equal(result.potions, 14); assert.equal(result.revives, 5);
+assert.equal(result.a.balance, 28); assert.ok(result.a.xph > 0);
+state.automation.ballIds = [900];
+result = vm.runInContext(reader, guest);
+assert.equal(result.equippedBall.infinite, true); assert.equal(result.balls, 999999);
+state.meMiss = 2; state.sock.readyState = 0;
+assert.equal(vm.runInContext(reader, guest).live, false, 'a lost connection is not reported as online');
+guest.window.__poke = null;
+assert.equal(vm.runInContext(reader, guest).ok, false, 'no collector is reported as unavailable');
+
+async function testShellReader() {
+  let calls = 0, finish;
+  const webview = {};
+  const coordinator = runtime.createReadCoordinator(() => {
+    calls++;
+    return new Promise(resolve => { finish = () => resolve({ ok: true, live: true, cid: 'trainer-fixture', name: 'Conta fictícia' }); });
+  });
+  const cache = {};
+  const host = vm.createContext({
+    window: { stCache: cache, stSane: d => d }, webviews: [webview], off: [false],
+    states: new Map(), tabNames: [], baseState: i => ({ i, ok: false }),
+    readPanelState: i => coordinator.read(i, webview)
+  });
+  const start = shell.indexOf('  async function collectOne(i) {');
+  const end = shell.indexOf('  let collecting =', start);
+  assert.ok(start >= 0 && end > start);
+  vm.runInContext(shell.slice(start, end), host);
+  const sidebar = host.collectOne(0), otherReader = coordinator.read(0, webview);
+  await Promise.resolve();
+  assert.equal(calls, 1, 'upstream sidebar and another HUD consumer share one pending guest read');
+  finish(); await Promise.all([sidebar, otherReader]);
+  assert.equal(cache[0].d.cid, 'trainer-fixture', 'window fallback publishes the sanitized snapshot');
+  assert.equal((await host.collectOne(0)).name, 'Conta fictícia');
+  assert.equal(calls, 1, 'the sidebar reuses a valid recent snapshot');
+  cache[0] = { t: Date.now(), d: { ok: false } };
+  const fresh = host.collectOne(0);
+  await Promise.resolve(); assert.equal(calls, 2, 'an invalid snapshot does not hide the current state');
+  finish(); await fresh;
+}
+testShellReader().then(() => {
+  console.log('PASS: upstream collector syntax, live identity, team, selected supplies, rates, disconnected state and shared sidebar reads.');
+}).catch(error => { console.error(error); process.exitCode = 1; });

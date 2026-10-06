@@ -152,6 +152,7 @@
     <div class="leaf-tool-sep"></div>
     <button class="leaf-tool-item" data-old="autoSellBtn"><span class="ico">💰</span><span>Venda Automática</span><span class="leaf-tool-badge" id="leafAutoSellBadge">OFF</span></button>
     <button class="leaf-tool-item" data-old="autoSupplyBtn"><span class="ico">📦</span><span>Auto Supply</span><span class="leaf-tool-badge" id="leafAutoSupplyBadge">OFF</span></button>
+    <button class="leaf-tool-item" data-old="indivSupplyBtn"><span class="ico">🛒</span><span>Resupply por Contas</span></button>
     <button class="leaf-tool-item" data-old="dispatchHuntBtn"><span class="ico">🎯</span><span>Despachar Contas</span></button>`;
   document.body.appendChild(tools);
   tools.inert = true;
@@ -345,7 +346,7 @@
   function stateStatus(r) {
     const hasCreds = Boolean(typeof accounts !== 'undefined' && accounts[r?.i] && accounts[r.i].email && accounts[r.i].senha);
     if (!hasCreds || (typeof off !== 'undefined' && off[r?.i])) return ['off','Desligada'];
-    if (!r || !r.ok) {
+    if (!r || !r.ok || !r.live) {
       const dot = grid.children[r?.i]?.querySelector('.panel-header .dot');
       return dot?.classList.contains('err') ? ['err','Erro'] : ['wait','Conectando'];
     }
@@ -353,25 +354,33 @@
   }
   function attention(r) {
     if (!r || !r.ok) return false;
-    if ((+r.balls || 0) > 0 && (+r.balls || 0) < 100) return true;
+    const bInf = Boolean((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999));
+    if (!bInf && (+r.balls || 0) < 100) return true;
     const lead=(r.team||[]).find(p=>p.ld)||(r.team||[])[0];
     return !!(lead && lead.hm > 0 && lead.hp <= 0);
   }
   async function collectOne(i) {
     let d = null;
     try {
-      const pc = typeof stCache !== 'undefined' && stCache[i];
-      if (pc && Date.now() - pc.t < 3500) d = pc.d;
-      else if (typeof webviews !== 'undefined' && webviews[i] && !(typeof off !== 'undefined' && off[i])) {
-        d = await readPanelState(i);
-        if (d && d.ok && typeof stCache !== 'undefined') {
-          const s = (typeof stSane === 'function' ? stSane(d) : d) || d;
-          stCache[i] = { t: Date.now(), d: s };
+      const pc = (typeof stCache !== 'undefined' ? stCache[i] : null) || (window.stCache ? window.stCache[i] : null);
+      if (pc && pc.d && pc.d.ok && Date.now() - pc.t < 15000) {
+        d = pc.d;
+      } else if (typeof webviews !== 'undefined' && webviews[i] && !(typeof off !== 'undefined' && off[i])) {
+        if (typeof readPanelState === 'function') {
+          d = await readPanelState(i);
+        } else {
+          const rs = (typeof READ_STATE !== 'undefined' ? READ_STATE : null) || window.READ_STATE;
+          if (rs) d = await webviews[i].executeJavaScript(rs);
+        }
+        if (d && d.ok) {
+          const s = (typeof stSane === 'function' ? stSane(d) : null) || (window.stSane ? window.stSane(d) : null) || d;
+          if (typeof stCache !== 'undefined') stCache[i] = { t: Date.now(), d: s };
+          if (window.stCache) window.stCache[i] = { t: Date.now(), d: s };
           d = s;
-        } else if (pc) {
+        } else if (pc && pc.d && pc.d.ok) {
           d = pc.d;
         }
-      } else if (pc) {
+      } else if (pc && pc.d && pc.d.ok) {
         d = pc.d;
       }
     } catch {}
@@ -395,9 +404,14 @@
   function renderAll(arr) {
     const online = arr.filter(x => x && x.ok).length;
     let balls = 0, inf = false, att = 0;
-    arr.forEach(x => { if ((+x.balls||0)>=999999) inf=true; else balls += +x.balls||0; if (attention(x)) att++; });
+    arr.forEach(x => {
+      const bInf = Boolean((x.equippedBall && x.equippedBall.infinite) || (+x.balls >= 999999));
+      if (bInf) inf = true;
+      else balls += +x.balls || 0;
+      if (attention(x)) att++;
+    });
     RebosteioPerformance.setText($('#leafKpiOnline'), `${online}/${arr.length || 0}`);
-    RebosteioPerformance.setText($('#leafKpiBalls'), inf ? '∞' : fmtCompact(balls));
+    RebosteioPerformance.setText($('#leafKpiBalls'), (inf && balls === 0) ? '∞' : (inf ? `${fmtCompact(balls)}+∞` : fmtCompact(balls)));
     RebosteioPerformance.setText($('#leafKpiAttention'), att);
     $('#leafKpiAttention').classList.toggle('warn',att>0);
     RebosteioPerformance.setText($('#leafConnectedText'), `${online}/${arr.length || 0} conectadas`);
@@ -448,7 +462,7 @@
           </div>
           <div class="leaf-hunt-row"><span class="leaf-hunt-glyph">${ico('hunt')}</span><span class="leaf-hunt-name">Em caça <b>${escH(hunt)}</b></span><span class="leaf-hunt-time">${a.seconds?Math.floor(a.seconds/3600)+'h '+String(Math.floor(a.seconds%3600/60)).padStart(2,'0')+'m':'—'}</span></div>
           <div class="leaf-account-metrics">
-            <div class="leaf-metric" title="Bolas"><div class="mk">Bolas</div><div class="mv">${(+r.balls||0)>=999999?'∞':fmtCompact(r.balls)}</div></div>
+            <div class="leaf-metric" title="${(r.equippedBall && r.equippedBall.name) ? `${escH(r.equippedBall.name)}: ${((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999)) ? '∞' : fmtCompact(r.balls)}` : `Bolas: ${((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999)) ? '∞' : fmtCompact(r.balls)}`}"><div class="mk">Bolas</div><div class="mv">${((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999)) ? '∞' : fmtCompact(r.balls)}</div></div>
             <div class="leaf-metric" title="Shiny"><div class="mk">Shiny</div><div class="mv">${a.shinyFound!=null?fmtCompact(a.shinyFound):'—'}</div></div>
             <div class="leaf-metric" title="EXP"><div class="mk">EXP</div><div class="mv">${a.xpg!=null?fmtCompact(a.xpg):'—'}</div></div>
             <div class="leaf-metric" title="Kills/h"><div class="mk">Kills/h</div><div class="mv">${a.kph!=null?fmtCompact(a.kph):'—'}</div></div>
@@ -499,7 +513,7 @@
         <div class="leaf-list-identity"><span class="leaf-list-index">${String(r.i+1).padStart(2,'0')}</span><div class="avatar">${spr?`<img src="${spr}" width="48" height="48" alt="" loading="lazy" onerror="this.remove()">`:ico('user')}</div>
           <div class="leaf-list-person"><div class="name">${escH(displayName(r))}</div><div class="sub">${stateStatus(r)[1]}${r.level?' · Nv '+escH(r.level):''}${lead?' · '+escH(lead.name):''}</div></div><span class="leaf-list-state ${stateStatus(r)[0]}">${stateStatus(r)[1]}</span></div>
         <div class="leaf-list-hunt"><span>Caça atual</span><b>${escH(prettyHunt(r.hunt)||'Aguardando dados')}</b></div>
-        <div class="leaf-list-stats"><div class="leaf-list-cell"><div class="label">Bolas</div><div class="value">${(+r.balls||0)>=999999?'∞':fmtCompact(r.balls)}</div></div>
+        <div class="leaf-list-stats"><div class="leaf-list-cell" title="${(r.equippedBall && r.equippedBall.name) ? `${escH(r.equippedBall.name)}: ${((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999)) ? '∞' : fmtCompact(r.balls)}` : `Bolas: ${((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999)) ? '∞' : fmtCompact(r.balls)}`}"><div class="label">Bolas</div><div class="value">${((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999)) ? '∞' : fmtCompact(r.balls)}</div></div>
           <div class="leaf-list-cell"><div class="label">Shiny</div><div class="value">${a.shinyFound!=null?fmtCompact(a.shinyFound):'—'}</div></div>
           <div class="leaf-list-cell"><div class="label">EXP</div><div class="value">${a.xpg!=null?fmtCompact(a.xpg):'—'}</div></div>
           <div class="leaf-list-cell"><div class="label">Kills/h</div><div class="value">${a.kph!=null?fmtCompact(a.kph):'—'}</div></div></div>
@@ -530,7 +544,8 @@
         f.__leafSprite = spr;
       }
       const huntText = prettyHunt(r.hunt)||'Aguardando dados';
-      const ballsText = (+r.balls||0)>=999999?'∞':fmtCompact(r.balls);
+      const bInf = Boolean((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999));
+      const ballsText = bInf ? '∞' : fmtCompact(r.balls);
       const huntEl = $('.pf-hunt b',f), ballsEl = $('.pf-balls b',f);
       if (huntEl && huntEl.textContent !== huntText) huntEl.textContent = huntText;
       if (ballsEl && ballsEl.textContent !== ballsText) ballsEl.textContent = ballsText;

@@ -70,6 +70,12 @@ function testHistories() {
   vm.runInContext('mergeLogs(1,batch)', context);
   const last = context.lifeCatch.at(-1);
   assert.equal(last.id, 'capture-id'); assert.equal(last.ivs.hp, 10, 'late IV details still update an existing capture');
+  assert.equal(context.lifeCatch.length, 300, 'adding a capture ID does not duplicate its history entry');
+  context.batch = { catchLog: [{ n: 'Pikachu', t: 6000, ivs: { hp: 10, atk: 20, def: 15, spAtk: 12, spDef: 14, speed: 18 } }] };
+  vm.runInContext('mergeLogs(1,batch)', context);
+  assert.equal(context.lifeCatch.at(-1).iv, 89, 'upstream IV totals are recovered from the individual stats');
+  vm.runInContext('mergeLogs(1,batch)', context);
+  assert.equal(context.lifeCatch.length, 300, 'repeated enriched captures remain deduplicated');
 
   const huntStart = html.indexOf('  const hlVistos =');
   const huntEnd = html.indexOf('  // Exporta duas planilhas:', huntStart);
