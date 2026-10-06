@@ -73,7 +73,7 @@
         <button class="leaf-chip" id="leafHuntOnly"><span style="width:13px;height:13px">${ico('hunt')}</span><span class="txt-hide-sm">Só a caça</span></button>
         <button class="leaf-chip" id="leafMap" aria-pressed="false"><span class="leaf-map-icon" style="width:13px;height:13px">${ico('chart')}</span><span class="txt-hide-sm">Painel</span></button>
         <button class="leaf-chip" id="leafSimple"><span style="width:13px;height:13px">${ico('simple')}</span><span class="txt-hide-sm">Simples</span></button>
-        <button class="leaf-chip" id="leafAlerts"><span style="width:13px;height:13px">${ico('bell')}</span><span class="txt-hide-sm">Alertas</span></button>
+        <button class="leaf-chip" id="leafAlerts" title="Alternar alertas e todos os sons do jogo"><span style="width:13px;height:13px">${ico('bell')}</span><span class="txt-hide-sm">Alertas</span></button>
       </div>
       <div class="leaf-top-right">
         <div class="leaf-top-note">Mesmo nas noites mais escuras,<br>há um propósito.</div>
@@ -152,7 +152,6 @@
     <div class="leaf-tool-sep"></div>
     <button class="leaf-tool-item" data-old="autoSellBtn"><span class="ico">💰</span><span>Venda Automática</span><span class="leaf-tool-badge" id="leafAutoSellBadge">OFF</span></button>
     <button class="leaf-tool-item" data-old="autoSupplyBtn"><span class="ico">📦</span><span>Auto Supply</span><span class="leaf-tool-badge" id="leafAutoSupplyBadge">OFF</span></button>
-    <button class="leaf-tool-item" data-old="indivSupplyBtn"><span class="ico">🛒</span><span>Resupply por Contas</span></button>
     <button class="leaf-tool-item" data-old="dispatchHuntBtn"><span class="ico">🎯</span><span>Despachar Contas</span></button>`;
   document.body.appendChild(tools);
   tools.inert = true;

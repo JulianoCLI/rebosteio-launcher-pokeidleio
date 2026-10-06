@@ -740,56 +740,56 @@ body[data-theme] .leaf-layout-options button.is-on {
 }
 
 /* Modais & Inputs (Compatibilidade Universal com Todos os 12 Temas e 800+ Pokémon) */
-body[data-theme] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay, #indivSupplyOverlay) {
+body[data-theme] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay) {
   background: rgba(0, 0, 0, 0.72) !important;
   backdrop-filter: blur(8px) !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal, #indivSupplyModal) {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal) {
   background: var(--color-bg-elevated) !important;
   border: 1px solid var(--border-subtle) !important;
   color: var(--color-text-primary) !important;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--border-subtle) inset !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal, #indivSupplyModal) h2 {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal) h2 {
   color: var(--color-text-primary) !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal, #indivSupplyModal) .hint {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal) .hint {
   color: var(--color-text-muted) !important;
 }
 
-body[data-theme] :is(#modal, #autoSupplyModal, #indivSupplyModal) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+body[data-theme] :is(#modal, #autoSupplyModal) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
   background: var(--color-surface-1) !important;
   color: var(--color-text-primary) !important;
   border: 1px solid var(--border-subtle) !important;
 }
 
-body[data-theme] :is(#modal, #autoSupplyModal, #indivSupplyModal) :is(input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus) {
+body[data-theme] :is(#modal, #autoSupplyModal) :is(input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus) {
   border-color: var(--color-accent) !important;
   box-shadow: 0 0 0 2px var(--color-accent-soft) !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) button {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) button {
   background: var(--color-surface-1) !important;
   color: var(--color-text-secondary) !important;
   border: 1px solid var(--border-subtle) !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) button:hover {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) button:hover {
   background: var(--color-surface-hover) !important;
   color: var(--color-text-primary) !important;
   border-color: var(--color-accent) !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) button.primary {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) button.primary {
   background: var(--color-action-primary) !important;
   border-color: var(--color-action-primary) !important;
   color: #ffffff !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) button.primary:hover:not(:disabled) {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) button.primary:hover:not(:disabled) {
   background: var(--color-action-primary-hover) !important;
   border-color: var(--color-action-primary-hover) !important;
 }
@@ -808,166 +808,178 @@ body[data-theme] .acc-family {
 }
 
 /* Suprimentos Individual e Auto Supply nos 12 Temas e 800+ Pokémon */
-body[data-theme] .indiv-head-icon {
+body[data-theme] .supply-head-icon {
   background: var(--color-accent-soft) !important;
   border-color: var(--border-subtle) !important;
   color: var(--color-accent) !important;
 }
 
-body[data-theme] .indiv-close {
+body[data-theme] .supply-close {
   color: var(--color-text-muted) !important;
 }
 
-body[data-theme] .indiv-close:hover {
+body[data-theme] .supply-close:hover {
   color: var(--color-text-primary) !important;
   background: var(--color-surface-hover) !important;
 }
 
-body[data-theme] :is(.indiv-banner, .supply-banner) {
+body[data-theme] :is(.supply-global-card, .supply-section, .supply-sub-section) {
   background: var(--color-surface-1) !important;
   border: 1px solid var(--border-subtle) !important;
-  color: var(--color-text-secondary) !important;
-}
-
-body[data-theme] :is(.indiv-banner-hint, .supply-banner-hint) {
-  color: var(--color-text-muted) !important;
-}
-
-body[data-theme] :is(.indiv-mode-pill, .supply-mode-pill) {
-  background: var(--color-surface-2) !important;
-  border: 1px solid var(--border-subtle) !important;
-}
-
-body[data-theme] :is(.indiv-mode-pill, .supply-mode-pill) button {
-  color: var(--color-text-muted) !important;
-}
-
-body[data-theme] :is(.indiv-mode-pill, .supply-mode-pill) button.active {
-  background: var(--color-surface-selected) !important;
-  color: var(--color-text-primary) !important;
-  box-shadow: 0 1px 6px var(--color-accent-soft) !important;
-}
-
-body[data-theme] .indiv-section-title {
   color: var(--color-text-primary) !important;
 }
 
-body[data-theme] .indiv-section-title .badge {
+body[data-theme] .supply-acc-count-badge {
   background: var(--color-accent-soft) !important;
-  color: var(--color-accent) !important;
-  border: 1px solid var(--border-subtle) !important;
-}
-
-body[data-theme] .indiv-batch-bar button {
-  background: var(--color-surface-1) !important;
-  border: 1px solid var(--border-subtle) !important;
-  color: var(--color-text-secondary) !important;
-}
-
-body[data-theme] .indiv-batch-bar button:hover {
-  background: var(--color-surface-hover) !important;
-  border-color: var(--color-accent) !important;
-  color: var(--color-text-primary) !important;
-}
-
-body[data-theme] :is(.indiv-acc-card, .supply-acc-chip) {
-  background: var(--color-surface-1) !important;
-  border: 1px solid var(--border-subtle) !important;
-  color: var(--color-text-primary) !important;
-}
-
-body[data-theme] :is(.indiv-acc-card, .supply-acc-chip):hover {
-  background: var(--color-surface-hover) !important;
-  border-color: var(--color-accent) !important;
-}
-
-body[data-theme] .indiv-acc-card.selected {
-  background: var(--color-surface-selected) !important;
-  border-color: var(--color-accent) !important;
-  box-shadow: 0 0 0 1px var(--color-accent) inset, 0 4px 14px var(--color-accent-soft) !important;
-}
-
-body[data-theme] .indiv-acc-name {
-  color: var(--color-text-primary) !important;
-}
-
-body[data-theme] .indiv-acc-gold {
+  border-color: var(--border-subtle) !important;
   color: var(--color-accent) !important;
 }
 
-body[data-theme] .indiv-stock-badge {
+body[data-theme] .supply-mini-btn {
   background: var(--color-surface-2) !important;
   border: 1px solid var(--border-subtle) !important;
   color: var(--color-text-secondary) !important;
 }
 
-body[data-theme] .indiv-stock-badge.low {
+body[data-theme] .supply-mini-btn:hover {
+  background: var(--color-surface-hover) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-text-primary) !important;
+}
+
+body[data-theme] .supply-acc-card {
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--color-text-primary) !important;
+}
+
+body[data-theme] .supply-acc-card:hover {
+  background: var(--color-surface-hover) !important;
+  border-color: var(--color-accent) !important;
+}
+
+body[data-theme] .supply-acc-card.is-selected {
+  background: var(--color-surface-selected) !important;
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 1px var(--color-accent) inset, 0 3px 14px var(--color-accent-soft) !important;
+}
+
+body[data-theme] .supply-acc-card.is-active-tab {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 12px var(--color-accent-soft) !important;
+}
+
+body[data-theme] .supply-acc-name {
+  color: var(--color-text-primary) !important;
+}
+
+body[data-theme] .supply-acc-hero {
+  background: var(--color-surface-2) !important;
+  border: 1px solid var(--border-subtle) !important;
+}
+
+body[data-theme] .supply-acc-gold-row {
+  color: var(--color-accent) !important;
+}
+
+body[data-theme] .supply-item-chip {
+  background: var(--color-surface-2) !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--color-text-primary) !important;
+}
+
+body[data-theme] .supply-item-chip.is-low {
   background: rgba(239, 68, 68, 0.16) !important;
   border-color: rgba(239, 68, 68, 0.45) !important;
   color: #ef4444 !important;
 }
 
-body[data-theme] :is(.indiv-item-card, .supply-item-card) {
+body[data-theme] .supply-scope-tab-bar {
+  border-bottom-color: var(--border-subtle) !important;
+}
+
+body[data-theme] .supply-scope-tab {
   background: var(--color-surface-1) !important;
   border: 1px solid var(--border-subtle) !important;
-  color: var(--color-text-primary) !important;
+  color: var(--color-text-muted) !important;
 }
 
-body[data-theme] :is(.indiv-item-card, .supply-item-card):hover {
-  border-color: var(--color-accent) !important;
-}
-
-body[data-theme] :is(.indiv-item-title, .supply-item-title) {
-  color: var(--color-text-primary) !important;
-}
-
-body[data-theme] :is(.indiv-item-price, .supply-item-price) {
-  color: var(--color-accent) !important;
-}
-
-body[data-theme] :is(.indiv-qty-wrap input, .supply-qty-wrap input) {
-  background: var(--color-surface-2) !important;
-  border: 1px solid var(--border-subtle) !important;
-  color: var(--color-text-primary) !important;
-}
-
-body[data-theme] :is(.indiv-qty-presets button, .supply-qty-presets button) {
-  background: var(--color-surface-2) !important;
-  border: 1px solid var(--border-subtle) !important;
-  color: var(--color-text-secondary) !important;
-}
-
-body[data-theme] :is(.indiv-qty-presets button, .supply-qty-presets button):hover {
+body[data-theme] .supply-scope-tab:hover {
   background: var(--color-surface-hover) !important;
   color: var(--color-text-primary) !important;
   border-color: var(--color-accent) !important;
 }
 
-body[data-theme] :is(.indiv-calc-card, .supply-calc-card) {
-  background: var(--color-surface-1) !important;
+body[data-theme] .supply-scope-tab.is-active {
+  background: var(--color-action-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--color-action-primary) !important;
+  box-shadow: 0 2px 10px var(--color-accent-soft) !important;
+}
+
+body[data-theme] .supply-scope-context-banner {
+  background: var(--color-surface-2) !important;
   border: 1px solid var(--border-subtle) !important;
 }
 
-body[data-theme] :is(.indiv-calc-val, .supply-calc-val) {
+body[data-theme] .supply-scope-badge {
+  background: var(--color-accent-soft) !important;
+  color: var(--color-accent) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+body[data-theme] .supply-scope-title {
   color: var(--color-text-primary) !important;
 }
 
-body[data-theme] :is(.indiv-calc-lbl, .supply-calc-lbl) {
-  color: var(--color-text-muted) !important;
+body[data-theme] .supply-card {
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--color-text-primary) !important;
 }
 
-body[data-theme] .indiv-calc-total .indiv-calc-val {
+body[data-theme] .supply-card:hover {
+  border-color: var(--color-accent) !important;
+  background: var(--color-surface-hover) !important;
+}
+
+body[data-theme] .supply-card.active {
+  border-color: var(--color-accent) !important;
+  background: var(--color-surface-selected) !important;
+  box-shadow: 0 0 10px var(--color-accent-soft) !important;
+}
+
+body[data-theme] .supply-card-name {
+  color: var(--color-text-primary) !important;
+}
+
+body[data-theme] .supply-card-price {
   color: var(--color-accent) !important;
 }
 
-body[data-theme] .indiv-opt-row {
-  color: var(--color-text-secondary) !important;
+body[data-theme] .supply-card-desc {
+  color: var(--color-text-muted) !important;
 }
 
-body[data-theme] .indiv-feedback {
+body[data-theme] .supply-acc-row {
   background: var(--color-surface-1) !important;
-  color: var(--color-text-primary) !important;
   border: 1px solid var(--border-subtle) !important;
+}
+
+body[data-theme] .supply-row-stock-pill {
+  background: var(--color-surface-2) !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--color-text-primary) !important;
+}
+
+body[data-theme] .supply-row-gold {
+  color: var(--color-accent) !important;
+}
+
+body[data-theme] .supply-status-bar {
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--color-text-primary) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -1014,11 +1026,11 @@ body[data-theme-tone="light"] #leafAccountList::-webkit-scrollbar-thumb {
   background: var(--border-strong) !important;
 }
 
-body[data-theme-tone="light"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay, #indivSupplyOverlay) {
+body[data-theme-tone="light"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay) {
   background: rgba(15, 23, 42, 0.45) !important;
 }
 
-body[data-theme-tone="light"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal, #indivSupplyModal) {
+body[data-theme-tone="light"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal) {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16), 0 0 0 1px var(--border-subtle) !important;
 }
 

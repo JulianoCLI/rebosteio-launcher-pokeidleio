@@ -994,11 +994,11 @@ body[data-theme^="kuromi-xp"] #cards input[type="checkbox"] { accent-color: var(
 /* --------------------------------------------------------------------------
    10. MENU FERRAMENTAS, CONFIGURAÇÕES, MODAIS
    -------------------------------------------------------------------------- */
-body[data-theme^="kuromi-xp"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay, #indivSupplyOverlay) {
+body[data-theme^="kuromi-xp"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay) {
   background: var(--kx-overlay) !important;
   backdrop-filter: none !important;
 }
-body[data-theme^="kuromi-xp"] :is(#leafToolsMenu, #leafSettingsDrawer, #modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal, #ivCard) {
+body[data-theme^="kuromi-xp"] :is(#leafToolsMenu, #leafSettingsDrawer, #modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #ivCard) {
   background: var(--kx-face) !important;
   color: var(--kx-text) !important;
   border: 0 !important;
@@ -1067,25 +1067,25 @@ body[data-theme^="kuromi-xp"] .leaf-pokemon-lock { color: var(--kx-text) !import
 body[data-theme^="kuromi-xp"] .leaf-theme-empty { color: var(--kx-text-dim) !important; font-size: 16px !important; }
 
 /* modais */
-body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) h2 {
+body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) h2 {
   color: var(--kx-text) !important; font-size: 26px !important; font-weight: normal !important;
   text-shadow: 2px 2px 0 var(--kx-pink);
 }
-body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
   border: 0 !important; border-radius: 0 !important;
   background: var(--kx-face-2) !important; color: var(--kx-text) !important;
   box-shadow: var(--kx-field) !important;
   font-size: 16px !important;
 }
-body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) button {
+body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) button {
   border: 0 !important; border-radius: 0 !important;
   background: var(--kx-btn) !important; color: var(--kx-on-btn) !important;
   box-shadow: var(--kx-bevel) !important;
   font-size: 16px !important;
   text-shadow: 1px 1px 0 var(--kx-tshadow);
 }
-body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) button:hover { background: var(--kx-btn-hover) !important; }
-body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #indivSupplyModal) .primary { background: var(--kx-pbtn) !important; box-shadow: var(--kx-bevel-pink) !important; }
+body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) button:hover { background: var(--kx-btn-hover) !important; }
+body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal) .primary { background: var(--kx-pbtn) !important; box-shadow: var(--kx-bevel-pink) !important; }
 body[data-theme^="kuromi-xp"] :is(.sc-row, .tl-row) { border-radius: 0 !important; background: var(--kx-face-2) !important; border-color: var(--kx-btn) !important; color: var(--kx-text) !important; }
 body[data-theme^="kuromi-xp"] :is(.sc-tag, .tl-sub) { color: var(--kx-text-dim) !important; }
 body[data-theme^="kuromi-xp"] :is(input[type="checkbox"], input[type="radio"]) { accent-color: var(--kx-pink); }
@@ -1236,14 +1236,14 @@ body[data-theme^="kuromi-xp"] .primary {
   border-color: transparent !important;
   color: var(--kx-on-btn) !important;
 }
-body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #bulkModal, #autoSupplyModal, #indivSupplyModal) button.primary:hover { background: var(--kx-pbtn-hover) !important; }
+body[data-theme^="kuromi-xp"] :is(#modal, #scModal, #tlModal, #dtModal, #bulkModal, #autoSupplyModal) button.primary:hover { background: var(--kx-pbtn-hover) !important; }
 
 /* Modais de suprimentos no Kuromi XP */
-body[data-theme^="kuromi-xp"] :is(#autoSupplyModal, #indivSupplyModal) {
+body[data-theme^="kuromi-xp"] :is(#autoSupplyModal) {
   border-radius: 0 !important;
 }
 
-body[data-theme^="kuromi-xp"] :is(.indiv-banner, .supply-banner, .indiv-acc-card, .indiv-item-card, .supply-item-card, .indiv-calc-card, .supply-calc-card, .indiv-feedback) {
+body[data-theme^="kuromi-xp"] :is(.supply-global-card, .supply-section, .supply-sub-section, .supply-acc-card, .supply-acc-hero, .supply-item-chip, .supply-scope-context-banner, .supply-card, .supply-acc-row, .supply-row-stock-pill, .supply-status-bar) {
   background: var(--kx-face-2) !important;
   border-radius: 0 !important;
   border: 0 !important;
@@ -1251,32 +1251,44 @@ body[data-theme^="kuromi-xp"] :is(.indiv-banner, .supply-banner, .indiv-acc-card
   color: var(--kx-text) !important;
 }
 
-body[data-theme^="kuromi-xp"] .indiv-acc-card.selected {
+body[data-theme^="kuromi-xp"] .supply-acc-card.is-selected {
   outline: 2px solid var(--kx-pink) !important;
   background: var(--kx-face) !important;
 }
 
-body[data-theme^="kuromi-xp"] .indiv-acc-gold {
+body[data-theme^="kuromi-xp"] .supply-acc-card.is-active-tab {
+  outline: 2px solid var(--kx-hl) !important;
+}
+
+body[data-theme^="kuromi-xp"] .supply-card.active {
+  outline: 2px solid var(--kx-pink) !important;
+  background: var(--kx-face) !important;
+}
+
+body[data-theme^="kuromi-xp"] :is(.supply-acc-gold-row, .supply-card-price, .supply-row-gold) {
   color: var(--kx-hl) !important;
 }
 
-body[data-theme^="kuromi-xp"] :is(.indiv-stock-badge, .indiv-mode-pill, .indiv-batch-bar button, .indiv-qty-presets button, .supply-qty-presets button) {
+body[data-theme^="kuromi-xp"] :is(.supply-mini-btn, .supply-scope-tab) {
+  background: var(--kx-btn) !important;
+  box-shadow: var(--kx-bevel) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: var(--kx-on-btn) !important;
+}
+
+body[data-theme^="kuromi-xp"] :is(.supply-mini-btn:hover, .supply-scope-tab:hover) {
+  background: var(--kx-btn-hover) !important;
+}
+
+body[data-theme^="kuromi-xp"] .supply-scope-tab.is-active {
+  background: var(--kx-pbtn) !important;
+  box-shadow: var(--kx-bevel-pink) !important;
+  color: #fff !important;
+}
+
+body[data-theme^="kuromi-xp"] .supply-acc-count-badge {
+  background: var(--kx-pbtn) !important;
+  color: #fff !important;
   border-radius: 0 !important;
 }
-
-body[data-theme^="kuromi-xp"] :is(.indiv-mode-pill, .supply-mode-pill) button.active {
-  background: var(--kx-pbtn) !important;
-  color: var(--kx-on-btn) !important;
-  box-shadow: var(--kx-bevel-pink) !important;
-}
-
-/* rodapé panorâmico */
-body[data-theme^="kuromi-xp"] .leaf-landscape-footer span {
-  color: var(--kx-hl) !important;
-  font-size: 15px !important;
-  letter-spacing: 2px !important;
-  text-shadow: none !important;
-}
-
-/* acessibilidade */
-body[data-theme^="kuromi-xp"] :focus-visible { outline: 2px dotted var(--kx-pink) !important; outline-offset: 1px !important; }

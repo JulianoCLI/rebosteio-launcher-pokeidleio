@@ -30,7 +30,7 @@ A barra superior organiza os controles centrais do launcher e acesso rápido às
 | **☰ Opções** | Menu de configurações avançadas: Hunt Analyzer, Tierlist analítica, Otimizador de Ditto, Alertas Discord/Windows, Venda Protegida, Modo Eco e diagnósticos. |
 
 > ⌨️ **Atalhos de teclado rápidos** (quando o foco estiver no launcher e sem modais abertos):  
-> **H** Hunts · **C** Modo Simples · **L** Limpar tela de combate · **R** Atualizar tudo · **T** Treinadores · **G** Tierlist · **D** Ditto · **O** Menu Opções · **M** Menu do jogo · **E** Alternar Modo Eco · **A** Alternar Alertas.
+> **H** Hunts · **C** Modo Simples · **L** Limpar tela de combate · **R** Atualizar tudo · **T** Treinadores · **G** Tierlist · **D** Ditto · **O** Menu Opções · **M** Menu do jogo · **E** Alternar Modo Eco · **A** Alternar Alertas e Sons do Jogo.
 
 ---
 
@@ -84,5 +84,5 @@ Ferramenta indispensável para treinadores que farmam com **Ditto Comum** ou **S
 ## 🛡 Proteções e Segurança Integrada
 
 * **Venda Protegida**: Exige confirmação explícita ao vender acidentalmente Pokémon shiny, qualidade Lendária ou itens de alto valor. Você também pode trancar itens específicos com o **🔒 Cadeado de Venda**.
-* **Alertas Sonoros e Webhook Discord**: Notifica imediatamente quando um shiny surgir no radar, quando uma conta for desconectada, quando os suprimentos acabarem ou quando o time desmaiar.
+* **Alertas Sonoros, Sons do Jogo e Webhook Discord**: Alterna todos os sons nativos da configuração do jogo (Sound Mode, som de shiny, captura e drops de boss) e notificações de radar, queda de conta ou suprimentos baixos.
 * **Salvamento Criptografado**: Todas as credenciais de login são salvas utilizando as chaves seguras do próprio Windows (DPAPI) via `safeStorage` do Electron, sem qualquer envio externo.
