@@ -361,7 +361,7 @@
     let d = null;
     try {
       const pc = (typeof stCache !== 'undefined' ? stCache[i] : null) || (window.stCache ? window.stCache[i] : null);
-      if (pc && pc.d && pc.d.ok && Date.now() - pc.t < 15000) {
+      if (pc && pc.d && pc.d.ok && pc.d.live && (pc.d.team && pc.d.team.length > 0) && Date.now() - pc.t < 15000) {
         d = pc.d;
       } else if (typeof webviews !== 'undefined' && webviews[i] && !(typeof off !== 'undefined' && off[i])) {
         const rs = (typeof READ_STATE !== 'undefined' ? READ_STATE : null) || window.READ_STATE;

@@ -27,17 +27,28 @@ rem 1. Verifica se ja temos o Node portatil baixado localmente
 if exist ".runtime\node\node.exe" (
   set "NODE_CMD=%~dp0.runtime\node\node.exe"
   set "NPM_CMD=%~dp0.runtime\node\npm.cmd"
+  if exist "%~dp0.runtime\node\node_modules\npm\bin\npm-cli.js" (
+    set "NPM_CLI_JS=%~dp0.runtime\node\node_modules\npm\bin\npm-cli.js"
+  )
   set "PATH=%~dp0.runtime\node;%PATH%"
 ) else (
   rem 2. Verifica se o Node.js esta instalado no sistema e se a versao e >= 22.12
-  where node >nul 2>nul
+  where.exe node.exe >nul 2>nul
   if not errorlevel 1 (
-    where npm >nul 2>nul
+    where.exe npm >nul 2>nul
     if not errorlevel 1 (
       node -e "const [M,m]=process.versions.node.split('.').map(Number);process.exit(M>22||(M===22&&m>=12)?0:1)" >nul 2>nul
       if not errorlevel 1 (
         set "NODE_CMD=node"
-        set "NPM_CMD=npm"
+        for /f "delims=" %%I in ('node -e "try{console.log(require('path').join(require('path').dirname(process.execPath),'node_modules','npm','bin','npm-cli.js'))}catch(_){}" 2^>nul') do (
+          if exist "%%I" set "NPM_CLI_JS=%%I"
+        )
+        if not defined NPM_CLI_JS (
+          for /f "delims=" %%I in ('where.exe npm.cmd 2^>nul') do (
+            if not defined NPM_CMD set "NPM_CMD=%%I"
+          )
+        )
+        if not defined NPM_CMD set "NPM_CMD=npm"
       )
     )
   )
@@ -90,6 +101,9 @@ if not defined NODE_CMD (
   if exist ".runtime\node\node.exe" (
     set "NODE_CMD=%~dp0.runtime\node\node.exe"
     set "NPM_CMD=%~dp0.runtime\node\npm.cmd"
+    if exist "%~dp0.runtime\node\node_modules\npm\bin\npm-cli.js" (
+      set "NPM_CLI_JS=%~dp0.runtime\node\node_modules\npm\bin\npm-cli.js"
+    )
     set "PATH=%~dp0.runtime\node;%PATH%"
     echo Node.js configurado com sucesso.
     echo.
@@ -109,7 +123,11 @@ if not exist "node_modules\electron\dist\electron.exe" set "PG_FALTA=1"
 if defined PG_FALTA (
   echo Instalando as dependencias do PIO Rebosteio...
   echo Na primeira vez isso pode levar alguns minutos. Nao feche esta janela...
-  call "!NPM_CMD!" install --no-audit --no-fund
+  if defined NPM_CLI_JS (
+    "!NODE_CMD!" "!NPM_CLI_JS!" install --no-audit --no-fund
+  ) else (
+    call "!NPM_CMD!" install --no-audit --no-fund
+  )
   echo Baixando o Electron...
   if exist "tools\ensure-electron.js" (
     "!NODE_CMD!" "tools\ensure-electron.js"
@@ -129,9 +147,7 @@ if not exist "node_modules\electron\dist\electron.exe" (
 
 if not exist "node_modules\electron\dist\electron.exe" (
   echo.
-  echo A instalacao nao terminou. Confira a conexao com a internet e abra novamente.
-  echo Se o erro persistir, instale o Microsoft Visual C++ Redistributable em:
-  echo https://aka.ms/vs/17/release/vc_redist.x64.exe
+  echo A instalacao do Electron nao terminou. Confira a conexao com a internet e abra novamente.
   echo.
   pause
   exit /b 1
