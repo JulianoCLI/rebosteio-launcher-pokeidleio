@@ -100,7 +100,7 @@ npm start
 ## Segurança e Integridade
 
 1. **Criptografia Local**: Credenciais salvas no formulário de Treinadores são protegidas pela API DPAPI nativa do Windows através do `safeStorage` do Electron.
-2. **Sandbox Fechado**: Webviews rodam isoladas, restringindo navegação exclusivamente aos domínios oficiais do jogo (`pokeidle.io` e `poke.idleworld.online`).
+2. **Sandbox Fechado**: Webviews rodam isoladas, restringindo navegação exclusivamente aos domínios oficiais do jogo (`pokeidle.io`).
 3. **Privacidade**: O launcher não coleta dados de usuário, não possui telemetria invasiva e não possui servidores intermediários.
 
 ---
