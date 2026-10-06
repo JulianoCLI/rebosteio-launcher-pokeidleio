@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.29
+
+- **Correção da sidebar e telemetria travadas no Modo Eco e Sem HUD (Limpar Jogo).** Resolvido o erro fatal silencioso (`ReferenceError: Cannot access 'S' before initialization`) no coletor de estado `READ_STATE`, que impedia o cálculo de métricas e deixava todos os cards da sidebar travados em "Conectando", "Time ainda não carregado" e métricas zeradas após o jogo salvar a sessão no `localStorage`.
+  *Fixed sidebar and telemetry freeze in Eco and Clean HUD modes: resolved a silent fatal TDZ ReferenceError in `READ_STATE` that prevented metrics calculation and permanently trapped sidebar cards in "Connecting" and "Team not yet loaded" states after session keys were stored in localStorage.*
+- **Captura resiliente de WebSocket e hidratação imediata no cold start.** Em inicializações rápidas sob Modo Eco ou tela limpa, o jogo estabelecia o WebSocket antes do evento `dom-ready`. O coletor agora intercepta `WebSocket.prototype.send` e vincula diretamente instâncias existentes (`window.ws`, `window.estado.ws`), sincronizando instantaneamente os dados de treinador, equipe e caça a partir de `window.estado.eu`.
+  *Resilient WebSocket hooking and instant cold start hydration: under lightweight Eco or clean HUD cold starts, WebSocket connections opened before `dom-ready`. The collector now hooks `WebSocket.prototype.send` and existing socket references (`window.ws`, `window.estado.ws`), instantly hydrating trainer, team, and hunt telemetry from `window.estado.eu`.*
+- **Fim da disputa de modos entre Modo Eco e Sem HUD.** O modo Sem HUD (`cleanScript`) não desativa mais forçadamente o Modo Economia nem aciona `#eco-sair`, e o Modo Eco não é mais bloqueado quando a interface estiver limpa. Ambos os modos agora coexistem de forma estável sem desarmes mútuos a cada ciclo.
+  *Eliminated conflict between Eco and Clean HUD modes: Clean HUD (`cleanScript`) no longer forcibly turns off economy mode or clicks `#eco-sair`, and Eco mode is no longer blocked when immersive mode is active. Both modes now stably coexist without fighting each other.*
+- **Leitura numérica precisa (`nDom`) e fallbacks DOM completos.** Adicionado parser numérico com suporte a pontuação de milhar brasileira e internacional (`1.250.000`, `350.000`), além de leituras de contingência para o time Pokémon (`#time .poke-linha`), hunt ativa (`#hud-hunt`, `#eco-onde`), pokébola equipada (`#auto-ball-opts .auto-chip.on`) e dados do treinador.
+  *Accurate numeric parsing (`nDom`) and complete DOM fallbacks: added robust thousands-separator parsing (`1.250.000`, `350.000`), alongside resilient DOM fallbacks for Pokémon team (`#time .poke-linha`), active hunt (`#hud-hunt`, `#eco-onde`), equipped ball (`#auto-ball-opts .auto-chip.on`), and trainer statistics.*
+- **Ajuste de retenção de cache na sidebar.** A função `collectOne` no shell da sidebar agora invalida imediatamente estados em espera ou com time vazio, evitando que a interface permaneça exibindo dados vazios por 15 segundos durante a carga inicial.
+  *Sidebar cache retention fix: `collectOne` in the shell now immediately bypasses cached empty or waiting states, ensuring the UI refreshes instantly instead of trapping empty data for 15 seconds during initial loading.*
+
 ## 1.5.28
 
 - **Auto-Update e sincronização transparente no inicializador do Windows.** O arquivo `Abrir Poke Idle IO.bat` agora executa um `git pull` automático e silencioso antes de carregar o jogo, recebendo atualizações da comunidade sem exigir downloads manuais nem travar caso o jogador esteja offline ou sem git.
