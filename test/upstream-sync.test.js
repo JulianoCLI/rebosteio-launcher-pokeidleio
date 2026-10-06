@@ -53,6 +53,34 @@ assert.equal(result.a.balance, 28); assert.ok(result.a.xph > 0);
 state.automation.ballIds = [900];
 result = vm.runInContext(reader, guest);
 assert.equal(result.equippedBall.infinite, true); assert.equal(result.balls, 999999);
+state.api['/game/items.json'].items.find(item => item.id === 10).npcPrice = 50;
+state.api['/game/items.json'].items.find(item => item.id === 11).npcPrice = 150;
+guest.localStorage = { getItem: key => key === 'sessao-hunt:conta fictícia' ? JSON.stringify({
+  abates: 12, xpTreinador: 3600, capturas: 2, gold: 1000, ms: 3600000,
+  bolas: { 4: 2 }, pocoes: { 10: 1 }, revives: { 11: 1 }, shiniesVistos: 1, shinies: 1
+}) : null };
+result = vm.runInContext(reader, guest);
+assert.equal(result.a.srv, 1, 'the native game session is read without a swallowed initialization error');
+assert.equal(result.a.kills, 12); assert.equal(result.a.captures, 2);
+assert.equal(result.a.supplyGold, 460); assert.equal(result.a.balance, 540);
+assert.equal(result.a.xph, 3600); assert.equal(result.a.kph, 12);
+guest.localStorage.getItem = () => null;
+const scoreboard = { querySelector: () => ({ textContent: '1h 00m' }) };
+const metrics = {
+  '[data-kpi="lucro"] .eco-kpi-v': '1.234,50', '[data-kpi="lucro"] .eco-kpi-h': '1.234,50/h',
+  '[data-kpi="lucro"] .eco-kpi-sub': 'Gastos -120,50',
+  '[data-kpi="xpTreinador"] .eco-kpi-v': '12.345', '[data-kpi="xpTreinador"] .eco-kpi-h': '12.345/h',
+  '[data-kpi="abates"] .eco-kpi-v': '12', '[data-kpi="abates"] .eco-kpi-h': '1.200/h',
+  '[data-kpi="capturas"] .eco-kpi-v': '2', '[data-kpi="capturas"] .eco-kpi-h': '2/h'
+};
+guest.document = {
+  getElementById: id => id === 'eco-placar' ? scoreboard : null,
+  querySelector: selector => selector in metrics ? { textContent: metrics[selector] } : null
+};
+result = vm.runInContext(reader, guest);
+assert.equal(result.a.balance, 1234.5, 'the injected parser preserves thousands separators and decimal commas');
+assert.equal(result.a.supplyGold, 120.5); assert.equal(result.a.gph, 1234.5);
+assert.equal(result.a.xpg, 12345); assert.equal(result.a.xph, 12345); assert.equal(result.a.kph, 1200);
 state.meMiss = 2; state.sock.readyState = 0;
 assert.equal(vm.runInContext(reader, guest).live, false, 'a lost connection is not reported as online');
 guest.window.__poke = null;
@@ -63,7 +91,7 @@ async function testShellReader() {
   const webview = {};
   const coordinator = runtime.createReadCoordinator(() => {
     calls++;
-    return new Promise(resolve => { finish = () => resolve({ ok: true, live: true, cid: 'trainer-fixture', name: 'Conta fictícia' }); });
+    return new Promise(resolve => { finish = () => resolve({ ok: true, live: true, cid: 'trainer-fixture', name: 'Conta fictícia', team: [{ name: 'Venusaur' }] }); });
   });
   const cache = {};
   const host = vm.createContext({
@@ -82,11 +110,18 @@ async function testShellReader() {
   assert.equal(cache[0].d.cid, 'trainer-fixture', 'window fallback publishes the sanitized snapshot');
   assert.equal((await host.collectOne(0)).name, 'Conta fictícia');
   assert.equal(calls, 1, 'the sidebar reuses a valid recent snapshot');
+  cache[0] = { t: Date.now(), d: { ok: true, live: true, team: [] } };
+  const incomplete = host.collectOne(0);
+  await Promise.resolve(); assert.equal(calls, 2, 'upstream rereads a partial snapshot without its team');
+  finish(); await incomplete;
   cache[0] = { t: Date.now(), d: { ok: false } };
   const fresh = host.collectOne(0);
-  await Promise.resolve(); assert.equal(calls, 2, 'an invalid snapshot does not hide the current state');
+  await Promise.resolve(); assert.equal(calls, 3, 'an invalid snapshot does not hide the current state');
   finish(); await fresh;
 }
-testShellReader().then(() => {
-  console.log('PASS: upstream collector syntax, live identity, team, selected supplies, rates, disconnected state and shared sidebar reads.');
-}).catch(error => { console.error(error); process.exitCode = 1; });
+let timeout;
+Promise.race([testShellReader(), new Promise((_resolve, reject) => {
+  timeout = setTimeout(() => reject(new Error('Sidebar integration check timed out')), 5000);
+})]).then(() => {
+  console.log('PASS: upstream collector syntax, live identity, team, selected supplies, native hunt session, economy scoreboard, disconnected state and shared sidebar reads.');
+}).catch(error => { console.error(error); process.exitCode = 1; }).finally(() => clearTimeout(timeout));

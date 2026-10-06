@@ -13,7 +13,7 @@ async function ensureElectron() {
 
   console.log('[PIO] Inicializando instalacao do Electron...');
 
-  // 1. Tentar primeiro o instalador padrao do Electron
+  // 1. Tentar primeiro o instalador padrao do Electron (se existir apos npm install)
   const installJs = path.join(electronDir, 'install.js');
   if (fs.existsSync(installJs)) {
     try {
@@ -22,23 +22,54 @@ async function ensureElectron() {
         return true;
       }
     } catch (_) {
-      console.warn('[PIO] Extrator padrao falhou (falta de C++ Redistributable ou erro de binding).');
+      console.warn('[PIO] Extrator padrao falhou. Tentando instalacao de contingencia direta...');
     }
   }
 
   // 2. Contingencia: Baixar e extrair nativamente via Windows (tar.exe ou PowerShell)
-  console.log('[PIO] Executando instalacao de contingencia sem dependencias nativas C++...');
+  console.log('[PIO] Executando instalacao de contingencia sem dependencias externas...');
   try {
-    const { downloadArtifact } = require('@electron/get');
-    const { version } = require(path.join(electronDir, 'package.json'));
+    let version = '43.1.1';
+    try {
+      const pkg = require(path.join(electronDir, 'package.json'));
+      if (pkg.version) version = pkg.version;
+    } catch (_) {
+      try {
+        const rootPkg = require(path.join(rootDir, 'package.json'));
+        if (rootPkg.devDependencies && rootPkg.devDependencies.electron) {
+          version = rootPkg.devDependencies.electron.replace(/^[\^~]/, '');
+        }
+      } catch (_) {}
+    }
 
-    console.log(`[PIO] Baixando/verificando cache do Electron v${version}...`);
-    const zipPath = await downloadArtifact({
-      version,
-      artifactName: 'electron',
-      platform: 'win32',
-      arch: 'x64'
-    });
+    let zipPath = null;
+    try {
+      const { downloadArtifact } = require('@electron/get');
+      zipPath = await downloadArtifact({
+        version,
+        artifactName: 'electron',
+        platform: 'win32',
+        arch: 'x64'
+      });
+    } catch (_) {
+      // Se @electron/get nao estiver presente (ex.: npm falhou), baixa diretamente do GitHub oficial
+      const cacheDir = path.join(rootDir, '.runtime');
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+      zipPath = path.join(cacheDir, `electron-v${version}-win32-x64.zip`);
+      if (!fs.existsSync(zipPath)) {
+        const electronZipUrl = `https://github.com/electron/electron/releases/download/v${version}/electron-v${version}-win32-x64.zip`;
+        console.log(`[PIO] Baixando Electron v${version} diretamente do GitHub oficial...`);
+        let downloaded = false;
+        try {
+          execSync(`curl.exe -L "${electronZipUrl}" -o "${zipPath}"`, { stdio: 'inherit' });
+          if (fs.existsSync(zipPath) && fs.statSync(zipPath).size > 1000000) downloaded = true;
+        } catch (_) {}
+        if (!downloaded) {
+          const psCmd = `[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object Net.WebClient).DownloadFile('${electronZipUrl}', '${zipPath.replace(/'/g, "''")}')`;
+          execSync(`powershell -NoProfile -ExecutionPolicy Bypass -Command "${psCmd}"`, { stdio: 'inherit' });
+        }
+      }
+    }
 
     const distPath = path.join(electronDir, 'dist');
     if (!fs.existsSync(distPath)) {
@@ -47,7 +78,7 @@ async function ensureElectron() {
 
     let extracted = false;
     try {
-      console.log('[PIO] Extraindo arquivos via tar do Windows...');
+      console.log('[PIO] Extraindo arquivos do Electron via tar do Windows...');
       execSync(`tar.exe -xf "${zipPath}" -C "${distPath}"`, { stdio: 'inherit' });
       if (fs.existsSync(electronExe)) {
         extracted = true;

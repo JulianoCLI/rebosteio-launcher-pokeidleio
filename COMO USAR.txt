@@ -16,7 +16,8 @@ No Windows, voce NAO precisa instalar o Node.js manualmente:
 
   2. Se voce nao tiver o Node.js instalado, o proprio arquivo .bat
      vai baixar a versao oficial portatil do Node e instalar todas
-     as bibliotecas necessarias sozinho!
+     as bibliotecas necessarias sozinho! Ele tambem configura o Camoufox
+     automaticamente para logins inteligentes com Cloudflare Turnstile.
 
   3. Na primeira vez ele demora 1 ou 2 minutos enquanto baixa o
      necessario e em seguida abre a janela do launcher automaticamente.
@@ -32,7 +33,7 @@ No Windows, voce NAO precisa instalar o Node.js manualmente:
   Enviar para > Area de trabalho (criar atalho).
 
   No Mac ou Linux: instale o Node.js LTS (https://nodejs.org),
-  abra o Terminal na pasta e digite:  bash iniciar.sh
+  abra o Terminal na pasta e digite:  npm install && npm start
 
 
 PASSO 2 - USAR E CONECTAR
@@ -48,7 +49,9 @@ PASSO 2 - USAR E CONECTAR
 
 PARA ATUALIZAR DEPOIS
 ---------------------
-Baixe o ZIP de novo e substitua os arquivos da pasta antiga.
+- Se voce clonou pelo Git, o arquivo "Abrir Poke Idle IO.bat" ja baixa
+  e sincroniza todas as novidades sozinho toda vez que voce abrir!
+- Se baixou como ZIP avulso, basta baixar o ZIP novo e substituir os arquivos.
 Suas contas e configuracoes continuam salvas intactas no PC.
 
 

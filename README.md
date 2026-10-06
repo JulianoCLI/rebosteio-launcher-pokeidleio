@@ -74,12 +74,6 @@ O launcher se adapta à quantidade de contas que você usa: se tiver 1 conta cad
 Abra o terminal na pasta do projeto e execute:
 
 ```bash
-bash iniciar.sh
-```
-
-Ou diretamente via Node/NPM:
-
-```bash
 npm install
 npm start
 ```
@@ -100,8 +94,15 @@ npm start
 ## Segurança e Integridade
 
 1. **Criptografia Local**: Credenciais salvas no formulário de Treinadores são protegidas pela API DPAPI nativa do Windows através do `safeStorage` do Electron.
-2. **Sandbox Fechado**: Webviews rodam isoladas, restringindo navegação exclusivamente aos domínios oficiais do jogo (`pokeidle.io` e `poke.idleworld.online`).
+2. **Sandbox Fechado**: Webviews rodam isoladas, restringindo navegação exclusivamente aos domínios oficiais do jogo (`pokeidle.io`).
 3. **Privacidade**: O launcher não coleta dados de usuário, não possui telemetria invasiva e não possui servidores intermediários.
+
+---
+
+## Atualizações e Versionamento
+
+* **Incremento de Versão no `package.json`**: Sempre que enviar uma atualização, correção ou novidade para o repositório, incremente a versão no [`package.json`](package.json) (ex.: de `1.5.27` para `1.5.28`). O launcher e o inicializador automático utilizam essa numeração para detectar novas versões e sincronizar os arquivos para os usuários.
+* **Changelog**: Registre as novidades da versão no [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 

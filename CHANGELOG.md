@@ -1,7 +1,20 @@
 # Changelog
 
+## 1.5.28
+
+- **Auto-Update e sincronização transparente no inicializador do Windows.** O arquivo `Abrir Poke Idle IO.bat` agora executa um `git pull` automático e silencioso antes de carregar o jogo, recebendo atualizações da comunidade sem exigir downloads manuais nem travar caso o jogador esteja offline ou sem git.
+  *Transparent auto-update in Windows launcher: `Abrir Poke Idle IO.bat` now performs an automatic, non-blocking silent git pull upon launching, seamlessly receiving updates without requiring manual downloads.*
+- **Setup e download automático do motor Camoufox.** O inicializador agora verifica a presença do Python e do pacote `camoufox`, baixando os binários necessários (`camoufox fetch`) e realizando autoteste em cache local para logins stealth resilientes em desafios Cloudflare Turnstile.
+  *Automatic Camoufox engine setup: the launcher verifies Python and camoufox packages, fetching stealth browser binaries automatically with cached readiness checks for Cloudflare Turnstile logins.*
+- **Correção de resolução do npm no Windows.** O script agora invoca o `npm-cli.js` diretamente com caminho absoluto via Node, contornando o erro de `%~dp0` no Windows CMD onde o npm tentava resolver módulos a partir da pasta raiz do projeto.
+  *Fixed Windows npm resolution: the batch launcher directly invokes `npm-cli.js` via absolute path through Node, eliminating `%~dp0` batch caller issues where npm searched for modules in the working directory.*
+- **Contingência autônoma para instalação do Electron.** O script `tools/ensure-electron.js` agora faz download direto dos binários do Electron a partir dos lançamentos oficiais do GitHub caso o `@electron/get` ou o `npm install` falhem, garantindo inicialização mesmo em ambientes sem dependências instaladas.
+  *Standalone fallback for Electron installation: `tools/ensure-electron.js` directly downloads Electron binaries from official GitHub releases when npm or `@electron/get` are unavailable.*
+
 ## 1.5.27
 
+- **Botão Alertas controla todos os sons nativos da configuração do jogo.** O botão Alertas (🔔 no topo, na barra rápida, nas Opções ou tecla A) agora liga e desliga de forma sincronizada todos os 4 interruptores de som da tela de configurações do jogo (Sound Mode com trilhas de Hoenn, Som de shiny, Som de captura e Som de TM Disk Boss Drop), pausando a reprodução e mutando/desmutando o áudio dos painéis em tempo real.
+  *Alerts button toggles all native in-game sound settings: toggling Alerts now directly switches all 4 game sound toggles (Sound Mode Hoenn tracks, shiny capture sound, regular capture sound, and TM Disk Boss Drop sound), pausing playback and muting/unmuting panels in real time.*
 - **Tierlist por Pokémon e por gold/h.** Um seletor no topo da tierlist escolhe o que a nota mede: **XP/h** ou **Gold/h**. O jogo não manda gold por kill (o gold vem do loot vendido ao NPC), então o app calcula o loot esperado de cada hunt a partir da chance de cada drop e do preço de NPC, inclusive nas hunts que você nunca visitou, e multiplica pelos kills/h do modelo. E o chip **🎯 Pokémon** inverte a pergunta: escolha um Pokémon do seu time (com o nível, a qualidade, o IV e os TMs dele) ou digite qualquer um, e a lista mostra as melhores hunts pra ele até o seu nível, com kills/h, XP/h e gold/h de cada uma. Com Ditto, mostra a forma certa pra cada hunt.
   *Tierlist by Pokémon and by gold/h: choose whether the score measures XP/h or Gold/h (expected loot per kill at NPC price, computed for every hunt), and the 🎯 Pokémon chip lists the best hunts for a Pokémon from your team or any species, up to your level.*
 - **Mais leve com a janela minimizada ou na bandeja.** O app mantém os jogos acordados pra o farm não travar, e por isso eles seguiam desenhando o mapa pra ninguém. Agora, com a janela escondida, os jogos entram sozinhos no mesmo modo leve do 🍃 Simples (1 quadro por segundo, sem imagem) e o painel de números para de redesenhar; ao abrir a janela, tudo volta. O farm continua igual, porque roda no servidor.

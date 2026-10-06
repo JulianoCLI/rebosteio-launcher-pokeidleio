@@ -74,12 +74,6 @@ The launcher dynamically adapts to your configuration: if you configure 1 accoun
 Open your terminal inside the project folder and execute:
 
 ```bash
-bash iniciar.sh
-```
-
-Or directly via Node/NPM:
-
-```bash
 npm install
 npm start
 ```
@@ -100,7 +94,7 @@ npm start
 ## Security & Integrity
 
 1. **Local Encryption**: Passwords saved in the Trainers form are protected by Windows native DPAPI via Electron's `safeStorage`.
-2. **Strict Sandbox**: Webviews run isolated, restricting navigation strictly to official game domains (`pokeidle.io` and `poke.idleworld.online`).
+2. **Strict Sandbox**: Webviews run isolated, restricting navigation strictly to official game domains (`pokeidle.io`).
 3. **Privacy**: The launcher does not collect user data, has no telemetry trackers, and connects to no middleman servers.
 
 ---

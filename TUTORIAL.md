@@ -46,7 +46,8 @@ Caso utilize Linux/macOS ou prefira instalar o Node.js manualmente no sistema:
 Abra o Terminal dentro da pasta do projeto e digite:
 
 ```bash
-bash iniciar.sh
+npm install
+npm start
 ```
 
 ---
