@@ -419,6 +419,8 @@
 <link rel="stylesheet" href="src/ui/moon-garden-dark.css">
 <link rel="stylesheet" href="src/ui/themes.css">
 <link rel="stylesheet" href="src/ui/kuromi-xp.css">
+<link rel="stylesheet" href="src/ui/panel-controls.css">
+<script src="src/ui/runtime-performance.js"></script>
 <script src="src/ui/themes/pokemon/all-pokemon.js"></script>
 <script src="src/ui/theme-manager.js"></script>
 <script src="src/ui/kuromi-xp.js"></script>
@@ -477,6 +479,8 @@
     <button id="refBtn" title="Referral do criador, copie se quiser ajudar :)">🔗</button>
   </div>
   <div id="grid"></div>
+  <div id="featureDragShield"></div>
+  <div id="featureSplit" role="separator" aria-orientation="vertical" tabindex="0" aria-valuemin="50" aria-valuemax="82"></div>
   <div id="cards"></div>
 
   <div id="shinyParty"></div>
@@ -774,6 +778,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
 
   let accounts = [];
   const webviews = [];
+  const zoomers = [];
   const off = Array.from({ length: 4 }, () => false);
   const lastLogin = Array.from({ length: 4 }, () => 0); // cooldown do auto-login por painel (evita ressubmeter em loop)
   const isLoggingIn = Array.from({ length: 4 }, () => false); // rastreia autenticação ativa para impedir reloads do watchdog
@@ -786,6 +791,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
   // ----- Idioma (interface + jogo) -----
   const I18N = {
     pt: {
+      tFeature:'Destacar esta conta mantendo as outras visíveis', tFeatureOff:'Voltar à grade sem destaque', tFeatureSplit:'Largura do painel em destaque (setas ajustam; duplo clique restaura)',
       loginAll:'▶ Logar equipe', accounts:'👤 Treinadores', reloadAll:'⟳ Atualizar tudo', layout:'▦ Grade', layoutCol:'▤ Uma coluna', propOn:'🖼 Proporção original', asOn:'🚀 Abre com o Windows', asOff:'🚀 Abrir com o Windows', asTitle:'Cria um atalho do PokeGrid na pasta Inicializar do Windows, o mesmo lugar onde você colocaria um atalho à mão. Não mexe no registro e você pode remover pelo Win+R > shell:startup.', propOff:'🖼 Esticar na tela', propTitle:'Mantém a proporção original do jogo, sem esticar a imagem. Sobra fundo escuro quando o painel não bate com a proporção; desligado, a imagem preenche tudo mas distorce.', layoutRow:'▥ Uma linha', layoutTitle:'Como os painéis se organizam. Clique pra alternar: grade, uma coluna (empilhado) ou uma linha (lado a lado).',
       sound:'🔊 Som', muted:'🔇 Mudo', eco:'⚡ Eco', ecoOff:'⚡ Eco off', sleep:'💤 Dormir', awake:'☕ Acordado',
       chatHidden:'💬 Chat oculto', chatShown:'💬 Chat visível',
@@ -833,6 +839,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       autoSupplyBtn:'📦 Auto Supply', autoSupplyTitle:'Reabastecimento automático de Pokébolas e Poções com verificação de saldo',
     },
     en: {
+      tFeature:'Highlight this account while keeping the others visible', tFeatureOff:'Return to the grid without a highlight', tFeatureSplit:'Highlighted panel width (arrow keys adjust; double-click resets)',
       loginAll:'▶ Log in all', accounts:'👤 Accounts', reloadAll:'⟳ Reload all', layout:'▦ Grid', layoutCol:'▤ Single column', propOn:'🖼 Original aspect', asOn:'🚀 Opens with Windows', asOff:'🚀 Open with Windows', asTitle:'Creates a PokeGrid shortcut in the Windows Startup folder, the same place you would put one by hand. It does not touch the registry and you can remove it via Win+R > shell:startup.', propOff:'🖼 Stretch to fill', propTitle:'Keeps the game original aspect ratio instead of stretching the image. Dark bars appear when the panel does not match the ratio; turned off, the image fills everything but gets distorted.', layoutRow:'▥ Single row', layoutTitle:'How the panels are arranged. Click to cycle: grid, single column (stacked) or single row (side by side).',
       sound:'🔊 Sound', muted:'🔇 Muted', eco:'⚡ Eco', ecoOff:'⚡ Eco off', sleep:'💤 Sleep', awake:'☕ Awake',
       chatHidden:'💬 Chat hidden', chatShown:'💬 Chat shown',
@@ -881,6 +888,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       autoSupplyBtn:'📦 Auto Supply', autoSupplyTitle:'Automatic restock of Pokéballs and Potions with budget check',
     },
     es: {
+      tFeature:'Destacar esta cuenta manteniendo las demás visibles', tFeatureOff:'Volver a la cuadrícula sin destaque', tFeatureSplit:'Ancho del panel destacado (flechas ajustan; doble clic restaura)',
       loginAll:'▶ Iniciar equipo', accounts:'👤 Entrenadores', reloadAll:'⟳ Recargar todo', layout:'▦ Cuadrícula', layoutCol:'▤ Una columna', propOn:'🖼 Proporción original', asOn:'🚀 Abre con Windows', asOff:'🚀 Abrir con Windows', asTitle:'Crea un acceso directo de PokeGrid en la carpeta Inicio de Windows, el mismo lugar donde lo pondrías a mano. No toca el registro y puedes quitarlo con Win+R > shell:startup.', propOff:'🖼 Estirar en pantalla', propTitle:'Mantiene la proporción original del juego, sin estirar la imagen. Queda fondo oscuro cuando el panel no coincide con la proporción; apagado, la imagen llena todo pero se distorsiona.', layoutRow:'▥ Una fila', layoutTitle:'Cómo se organizan los paneles. Clic para alternar: cuadrícula, una columna (apilado) o una fila (lado a lado).',
       sound:'🔊 Sonido', muted:'🔇 Silencio', eco:'⚡ Eco', ecoOff:'⚡ Eco off', sleep:'💤 Dormir', awake:'☕ Despierto',
       chatHidden:'💬 Chat oculto', chatShown:'💬 Chat visible',
@@ -988,6 +996,25 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
 
   let cardsRefreshTimer = null;
 
+  function zoomTodos(acao) {
+    zoomers.forEach((z, i) => { if (z && webviews[i] && !off[i]) z(acao); });
+  }
+
+  // O wheel do webview nao chega ao documento do launcher. Usa a ponte de console existente.
+  function installZoomWheel() {
+    if (window.__rebosteioZoomWheel) return;
+    window.__rebosteioZoomWheel = true;
+    let last = -Infinity;
+    addEventListener('wheel', e => {
+      if (!(e.ctrlKey || e.metaKey) || !e.deltaY) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - last < 80) return;
+      last = now;
+      console.log('__RBZOOM__' + (e.deltaY < 0 ? 'in' : 'out'));
+    }, { capture: true, passive: false });
+  }
+
   function criarPainel(i) {
       const panel = document.createElement('div');
       panel.className = 'panel';
@@ -1000,6 +1027,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
           <span class="zpct"></span>
           <button class="zi">+</button>
           <button class="reload">⟳</button>
+          <button class="feature" aria-pressed="false">◫</button>
           <button class="expand">⛶</button>
         </div>`;
       const wv = document.createElement('webview');
@@ -1056,10 +1084,12 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       // o did-stop-loading sempre fecha o par do did-start-loading. Sem ele, navegacao interna da
       // SPA do jogo (que nao redispara o dom-ready) deixava o painel preso em "carregando...".
       wv.addEventListener('did-stop-loading', () => { if (!off[i] && !falhou) { dot.className = 'dot ok'; status.textContent = t('stOnline'); } });
+      wv.addEventListener('did-start-loading', () => stateReads.invalidate(i));
       // canal do painel pro card de IV do app: a extensao marca a mensagem, aqui a gente pesca
       wv.addEventListener('console-message', (e) => {
         const m = e && e.message;
         if (typeof m !== 'string') return;
+        if (m === '__RBZOOM__in' || m === '__RBZOOM__out') { zoomTodos(m.endsWith('in') ? 'in' : 'out'); return; }
         if (m === '__PGDLG__1' || m === '__PGDLG__0') { dlgT[i] = m === '__PGDLG__1' ? Date.now() : 0; return; } // alert/confirm/prompt aberto no painel (SELLGUARD): o vigia de 60s espera
         if (m.lastIndexOf('__PGST__', 0) === 0 && m.length < 2000000) {
           try {
@@ -1118,12 +1148,14 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       zpct.onclick = () => setZoom(1);
       panel.querySelector('.zi').onclick = () => setZoom(zoom + 0.1);
       panel.querySelector('.zo').onclick = () => setZoom(zoom - 0.1);
+      zoomers[i] = acao => setZoom(acao === 'reset' ? 1 : zoom + (acao === 'in' ? 0.1 : -0.1));
 
       wv.addEventListener('dom-ready', () => {
         if (!off[i] && !falhou) { dot.className = 'dot ok'; status.textContent = t('stOnline'); fails = 0; alertedDown = false; } // carregou DE VERDADE: zera o watchdog (a pagina de erro tambem emite dom-ready)
         dlgT[i] = 0; // pagina nova: um dialogo da anterior nao ficou aberto
         try {
           wv.setAudioMuted(muted || cardsOn); wv.setZoomFactor(zoom);
+          wv.executeJavaScript('(' + installZoomWheel.toString() + ')()').catch(() => {});
           // reload nao zera a sessao: o jogo continua no servidor, entao re-semeia os contadores de antes
           try {
             const sn = sessSnap[i];
@@ -1191,6 +1223,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
 
       panel.querySelector('.reload').onclick = () => { if (!off[i]) { try { wv.reloadIgnoringCache(); } catch { wv.reload(); } } };
       panel.querySelector('.expand').onclick = () => toggleExpand(i);
+      panel.querySelector('.feature').onclick = () => toggleFeature(i);
       // prompt() nao abre nada no Electron (volta null): edita no proprio rotulo. Enter ou sair do campo grava, Esc cancela
       nameEl.ondblclick = () => {
         const inp = document.createElement('input');
@@ -1221,6 +1254,7 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     countRow.title = t('countTitle');
     (countRow.querySelectorAll('button') || countBtns).forEach(b => b.classList.toggle('on', +b.dataset.n === count));
     lsSet('count', count);
+    applyFeatureLayout();
   }
   function build() { for (let i = 0; i < count; i++) criarPainel(i); aplicaCountLayout(); }
   function setCount(n) {
@@ -1234,6 +1268,9 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
       for (let i = atual - 1; i >= n; i--) {
         if (grid.children[i]) grid.children[i].remove();
         webviews.pop();
+        zoomers.pop();
+        stateReads.invalidate(i);
+        delete stCache[i];
       }
     } else if (n > atual) { // adiciona sem recarregar os existentes
       for (let i = atual; i < n; i++) { off[i] = false; lastLogin[i] = 0; alertedBalls[i] = false; criarPainel(i); }
@@ -1253,8 +1290,120 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
     const on = !p.classList.contains('expanded');
     [...grid.children].forEach(c => c.classList.remove('expanded')); // um por vez
     if (on) p.classList.add('expanded');
+    positionFeatureSplit();
     ajustaProporcao(); // expandir/voltar muda o espaco do painel
   }
+
+  // Destaque muda apenas o layout: os webviews e suas sessoes continuam os mesmos.
+  const featureSplit = document.getElementById('featureSplit');
+  const featureDragShield = document.getElementById('featureDragShield');
+  const savedFeature = Number(lsGet('featuredIndex') ?? -1);
+  let featuredIndex = Number.isInteger(savedFeature) && savedFeature >= 0 && savedFeature < 4 ? savedFeature : -1;
+  let featureRatio = Number(lsGet('featureRatio') ?? 68);
+  if (!Number.isFinite(featureRatio)) featureRatio = 68;
+  featureRatio = Math.min(82, Math.max(50, featureRatio));
+  let endFeatureDrag = null;
+
+  function featureIsVisible() {
+    return featuredIndex >= 0 && featuredIndex < count && count > 1 && !cardsOn &&
+      !grid.classList.contains('one-col') && !grid.classList.contains('one-row') &&
+      !grid.querySelector('.panel.expanded') && grid.getBoundingClientRect().width > 0;
+  }
+  function positionFeatureSplit() {
+    const visible = featureIsVisible();
+    featureSplit.classList.toggle('show', visible);
+    if (!visible) { if (endFeatureDrag) endFeatureDrag(); return; }
+    const panel = grid.children[featuredIndex].getBoundingClientRect();
+    const gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+    featureSplit.style.left = (panel.right + gap / 2) + 'px';
+    featureSplit.style.top = panel.top + 'px';
+    featureSplit.style.height = panel.height + 'px';
+    featureSplit.setAttribute('aria-valuenow', String(Math.round(featureRatio)));
+    featureSplit.setAttribute('aria-valuetext', Math.round(featureRatio) + '%');
+  }
+  function applyFeatureLayout() {
+    const panels = [...grid.children];
+    if (!panels.length) return; // layout inicia antes de carregar as contas salvas
+    if (featuredIndex >= panels.length || panels.length < 2) featuredIndex = -1;
+    grid.style.setProperty('--feature-main', featureRatio + 'fr');
+    grid.style.setProperty('--feature-rest', (100 - featureRatio) + 'fr');
+    grid.classList.toggle('featured', featuredIndex >= 0);
+    panels.forEach((p, i) => {
+      const selected = i === featuredIndex;
+      p.classList.toggle('featured-panel', selected);
+      const button = p.querySelector('.feature');
+      if (!button) return;
+      const active = selected && !grid.classList.contains('one-col') && !grid.classList.contains('one-row');
+      button.classList.toggle('on', active);
+      button.disabled = panels.length < 2;
+      button.setAttribute('aria-pressed', String(active));
+      button.title = t(active ? 'tFeatureOff' : 'tFeature');
+      button.setAttribute('aria-label', button.title);
+    });
+    featureSplit.setAttribute('aria-label', t('tFeatureSplit'));
+    lsSet('featuredIndex', featuredIndex);
+    lsSet('featureRatio', featureRatio);
+    requestAnimationFrame(() => { positionFeatureSplit(); ajustaProporcao(); });
+  }
+  function toggleFeature(i) {
+    if (count < 2 || !grid.children[i]) return;
+    if (layoutMode !== 'grid') {
+      layoutMode = 'grid';
+      applyLayout();
+      document.dispatchEvent(new CustomEvent('piw-layout-mode', { detail: { mode: 'grid' } }));
+    }
+    [...grid.children].forEach(p => p.classList.remove('expanded'));
+    featuredIndex = featuredIndex === i ? -1 : i;
+    applyFeatureLayout();
+  }
+  function updateFeatureRatio(value) {
+    featureRatio = Math.min(82, Math.max(50, value));
+    grid.style.setProperty('--feature-main', featureRatio + 'fr');
+    grid.style.setProperty('--feature-rest', (100 - featureRatio) + 'fr');
+    positionFeatureSplit();
+    ajustaProporcao();
+  }
+  function dragFeature(clientX) {
+    const rect = grid.getBoundingClientRect();
+    const style = getComputedStyle(grid);
+    const left = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.borderLeftWidth) || 0);
+    const right = (parseFloat(style.paddingRight) || 0) + (parseFloat(style.borderRightWidth) || 0);
+    const gap = parseFloat(style.columnGap) || 0;
+    updateFeatureRatio((clientX - rect.left - left - gap / 2) / Math.max(1, rect.width - left - right - gap) * 100);
+  }
+  featureSplit.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || !featureIsVisible()) return;
+    if (endFeatureDrag) endFeatureDrag();
+    e.preventDefault();
+    featureSplit.focus();
+    featureSplit.classList.add('dragging');
+    featureDragShield.classList.add('show'); // impede o guest de capturar o mouse durante o arraste
+    const move = event => { if (event.pointerId === e.pointerId) dragFeature(event.clientX); };
+    const end = () => {
+      window.removeEventListener('pointermove', move, true);
+      window.removeEventListener('pointerup', up, true);
+      window.removeEventListener('pointercancel', up, true);
+      window.removeEventListener('blur', end);
+      featureSplit.classList.remove('dragging');
+      featureDragShield.classList.remove('show');
+      endFeatureDrag = null;
+      lsSet('featureRatio', featureRatio);
+    };
+    const up = event => { if (event.pointerId === e.pointerId) end(); };
+    endFeatureDrag = end;
+    window.addEventListener('pointermove', move, true);
+    window.addEventListener('pointerup', up, true);
+    window.addEventListener('pointercancel', up, true);
+    window.addEventListener('blur', end);
+  });
+  featureSplit.ondblclick = () => { updateFeatureRatio(68); lsSet('featureRatio', featureRatio); };
+  featureSplit.onkeydown = e => {
+    if (!featureIsVisible() || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    e.preventDefault();
+    updateFeatureRatio(e.key === 'Home' ? 50 : e.key === 'End' ? 82 : featureRatio + (e.key === 'ArrowLeft' ? -1 : 1));
+    lsSet('featureRatio', featureRatio);
+  };
+  document.addEventListener('piw-view-changed', positionFeatureSplit);
 
   function togglePower(i) {
     const panel = grid.children[i];
@@ -1730,6 +1879,9 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
   // funcao, nao constante: o READ_STATE so e declarado mais abaixo; no dom-ready ja existe
   const PUSH_STATE = () => '(()=>{if(window.__pgPush)return;window.__pgPush=1;setInterval(()=>{try{const imersivo=document.documentElement.classList.contains("modo-imersivo")||document.getElementById("pg-clean");if(!imersivo&&localStorage.getItem("cfg-economia")==="1"&&!document.documentElement.classList.contains("modo-economia")){const eb=document.getElementById("hunt-eco");if(eb){try{localStorage.setItem("cfg-economia","0");}catch(x){}eb.click();try{localStorage.setItem("cfg-economia","1");}catch(x){}}}else if((imersivo||localStorage.getItem("cfg-economia")==="0")&&document.documentElement.classList.contains("modo-economia")){const eb=document.getElementById("eco-sair")||document.querySelector(".eco-sair,#eco-painel button,.eco-painel button,[data-eco-sair],.btn-eco-sair");if(eb)eb.click();else{const he=document.getElementById("hunt-eco");if(he)he.click();document.documentElement.classList.remove("modo-economia");}try{if(window.PIXI&&window.PIXI.Ticker&&window.PIXI.Ticker.shared&&!window.PIXI.Ticker.shared.started)window.PIXI.Ticker.shared.start();}catch(x){}}}catch(x){}try{const d=' + READ_FAST + ';if(d&&d.ok){console.clear();console.log("__PGST__"+JSON.stringify(d))}}catch(x){}},4000)})()'; // clear: o console do painel guardava cada push (ate 10 MB)
   const stCache = {};
+  // Share only overlapping reads. The next request still gets a fresh sample.
+  const stateReads = RebosteioPerformance.createReadCoordinator(w => w.executeJavaScript(READ_STATE));
+  function readPanelState(i) { return stateReads.read(i, webviews[i]); }
   // Depot por conta (pedido do Semai: "aparece o depot da familia?"). Busca preguicosa: so com o
   // Simples aberto e a secao de inventario visivel, no maximo a cada 2 min por conta. A resposta
   // vem de codigo injetado, entao e saneada: so chaves simples, quantidade > 0, teto de 500 itens.
@@ -3718,8 +3870,8 @@ const HOME_URL  = 'https://pokeidle.io/app?ref=CJNKGPB'; // link do referral (bo
   }
   propBtn.onclick = () => { propNat = !propNat; applyPropNat(); };
   // refaz a conta quando o espaco muda: janela, layout, contagem de paineis, expandir, painel lateral
-  try { new ResizeObserver(() => ajustaProporcao()).observe(grid); } catch {}
-  addEventListener('resize', ajustaProporcao);
+  try { new ResizeObserver(() => { ajustaProporcao(); positionFeatureSplit(); }).observe(grid); } catch {}
+  addEventListener('resize', () => { ajustaProporcao(); positionFeatureSplit(); });
 
   // ----- Minimizar: pra bandeja (padrao) ou normal, na barra de tarefas -----
   const minTrayBtn = document.getElementById('minTray');
@@ -3929,13 +4081,18 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     balls: hlNum(h.balls), pots: hlNum(h.pots), loot: hlNum(h.loot), sell: hlNum(h.sell), sup: hlNum(h.sup),
     drops: (Array.isArray(h.drops) ? h.drops : []).slice(0, 60).map(d => ({ id: hlNum(d && d.id), n: hlTxt(d && d.n, 40), q: hlNum(d && d.q), g: hlNum(d && d.g) }))
   }));
-  const hlVistos = {}; huntLog.forEach(h => hlVistos[h.p + '_' + h.start] = 1);
-  const salvaHuntLog = () => { try { lsSet('huntLog', JSON.stringify(huntLog)); } catch {} };
+  const hlVistos = RebosteioPerformance.createRecentLogIndex();
+  hlVistos.retain(huntLog.map(h => h.p + '_' + h.start));
+  const salvaHuntLog = () => {
+    hlVistos.retain(huntLog.map(h => h.p + '_' + h.start));
+    try { lsSet('huntLog', JSON.stringify(huntLog)); } catch {}
+  };
   function registraHunt(i, ph) {
     if (!ph || !ph.start || !(+ph.kills > 0)) return; // hunt vazia (troca rápida) não vira registro
     const key = i + '_' + hlNum(ph.start);
-    if (hlVistos[key]) return; // já registrada: o coletor repete o prev a cada leitura
-    hlVistos[key] = 1;
+    hlVistos.setSource(i, [key]);
+    if (hlVistos.has(key)) return; // já registrada: o coletor repete o prev a cada leitura
+    hlVistos.add(key);
     huntLog.push({
       p: i, acc: hlTxt(tabNames[i] || stName(i)), hunt: hlTxt(cap(String(ph.slug || '').replace(/[_-]+/g, ' ').trim()), 60),
       start: hlNum(ph.start), end: hlNum(ph.end), kills: hlNum(ph.kills), xp: hlNum(ph.xp), caps: hlNum(ph.caps),
@@ -4035,15 +4192,18 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
   // o que duplicaria a entrada e o aviso). Assim duas contas com a mesma especie no mesmo ms nao colidem.
   const kSh = (p, x) => 's' + p + '_' + x.t + '_' + (x.sid || x.n);
   const kCa = (p, x) => 'c' + p + '_' + x.t + '_' + (x.id || x.n);
-  const seenLog = {}; lifeShiny.forEach(x => seenLog[kSh(x.p, x)] = 1); lifeCatch.forEach(x => seenLog[kCa(x.p, x)] = 1);
+  const seenLog = RebosteioPerformance.createRecentLogIndex();
+  const retainSeenLogs = () => seenLog.retain(lifeShiny.map(x => kSh(x.p, x)).concat(lifeCatch.map(x => kCa(x.p, x))));
+  retainSeenLogs();
   const mergedOnce = []; // 1o merge do painel: backfill silencioso (shiny de antes nao e novidade nem rajada de webhook)
   function mergeLogs(i, r) {
     const acc = tabNames[i] || stName(i), dot = ACOR[i % ACOR.length] || '#8b949e';
     const avisa = !!mergedOnce[i]; mergedOnce[i] = 1;
+    seenLog.setSource(i, (r.shinyLog || []).map(x => kSh(i, x)).concat((r.catchLog || []).map(x => kCa(i, x))));
     let dirty = false;
     (r.shinyLog || []).forEach(x => {
       const key = kSh(i, x);
-      if (seenLog[key]) return; seenLog[key] = 1; dirty = true;
+      if (seenLog.has(key)) return; seenLog.add(key); dirty = true;
       lifeShiny.push({ n: String(x.n || '').slice(0, 40), sid: +x.sid || 0, t: +x.t || 0, cap: x.cap ? 1 : 0, def: x.def ? 1 : 0, p: i, acc, dot });
       if (avisa && whCfg.shiny) webhookSend((whCfg.mention ? '<@' + whCfg.mention + '> ' : '') + '✨ ' + acc + ': shiny ' + (x.n || ('#' + (+x.sid || '?'))) + ' ' + (x.cap ? t('whCaught') : t('whSeen'))); // o shiny e derrotado ANTES de ficar capturavel: na hora nao da pra dizer que foi perdido; se pegar, vem o CAPTURADO
       if (avisa && x.cap) { // CAPTUROU: aviso grande na tela, som de festa e notificacao propria
@@ -4055,7 +4215,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     (r.catchLog || []).forEach(x => {
       const key = kCa(i, x);
       const ivsClean = x.ivs && typeof x.ivs === 'object' ? { hp: +x.ivs.hp || 0, atk: +x.ivs.atk || 0, def: +x.ivs.def || 0, spAtk: +x.ivs.spAtk || 0, spDef: +x.ivs.spDef || 0, speed: +x.ivs.speed || 0 } : null;
-      if (seenLog[key]) {
+      if (seenLog.has(key)) {
         const exist = lifeCatch.find(lc => lc.p === i && (lc.id && x.id ? lc.id === x.id : (lc.t === +x.t && lc.n === String(x.n || '').slice(0, 40))));
         if (exist) {
           if (+x.iv > 0 && (!exist.iv || exist.iv === 0)) {
@@ -4073,7 +4233,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
         }
         return;
       }
-      seenLog[key] = 1; dirty = true;
+      seenLog.add(key); dirty = true;
       lifeCatch.push({ id: x.id || null, n: String(x.n || '').slice(0, 40), iv: +x.iv || 0, ivs: ivsClean, q: +x.q || 0, sh: !!x.sh, fx: !!x.fx, t: +x.t || 0, p: i, acc, dot });
     });
     if (r.allPokes && r.allPokes.length) {
@@ -4093,6 +4253,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       if (lifeCatch.length > 300) lifeCatch = lifeCatch.slice(-300);
       try { lsSet('lifeShiny', JSON.stringify(lifeShiny)); lsSet('lifeCatch', JSON.stringify(lifeCatch)); } catch {}
     }
+    retainSeenLogs();
   }
 
   // ----- Farm parado: conta online mas os kills nao andam ha 10 min -----
@@ -4192,6 +4353,9 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
   window.pokeAPI?.onHotkey?.((k) => {
     if (k === 'mute') muteBtn.click();
     else if (k === 'collapse') sairDoFoco();
+    else if (k === 'zoomIn') zoomTodos('in');
+    else if (k === 'zoomOut') zoomTodos('out');
+    else if (k === 'zoomReset') zoomTodos('reset');
     else if (k.lastIndexOf('ctx', 0) === 0) { // clique direito no jogo: modo foco
       const id = +k.slice(3);
       const ix = webviews.findIndex(w => { try { return w && w.getWebContentsId() === id; } catch { return false; } });
@@ -4199,6 +4363,16 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     }
     else if (k.startsWith('expand')) toggleExpand(+k.slice(6));
   });
+
+  let lastZoomWheel = -Infinity;
+  window.addEventListener('wheel', e => {
+    if (!(e.ctrlKey || e.metaKey) || !e.deltaY) return;
+    e.preventDefault();
+    const now = performance.now();
+    if (now - lastZoomWheel < 80) return;
+    lastZoomWheel = now;
+    zoomTodos(e.deltaY < 0 ? 'in' : 'out');
+  }, { capture: true, passive: false });
 
   // ----- Referral: copia o link de convite -----
   const refBtn = document.getElementById('refBtn');
@@ -4258,6 +4432,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     lb.textContent = t(layoutMode === 'col' ? 'layoutCol' : layoutMode === 'row' ? 'layoutRow' : 'layout');
     lb.title = t('layoutTitle');
     lsSet('layout', layoutMode);
+    applyFeatureLayout();
   }
   document.getElementById('layout').onclick = () => { layoutMode = layoutMode === 'grid' ? 'col' : layoutMode === 'col' ? 'row' : 'grid'; applyLayout(); };
   document.addEventListener('piw-layout-mode', (event) => {
@@ -4692,7 +4867,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     for (let i = 0; i < count; i++) {
       const nm0 = tabNames[i] || stName(i), dot = ACOR[i % ACOR.length] || '#8b949e';
       if (off[i] || !webviews[i]) { cards += aggCard(dot, shownAccountName(i, nm0), null); continue; }
-      let d = null; try { d = await webviews[i].executeJavaScript(READ_STATE); } catch {}
+      let d = null; try { d = await readPanelState(i); } catch {}
       if (d && d.name && tabNames[i] !== d.name) { tabNames[i] = d.name; buildStatsTabs(); }
       cards += aggCard(dot, shownAccountName(i, (d && d.name) || nm0), d);
       const a = d && d.ok ? d.a : null;
@@ -4720,7 +4895,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     const w = webviews[statsIdx];
     if (off[statsIdx] || !w) { stBody.innerHTML = '<div class="st-empty">' + t('statsOff') + '</div>'; return; }
     try {
-      const d = await w.executeJavaScript(READ_STATE);
+      const d = await readPanelState(statsIdx);
       renderStats(d);
       if (d && d.ok && d.name && tabNames[statsIdx] !== d.name) { tabNames[statsIdx] = d.name; buildStatsTabs(); }
     } catch { stBody.innerHTML = '<div class="st-empty">' + t('statsWaiting') + '</div>'; }
@@ -4807,7 +4982,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     if (!lastData || !lastData.usedList || !lastData.usedList.length) {
       let j = statsIdx >= 0 ? statsIdx : -1;
       if (j < 0 || off[j] || !webviews[j]) { j = -1; for (let i = 0; i < count; i++) { if (!off[i] && webviews[i]) { j = i; break; } } }
-      if (j >= 0) { try { const d = await webviews[j].executeJavaScript(READ_STATE); if (d && d.ok) lastData = d; } catch {} }
+      if (j >= 0) { try { const d = await readPanelState(j); if (d && d.ok) lastData = d; } catch {} }
     }
     let h = '<div class="cfg-h">' + t('cfgSections') + '</div><div class="cfg-secs">';
     cfg.order.forEach(name => h += '<div class="cfg-row" draggable="true" data-sec="' + name + '"><span class="cfg-grip">⋮⋮</span><label class="cfg-chk"><input type="checkbox" data-sec="' + name + '"' + (cfg.hide[name] ? '' : ' checked') + '> ' + secLabel(name) + '</label></div>');
@@ -5344,7 +5519,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     let mudou = false;
     for (let i = 0; i < count; i++) {
       if (off[i] || !webviews[i]) continue;
-      try { const d = await webviews[i].executeJavaScript(READ_STATE); if (d && d.ok && d.cid && d.hunt && d.a) { amostraHunt(d.cid, d.hunt, d.a); amostraDano(d); mudou = true; } } catch {}
+      try { const d = await readPanelState(i); if (d && d.ok && d.cid && d.hunt && d.a) { amostraHunt(d.cid, d.hunt, d.a); amostraDano(d); mudou = true; } } catch {}
     }
     if (mudou) { try { lsSet('huntStats2', JSON.stringify(huntStats)); } catch {} }
   }, 30000);
@@ -5808,7 +5983,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       if (!force && pc && Date.now() - pc.t < 3500) {
         d = pc.d;
       } else if (webviews[i] && !off[i]) {
-        try { d = await webviews[i].executeJavaScript(READ_STATE); } catch {}
+        try { d = await readPanelState(i); } catch {}
         if (d && d.ok) {
           d = stSane(d) || d;
           stCache[i] = { t: Date.now(), d };
@@ -6251,6 +6426,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     cardsEl.querySelectorAll('.cd-hide').forEach(f => f.onclick = () => { const k = f.dataset.h; if (huntHidden[k]) delete huntHidden[k]; else huntHidden[k] = 1; try { lsSet('huntHidden', JSON.stringify(huntHidden)); } catch {} refreshCards(true); });
   }
   function applyCards() {
+    requestAnimationFrame(positionFeatureSplit);
     document.body.classList.toggle('cards-on', cardsOn);
     cardsBtn.classList.toggle('on', cardsOn);
     lsSet('cardsOn', cardsOn ? '1' : '0');

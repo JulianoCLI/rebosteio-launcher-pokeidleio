@@ -5,7 +5,9 @@
   "main": "main.js",
   "author": "soufoka",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test:panels": "electron test/panel-controls.test.js",
+    "test:performance": "node test/runtime-performance.test.js"
   },
   "keywords": [
     "electron",

@@ -327,6 +327,7 @@
     $$('#leafViewTabs button').forEach(b => { const selected = b.dataset.view === view; b.classList.toggle('is-active', selected); b.setAttribute('aria-pressed', String(selected)); });
     $('#leafWindowView').hidden = view !== 'windows';
     $('#leafListView').hidden = view !== 'list';
+    document.dispatchEvent(new CustomEvent('piw-view-changed', { detail: { view } }));
     if (view === 'list') {
       renderList();
       if (!wasVisible && animate && !matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -362,7 +363,7 @@
       const pc = typeof stCache !== 'undefined' && stCache[i];
       if (pc && Date.now() - pc.t < 3500) d = pc.d;
       else if (typeof webviews !== 'undefined' && webviews[i] && !(typeof off !== 'undefined' && off[i])) {
-        d = await webviews[i].executeJavaScript(READ_STATE);
+        d = await readPanelState(i);
         if (d && d.ok && typeof stCache !== 'undefined') {
           const s = (typeof stSane === 'function' ? stSane(d) : d) || d;
           stCache[i] = { t: Date.now(), d: s };
@@ -387,7 +388,7 @@
     const n = typeof count !== 'undefined' ? count : (typeof webviews !== 'undefined' ? webviews.length : 0);
     const arr = [];
     for (let i=0;i<n;i++) arr.push(await collectOne(i));
-    renderAll(arr);
+    if (typeof janelaOculta === 'undefined' || !janelaOculta) renderAll(arr);
     } finally { collecting = false; }
   }
 
@@ -395,12 +396,12 @@
     const online = arr.filter(x => x && x.ok).length;
     let balls = 0, inf = false, att = 0;
     arr.forEach(x => { if ((+x.balls||0)>=999999) inf=true; else balls += +x.balls||0; if (attention(x)) att++; });
-    $('#leafKpiOnline').textContent = `${online}/${arr.length || 0}`;
-    $('#leafKpiBalls').textContent = inf ? '∞' : fmtCompact(balls);
-    $('#leafKpiAttention').textContent = String(att);
+    RebosteioPerformance.setText($('#leafKpiOnline'), `${online}/${arr.length || 0}`);
+    RebosteioPerformance.setText($('#leafKpiBalls'), inf ? '∞' : fmtCompact(balls));
+    RebosteioPerformance.setText($('#leafKpiAttention'), att);
     $('#leafKpiAttention').classList.toggle('warn',att>0);
-    $('#leafConnectedText').textContent = `${online}/${arr.length || 0} conectadas`;
-    $('#leafListCount').textContent = `${arr.length} conta${arr.length===1?'':'s'}`;
+    RebosteioPerformance.setText($('#leafConnectedText'), `${online}/${arr.length || 0} conectadas`);
+    RebosteioPerformance.setText($('#leafListCount'), `${arr.length} conta${arr.length===1?'':'s'}`);
     renderSidebar(arr);
     decoratePanels(arr);
     if (!$('#leafListView').hidden) renderList(arr);
@@ -534,13 +535,13 @@
       if (huntEl && huntEl.textContent !== huntText) huntEl.textContent = huntText;
       if (ballsEl && ballsEl.textContent !== ballsText) ballsEl.textContent = ballsText;
     });
-    try{grid.style.setProperty('--leaf-panels',String(arr.length||1));}catch{}
+    try{const value=String(arr.length||1);if(grid.style.getPropertyValue('--leaf-panels')!==value)grid.style.setProperty('--leaf-panels',value);}catch{}
   }
 
   function syncToggles(){
     const pairs=[['leafEco','eco'],['leafHuntOnly','cleanHud'],['leafSimple','cardsBtn'],['leafAlerts','alerts']];
-    pairs.forEach(([a,b])=>{const x=$('#'+a);if(x){const active=oldOn(b);x.classList.toggle('is-active',active);x.setAttribute('aria-pressed',String(active));}});
-    const stats = document.body.classList.contains('stats-open'); $('#leafMap')?.classList.toggle('is-active',stats); $('#leafMap')?.setAttribute('aria-pressed',String(stats));
+    pairs.forEach(([a,b])=>{const x=$('#'+a);if(x){const active=oldOn(b);x.classList.toggle('is-active',active);RebosteioPerformance.setAttribute(x,'aria-pressed',active);}});
+    const stats = document.body.classList.contains('stats-open'); $('#leafMap')?.classList.toggle('is-active',stats); RebosteioPerformance.setAttribute($('#leafMap'),'aria-pressed',stats);
     $$('#leafSettingsDrawer [data-old]').forEach(b=>b.classList.toggle('is-on',oldOn(b.dataset.old)));
   }
 
@@ -567,9 +568,11 @@
     }
   });
   document.addEventListener('piw-window-count-changed', () => {
+    for (const i of states.keys()) if (i >= count) states.delete(i);
     syncWindowCount();
     collectAll();
   });
+  window.pokeAPI?.onJanela?.(visible => { if (visible) collectAll(); });
   if (window.PIWThemeManager) {
     window.PIWThemeManager.setTheme(window.PIWThemeManager.getCurrentTheme().id, false);
   }

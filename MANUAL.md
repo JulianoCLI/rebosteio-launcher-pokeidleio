@@ -14,6 +14,14 @@ Guia completo e direto de como operar o launcher, seus controles e ferramentas i
 
 ---
 
+## Painel em destaque e zoom
+
+Com duas ou mais contas abertas, clique em **◫** no cabeçalho de uma conta para deixá-la maior à esquerda, mantendo as demais empilhadas à direita. Clique novamente para voltar à grade. Arraste o divisor entre as colunas para ajustar a largura; um duplo clique restaura 68%. Também é possível focar o divisor com Tab e ajustar pelas setas. A conta em destaque e a largura ficam salvas.
+
+O destaque usa o layout Grade. Ao expandir uma conta, abrir a Lista ou ativar o Simples, o divisor fica oculto e volta ao retornar às janelas.
+
+Os controles **−**, **+** e a porcentagem no cabeçalho ajustam o zoom de cada conta (50% a 200%). Clique na porcentagem para restaurar 100%. Para ajustar todas as contas ligadas, use **Ctrl + +**, **Ctrl + −**, **Ctrl + 0** ou **Ctrl + roda do mouse**, inclusive com o jogo em foco. No macOS, os atalhos também usam Cmd. Cada conta mantém seu próprio zoom salvo.
+
 ## 🧭 Barra Superior (Topbar)
 
 A barra superior organiza os controles centrais do launcher e acesso rápido às ferramentas operacionais:

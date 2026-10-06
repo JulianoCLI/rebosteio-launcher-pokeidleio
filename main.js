@@ -686,7 +686,11 @@ app.whenReady().then(() => {
           label: `Expandir painel ${n}`, accelerator: `CmdOrCtrl+${n}`,
           click: () => win.webContents.send('hotkey', 'expand' + (n - 1))
         })),
-        { label: 'Mudo', accelerator: 'CmdOrCtrl+M', click: () => win.webContents.send('hotkey', 'mute') }
+        { label: 'Mudo', accelerator: 'CmdOrCtrl+M', click: () => win.webContents.send('hotkey', 'mute') },
+        { type: 'separator' },
+        { label: 'Aumentar zoom dos jogos', accelerator: 'CmdOrCtrl+Plus', click: () => win.webContents.send('hotkey', 'zoomIn') },
+        { label: 'Diminuir zoom dos jogos', accelerator: 'CmdOrCtrl+-', click: () => win.webContents.send('hotkey', 'zoomOut') },
+        { label: 'Restaurar zoom dos jogos', accelerator: 'CmdOrCtrl+0', click: () => win.webContents.send('hotkey', 'zoomReset') }
       ]
     }
   ]));
