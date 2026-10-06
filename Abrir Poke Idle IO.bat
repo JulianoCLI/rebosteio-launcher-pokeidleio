@@ -15,7 +15,7 @@ if exist ".git" (
     set "GIT_TERMINAL_PROMPT=0"
     git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=5 pull --no-edit >nul 2>nul
     if not errorlevel 1 (
-      echo Projeto atualizado com sucesso!
+      echo Projeto atualizado com sucesso.
     )
   )
 )
@@ -91,7 +91,7 @@ if not defined NODE_CMD (
     set "NODE_CMD=%~dp0.runtime\node\node.exe"
     set "NPM_CMD=%~dp0.runtime\node\npm.cmd"
     set "PATH=%~dp0.runtime\node;%PATH%"
-    echo Node.js configurado com sucesso!
+    echo Node.js configurado com sucesso.
     echo.
   ) else (
     echo Nao foi possivel extrair o Node.js portatil.
@@ -137,90 +137,80 @@ if not exist "node_modules\electron\dist\electron.exe" (
   exit /b 1
 )
 
-rem 5. Verifica e prepara o Camoufox (Resolvedor Cloudflare Turnstile Stealth)
-set "CAMOUFOX_OK="
+rem 5. Verifica e prepara o Camoufox
 if exist ".runtime\camoufox.ready" (
-  if exist "%LOCALAPPDATA%\camoufox" set "CAMOUFOX_OK=1"
+  if exist "%LOCALAPPDATA%\camoufox" goto :pular_camoufox
 )
 
-if not defined CAMOUFOX_OK (
-  set "PYTHON_CMD="
+set "PYTHON_CMD="
+where.exe python.exe >nul 2>nul
+if not errorlevel 1 set "PYTHON_CMD=python"
+if not defined PYTHON_CMD (
+  where.exe py.exe >nul 2>nul
+  if not errorlevel 1 set "PYTHON_CMD=py"
+)
+if not defined PYTHON_CMD (
+  for /d %%D in ("%LOCALAPPDATA%\Programs\Python\Python3*" "%ProgramFiles%\Python3*") do (
+    if exist "%%D\python.exe" (
+      set "PYTHON_CMD=%%D\python.exe"
+      set "PATH=%%D;%%D\Scripts;!PATH!"
+    )
+  )
+)
+
+if not defined PYTHON_CMD goto :tentar_winget_python
+
+echo.
+echo ======================================================================
+echo   Configurando Camoufox - Resolvedor Cloudflare Turnstile Stealth
+echo ======================================================================
+
+"!PYTHON_CMD!" -c "import camoufox" >nul 2>nul
+if errorlevel 1 (
+  echo Instalando biblioteca Camoufox via pip...
+  "!PYTHON_CMD!" -m pip install --quiet --disable-pip-version-check camoufox
+)
+
+"!PYTHON_CMD!" -c "import camoufox.pkgman; assert camoufox.pkgman.installed_verstr()" >nul 2>nul
+if errorlevel 1 (
+  echo Baixando navegador Camoufox - necessario uma unica vez...
+  "!PYTHON_CMD!" -m camoufox fetch
+)
+
+if exist "tools\turnstile_solver.py" (
+  "!PYTHON_CMD!" "tools\turnstile_solver.py" --self-test >nul 2>nul
+  if not errorlevel 1 (
+    if not exist ".runtime" mkdir ".runtime"
+    echo camoufox_ok > ".runtime\camoufox.ready"
+    echo Camoufox configurado com sucesso.
+  )
+)
+echo.
+goto :pular_camoufox
+
+:tentar_winget_python
+where.exe winget.exe >nul 2>nul
+if not errorlevel 1 (
+  echo.
+  echo ======================================================================
+  echo   Python nao detectado. Instalando Python 3 para ativar o Camoufox...
+  echo ======================================================================
+  winget install Python.Python.3.12 --silent --accept-package-agreements --accept-source-agreements
   where.exe python.exe >nul 2>nul
   if not errorlevel 1 (
     set "PYTHON_CMD=python"
-  ) else (
-    where.exe py.exe >nul 2>nul
-    if not errorlevel 1 (
-      set "PYTHON_CMD=py"
-    ) else (
-      rem Verifica locais padroes de instalacao do Python no Windows caso nao esteja no PATH
-      for /d %%D in ("%LOCALAPPDATA%\Programs\Python\Python3*" "%ProgramFiles%\Python3*") do (
-        if exist "%%D\python.exe" (
-          set "PYTHON_CMD=%%D\python.exe"
-          set "PATH=%%D;%%D\Scripts;!PATH!"
-        )
-      )
-    )
+    "!PYTHON_CMD!" -m pip install --quiet --disable-pip-version-check camoufox
+    "!PYTHON_CMD!" -m camoufox fetch
+    if not exist ".runtime" mkdir ".runtime"
+    echo camoufox_ok > ".runtime\camoufox.ready"
+    echo Camoufox configurado com sucesso.
   )
-
-  if defined PYTHON_CMD (
-    echo.
-    echo ======================================================================
-    echo   Configurando Camoufox (Resolvedor Cloudflare Turnstile Stealth)...
-    echo ======================================================================
-
-    rem 5.1 Verifica se a biblioteca python do camoufox ja esta instalada
-    "!PYTHON_CMD!" -c "import camoufox" >nul 2>nul
-    if errorlevel 1 (
-      echo Instalando biblioteca Camoufox via pip...
-      "!PYTHON_CMD!" -m pip install --quiet --disable-pip-version-check camoufox
-    )
-
-    rem 5.2 Verifica se os binarios do navegador camoufox foram baixados
-    "!PYTHON_CMD!" -c "import camoufox.pkgman; assert camoufox.pkgman.installed_verstr()" >nul 2>nul
-    if errorlevel 1 (
-      echo Baixando navegador Camoufox (necessario uma unica vez)...
-      "!PYTHON_CMD!" -m camoufox fetch
-    )
-
-    rem 5.3 Testa o funcionamento com o auto-teste do turnstile_solver
-    if exist "tools\turnstile_solver.py" (
-      "!PYTHON_CMD!" "tools\turnstile_solver.py" --self-test >nul 2>nul
-      if not errorlevel 1 (
-        if not exist ".runtime" mkdir ".runtime"
-        echo camoufox_ok > ".runtime\camoufox.ready"
-        echo Camoufox configurado com sucesso!
-      ) else (
-        echo [Aviso] Camoufox instalado, mas teste inicial reportou pendencia. O launcher abrira normalmente.
-      )
-    )
-    echo.
-  ) else (
-    rem Se o Python nao estiver instalado, tenta instalar silenciosamente via winget se disponivel
-    where.exe winget.exe >nul 2>nul
-    if not errorlevel 1 (
-      echo.
-      echo ======================================================================
-      echo   Python nao detectado. Instalando Python 3 para ativar o Camoufox...
-      echo ======================================================================
-      winget install Python.Python.3.12 --silent --accept-package-agreements --accept-source-agreements
-      where.exe python.exe >nul 2>nul
-      if not errorlevel 1 (
-        set "PYTHON_CMD=python"
-        echo Instalando biblioteca Camoufox...
-        "!PYTHON_CMD!" -m pip install --quiet --disable-pip-version-check camoufox
-        echo Baixando navegador Camoufox...
-        "!PYTHON_CMD!" -m camoufox fetch
-        if not exist ".runtime" mkdir ".runtime"
-        echo camoufox_ok > ".runtime\camoufox.ready"
-        echo Camoufox configurado com sucesso!
-      )
-    ) else (
-      echo [Aviso] Python nao detectado. O launcher abrira normalmente com login padrao.
-      echo (Para ativar o Camoufox Turnstile Stealth, instale o Python em https://python.org)
-    )
-  )
+) else (
+  echo [Aviso] Python nao detectado. O launcher abrira normalmente com login padrao.
+  echo Para ativar o Camoufox Turnstile Stealth, instale o Python em https://python.org
 )
+
+:pular_camoufox
 
 rem 6. Abre o aplicativo
 start "" "node_modules\electron\dist\electron.exe" .
