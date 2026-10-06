@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.30
+
+- **Correção da identificação do Pokémon líder/ativo em combate (`activeId` vs `p.leader`).** Corrigido o bug onde a interface (cards da sidebar, lista de contas e rodapés dos painéis) continuava exibindo o Pokémon do Slot 0 (ex.: Wartortle) em vez do Pokémon atualmente selecionado para a caça (ex.: Annihilape). O coletor `READ_STATE` agora resolve o líder checando `activeId` da sessão em vez de esperar por uma propriedade `leader` inexistente nos pacotes do PokeIdle, e o shell da UI unificou o fallback com resolução resiliente por `getLead(r)`.
+  *Fixed active Pokémon detection in battle (`activeId` vs `p.leader`): resolved issue where sidebar cards, account list, and panel footers displayed the Slot 0 Pokémon (e.g. Wartortle) instead of the actual hunting leader (e.g. Annihilape). `READ_STATE` now identifies the leader using the session's `activeId` instead of an absent `leader` packet property, and UI shells unified leader resolution via `getLead(r)`.*
+
 ## 1.5.29
 
 - **Correção da sidebar e telemetria travadas no Modo Eco e Sem HUD (Limpar Jogo).** Resolvido o erro fatal silencioso (`ReferenceError: Cannot access 'S' before initialization`) no coletor de estado `READ_STATE`, que impedia o cálculo de métricas e deixava todos os cards da sidebar travados em "Conectando", "Time ainda não carregado" e métricas zeradas após o jogo salvar a sessão no `localStorage`.

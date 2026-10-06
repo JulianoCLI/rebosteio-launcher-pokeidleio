@@ -4088,6 +4088,7 @@
       a.drops = (Array.isArray(a0.drops) ? a0.drops : []).slice(0, 60).filter(e => e && typeof e === 'object').map(e => ({ name: String(e.name || '').slice(0, 40), qty: num(e.qty), gold: num(e.gold) }));
       d.a = a;
       d.name = String(d.name || '').slice(0, 40); d.cid = String(d.cid || '').slice(0, 60); d.hunt = String(d.hunt || '').slice(0, 60);
+      if (d.activeId) d.activeId = String(d.activeId).slice(0, 60);
       ['catchLog', 'usedList', 'team', 'chatShares', 'allPokes'].forEach(k => d[k] = (Array.isArray(d[k]) ? d[k] : []).slice(0, k === 'allPokes' ? 2000 : (k === 'usedList' ? 3000 : 120))
         .map(e => { if (e && typeof e === 'object') { for (const p2 in e) if (typeof e[p2] === 'string') e[p2] = e[p2].slice(0, 80); } return e; }));
       d.kills = num(d.kills != null ? d.kills : a.kills);
@@ -7751,7 +7752,10 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     // XP total pra chegar ao nivel: a totalXpForLevel do jogo (29x3d9sblzixv.js), cubica ate o 150, outro polinomio ate o 250 e depois C(250) + 2x
     const xpC = n => n<=1?0:Math.round(50/3*(n**3-6*n**2+17*n-12));
     const xpNv = n => { n = Math.floor(n); if (n <= 150) return xpC(n); const t = n - 150; if (t <= 100) return Math.round(xpC(150) + .5*(t*(t+1)/2)**2 + t*(t+1)*(2*t+1)/6*197.5 + t*(t+1)/2*25629 + 1087900*t); return Math.round(xpNv(250) + 2*(xpC(n) - xpC(250))); };
-    let team = ((ws.pokes && ws.pokes.list)||[]).filter(p=>p.team).sort((x,y)=>(x.slot||0)-(y.slot||0)).map(p=>({id:p.id!=null?String(p.id).slice(0,40):'',name:p.name,level:p.level,shiny:!!p.shiny,t1:p.type1||'',t2:p.type2||'',ld:!!p.leader,q:nL(p.quality),ivt:p.ivTotal!=null?nL(p.ivTotal):null,dt:!!p.isDitto,tms:(Array.isArray(p.tms)?p.tms:[]).slice(0,24).map(x=>String(x).toUpperCase().slice(0,12)),sid:+p.speciesId||+p.pokeId||0,hp:+p.hp||0,hm:+p.maxHp||+p.hpMax||+p.totalHp||0,xpp:(+p.xp>0&&+p.level>0?(X=>{const a=X(+p.level),b=X(+p.level+1);return b>a?Math.round((+p.xp-a)/(b-a)*100):null})(xpNv):null)}));
+    const actId = P.activeId || (P.estado && P.estado.activeId) || (window.estado && (window.estado.activeId || (window.estado.eu && window.estado.eu.activeId))) || null;
+    const rawPokes = ((ws.pokes && ws.pokes.list)||[]).filter(p=>p.team).sort((x,y)=>(x.slot||0)-(y.slot||0));
+    const hasActPoke = !!(actId && rawPokes.some(p => p.id === actId));
+    let team = rawPokes.map(p=>({id:p.id!=null?String(p.id).slice(0,40):'',name:p.name,level:p.level,shiny:!!p.shiny,t1:p.type1||'',t2:p.type2||'',ld:hasActPoke?(p.id===actId):(!!p.leader||p.slot===0),q:nL(p.quality),ivt:p.ivTotal!=null?nL(p.ivTotal):null,dt:!!p.isDitto,tms:(Array.isArray(p.tms)?p.tms:[]).slice(0,24).map(x=>String(x).toUpperCase().slice(0,12)),sid:+p.speciesId||+p.pokeId||0,hp:+p.hp||0,hm:+p.maxHp||+p.hpMax||+p.totalHp||0,xpp:(+p.xp>0&&+p.level>0?(X=>{const a=X(+p.level),b=X(+p.level+1);return b>a?Math.round((+p.xp-a)/(b-a)*100):null})(xpNv):null)}));
     if (team.length === 0) {
       const estPokes = (window.estado && (window.estado.eu ? window.estado.eu.pokemons : window.estado.pokemons)) || [];
       if (Array.isArray(estPokes) && estPokes.length > 0) {
@@ -7764,7 +7768,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
             shiny: !!p.shiny,
             t1: p.type1 || '',
             t2: p.type2 || '',
-            ld: p.slot === 0,
+            ld: (actId && estPokes.some(x => x && x.slot != null && x.id === actId)) ? (p.id === actId) : (p.slot === 0),
             q: nL(p.quality),
             ivt: ivs ? (ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed) : (p.ivTotal != null ? nL(p.ivTotal) : null),
             dt: !!p.isDitto,
@@ -7856,7 +7860,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     const inGame = (appEl && !appEl.classList.contains('hidden')) || (typeof document !== 'undefined' && (document.documentElement.classList.contains('modo-economia') || !!document.getElementById('eco-painel')));
     const hasData = !!(cName || (team && team.length > 0) || cLevel > 0 || P.cid || ch.id || (bm && bm.counts));
     const live = (inGame || hasData) && !isPort && !((P.meMiss || 0) >= 2 && !(P.sock && P.sock.readyState === 1));
-    return { ok:true, cid: ch.id||P.cid||(P.estado&&P.estado.id)||'', name: cName, level: cLevel, gold: cGold, diamonds: cDiamonds, vip: !!ch.isVip, clan: ch.clan||(P.estado&&P.estado.guild&&(P.estado.guild.nome||P.estado.guild.name))||null, clanRank: ch.clanRank||0, shinyEnc: P.shinyEnc||0, usedList: P.usedList||[], catchLog: P.catchLog||[], shinyLog: P.shinyLog||[], chatShares: P.chatShares||[], balls: sBalls, equippedBall, potions: sPot, revives: sRev, invMap, ballMap,
+    return { ok:true, cid: ch.id||P.cid||(P.estado&&P.estado.id)||'', name: cName, level: cLevel, gold: cGold, diamonds: cDiamonds, vip: !!ch.isVip, clan: ch.clan||(P.estado&&P.estado.guild&&(P.estado.guild.nome||P.estado.guild.name))||null, clanRank: ch.clanRank||0, shinyEnc: P.shinyEnc||0, usedList: P.usedList||[], catchLog: P.catchLog||[], shinyLog: P.shinyLog||[], chatShares: P.chatShares||[], balls: sBalls, equippedBall, activeId: actId || null, potions: sPot, revives: sRev, invMap, ballMap,
       prof: ch.profession||'', profRank: ch.professionRank||0, catches: ch.catches||0, hunt, gifts: mail.gifts||0,
       a, drops, bag, team, allPokes, prev,
       live, portal: isPort, sk: !!(P.sock && P.sock.readyState === 1),
