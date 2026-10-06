@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.5.28
+
+- **Auto-Update e sincronização transparente no inicializador do Windows.** O arquivo `Abrir Poke Idle IO.bat` agora executa um `git pull` automático e silencioso antes de carregar o jogo, recebendo atualizações da comunidade sem exigir downloads manuais nem travar caso o jogador esteja offline ou sem git.
+  *Transparent auto-update in Windows launcher: `Abrir Poke Idle IO.bat` now performs an automatic, non-blocking silent git pull upon launching, seamlessly receiving updates without requiring manual downloads.*
+- **Setup e download automático do motor Camoufox.** O inicializador agora verifica a presença do Python e do pacote `camoufox`, baixando os binários necessários (`camoufox fetch`) e realizando autoteste em cache local para logins stealth resilientes em desafios Cloudflare Turnstile.
+  *Automatic Camoufox engine setup: the launcher verifies Python and camoufox packages, fetching stealth browser binaries automatically with cached readiness checks for Cloudflare Turnstile logins.*
+- **Correção de resolução do npm no Windows.** O script agora invoca o `npm-cli.js` diretamente com caminho absoluto via Node, contornando o erro de `%~dp0` no Windows CMD onde o npm tentava resolver módulos a partir da pasta raiz do projeto.
+  *Fixed Windows npm resolution: the batch launcher directly invokes `npm-cli.js` via absolute path through Node, eliminating `%~dp0` batch caller issues where npm searched for modules in the working directory.*
+- **Contingência autônoma para instalação do Electron.** O script `tools/ensure-electron.js` agora faz download direto dos binários do Electron a partir dos lançamentos oficiais do GitHub caso o `@electron/get` ou o `npm install` falhem, garantindo inicialização mesmo em ambientes sem dependências instaladas.
+  *Standalone fallback for Electron installation: `tools/ensure-electron.js` directly downloads Electron binaries from official GitHub releases when npm or `@electron/get` are unavailable.*
+
 ## 1.5.27
 
 - **Botão Alertas controla todos os sons nativos da configuração do jogo.** O botão Alertas (🔔 no topo, na barra rápida, nas Opções ou tecla A) agora liga e desliga de forma sincronizada todos os 4 interruptores de som da tela de configurações do jogo (Sound Mode com trilhas de Hoenn, Som de shiny, Som de captura e Som de TM Disk Boss Drop), pausando a reprodução e mutando/desmutando o áudio dos painéis em tempo real.
