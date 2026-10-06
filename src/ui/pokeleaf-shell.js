@@ -344,7 +344,7 @@
   function stateStatus(r) {
     const hasCreds = Boolean(typeof accounts !== 'undefined' && accounts[r?.i] && accounts[r.i].email && accounts[r.i].senha);
     if (!hasCreds || (typeof off !== 'undefined' && off[r?.i])) return ['off','Desligada'];
-    if (!r || !r.ok) {
+    if (!r || !r.ok || !r.live) {
       const dot = grid.children[r?.i]?.querySelector('.panel-header .dot');
       return dot?.classList.contains('err') ? ['err','Erro'] : ['wait','Conectando'];
     }
@@ -359,18 +359,23 @@
   async function collectOne(i) {
     let d = null;
     try {
-      const pc = typeof stCache !== 'undefined' && stCache[i];
-      if (pc && Date.now() - pc.t < 3500) d = pc.d;
-      else if (typeof webviews !== 'undefined' && webviews[i] && !(typeof off !== 'undefined' && off[i])) {
-        d = await webviews[i].executeJavaScript(READ_STATE);
-        if (d && d.ok && typeof stCache !== 'undefined') {
-          const s = (typeof stSane === 'function' ? stSane(d) : d) || d;
-          stCache[i] = { t: Date.now(), d: s };
+      const pc = (typeof stCache !== 'undefined' ? stCache[i] : null) || (window.stCache ? window.stCache[i] : null);
+      if (pc && pc.d && pc.d.ok && Date.now() - pc.t < 15000) {
+        d = pc.d;
+      } else if (typeof webviews !== 'undefined' && webviews[i] && !(typeof off !== 'undefined' && off[i])) {
+        const rs = (typeof READ_STATE !== 'undefined' ? READ_STATE : null) || window.READ_STATE;
+        if (rs) {
+          d = await webviews[i].executeJavaScript(rs);
+        }
+        if (d && d.ok) {
+          const s = (typeof stSane === 'function' ? stSane(d) : null) || (window.stSane ? window.stSane(d) : null) || d;
+          if (typeof stCache !== 'undefined') stCache[i] = { t: Date.now(), d: s };
+          if (window.stCache) window.stCache[i] = { t: Date.now(), d: s };
           d = s;
-        } else if (pc) {
+        } else if (pc && pc.d && pc.d.ok) {
           d = pc.d;
         }
-      } else if (pc) {
+      } else if (pc && pc.d && pc.d.ok) {
         d = pc.d;
       }
     } catch {}
