@@ -7,6 +7,8 @@
   const privacyKey = 'hideAccountNames';
   let namesHidden = false;
   try { namesHidden = localStorage.getItem(privacyKey) === '1'; } catch {}
+  let sidebarCollapsed = false;
+  try { sidebarCollapsed = localStorage.getItem('hubSidebarCollapsed') === '1'; } catch {}
   const accountLabel = i => `Conta ${String(i + 1).padStart(2, '0')}`;
   const displayName = r => namesHidden ? accountLabel(r.i) : (r.name || `Conta ${r.i + 1}`);
   const fmtCompact = (n) => {
@@ -66,6 +68,7 @@
         <div class="leaf-brand-copy"><div class="leaf-brand-title leaf-brand-logos" aria-label="PokeIdle by Reboste.io"><img class="leaf-pokeidle-logo" src="src/ui/assets/pokeidle-logo-smooth.png" alt="PokeIdle"><span class="leaf-brand-by">by</span><img class="leaf-rebosteio-logo" src="src/ui/assets/rebosteio-logo.png" alt="Reboste.io"></div></div>
       </div>
       <div class="leaf-top-center">
+        <button type="button" class="leaf-icon-btn" id="leafSidebarToggle" aria-controls="leafSidebar" aria-expanded="true" title="Recolher menu lateral" aria-label="Recolher menu lateral"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path class="leaf-sidebar-arrow" d="m16 9-3 3 3 3"/></svg></button>
         <div class="leaf-segment" id="leafViewTabs">
           <button data-view="windows" class="is-active" aria-pressed="true"><span style="width:13px;height:13px">${ico('grid')}</span>Janelas</button>
           <button data-view="list" aria-pressed="false"><span style="width:13px;height:13px">${ico('list')}</span>Lista</button>
@@ -92,7 +95,7 @@
       </div>
     </header>
     <div class="leaf-body">
-      <aside class="leaf-sidebar">
+      <aside class="leaf-sidebar" id="leafSidebar" aria-label="Equipe e resumo">
         <div class="leaf-summary">
           <div class="leaf-summary-item"><div class="k">No jardim</div><div class="v good" id="leafKpiOnline">0/0</div></div>
           <div class="leaf-summary-item"><div class="k">Bolas</div><div class="v" id="leafKpiBalls">—</div></div>
@@ -165,6 +168,15 @@
     <div class="leaf-setting-section"><div class="leaf-setting-title">Temas & Aparência (14 Paletas)</div><div id="leafThemeSelectorContainer"></div></div>
     <div class="leaf-setting-section"><div class="leaf-setting-title">Interface</div><div class="leaf-setting-grid">
       <button class="leaf-setting-btn leaf-privacy-setting" id="leafHideNames" type="button" aria-pressed="false">Ocultar nomes das contas</button>
+      <div class="leaf-game-hud-setting">
+        <label for="leafGameHudLayout">HUD do jogo</label>
+        <select id="leafGameHudLayout" aria-describedby="leafGameHudHint">
+          <option value="original">Original (padrão)</option>
+          <option value="labels">Barra com rótulos</option>
+          <option value="icons">Ícones compactos</option>
+        </select>
+        <small id="leafGameHudHint" aria-live="polite"></small>
+      </div>
       <div class="leaf-window-count-setting"><span>Janelas abertas</span><div class="leaf-window-count-options" id="leafWindowCountOptions" role="group" aria-label="Quantidade de janelas abertas">
         <button type="button" data-window-count="1" aria-pressed="false">1</button>
         <button type="button" data-window-count="2" aria-pressed="false">2</button>
@@ -198,6 +210,42 @@
     </div></div>`;
   document.body.appendChild(drawer);
   drawer.inert = true;
+
+  function syncSidebar() {
+    const sidebar = $('#leafSidebar');
+    const toggle = $('#leafSidebarToggle');
+    const label = sidebarCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral';
+    if (sidebarCollapsed && sidebar.contains(document.activeElement)) toggle.focus();
+    document.body.classList.toggle('leaf-sidebar-collapsed', sidebarCollapsed);
+    sidebar.inert = sidebarCollapsed;
+    sidebar.setAttribute('aria-hidden', String(sidebarCollapsed));
+    toggle.setAttribute('aria-expanded', String(!sidebarCollapsed));
+    toggle.setAttribute('aria-label', label);
+    toggle.title = label;
+  }
+  function toggleSidebar() {
+    sidebarCollapsed = !sidebarCollapsed;
+    try { localStorage.setItem('hubSidebarCollapsed', sidebarCollapsed ? '1' : '0'); } catch {}
+    syncSidebar();
+  }
+  $('#leafSidebarToggle').onclick = toggleSidebar;
+  syncSidebar();
+
+  const gameHudSelect = $('#leafGameHudLayout');
+  gameHudSelect.value = gameHudLayout;
+  function syncGameHudHint() {
+    const text = cleanOn ? 'Interface limpa oculta o menu. Desligue-a para ver o layout.'
+      : dockHidden ? 'Menu oculto. Escolha um modo compacto para exibi-lo.'
+      : 'Aplica na hora. Original restaura o menu.';
+    RebosteioPerformance.setText($('#leafGameHudHint'), text + ' Zoom recomendado: 80% sem lateral; 70% com lateral.');
+  }
+  syncGameHudHint();
+  document.addEventListener('rebosteio-game-hud-layout', event => { gameHudSelect.value = event.detail.mode; syncGameHudHint(); });
+  gameHudSelect.onchange = async () => {
+    gameHudSelect.disabled = true;
+    try { await setGameHudLayout(gameHudSelect.value); }
+    finally { gameHudSelect.disabled = false; }
+  };
 
   if (window.PIWThemeManager && window.PIWThemeManager.mountSelector) {
     window.PIWThemeManager.mountSelector($('#leafThemeSelectorContainer', drawer));
@@ -344,6 +392,7 @@
     $$('#leafViewTabs button').forEach(b => { const selected = b.dataset.view === view; b.classList.toggle('is-active', selected); b.setAttribute('aria-pressed', String(selected)); });
     $('#leafWindowView').hidden = view !== 'windows';
     $('#leafListView').hidden = view !== 'list';
+    document.dispatchEvent(new CustomEvent('piw-view-changed', { detail: { view } }));
     if (view === 'list') {
       renderList();
       if (!wasVisible && animate && !matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -381,9 +430,11 @@
       if (pc && pc.d && pc.d.ok && pc.d.live && (pc.d.team && pc.d.team.length > 0) && Date.now() - pc.t < 15000) {
         d = pc.d;
       } else if (typeof webviews !== 'undefined' && webviews[i] && !(typeof off !== 'undefined' && off[i])) {
-        const rs = (typeof READ_STATE !== 'undefined' ? READ_STATE : null) || window.READ_STATE;
-        if (rs) {
-          d = await webviews[i].executeJavaScript(rs);
+        if (typeof readPanelState === 'function') {
+          d = await readPanelState(i);
+        } else {
+          const rs = (typeof READ_STATE !== 'undefined' ? READ_STATE : null) || window.READ_STATE;
+          if (rs) d = await webviews[i].executeJavaScript(rs);
         }
         if (d && d.ok) {
           const s = (typeof stSane === 'function' ? stSane(d) : null) || (window.stSane ? window.stSane(d) : null) || d;
@@ -410,7 +461,7 @@
     const n = typeof count !== 'undefined' ? count : (typeof webviews !== 'undefined' ? webviews.length : 0);
     const arr = [];
     for (let i=0;i<n;i++) arr.push(await collectOne(i));
-    renderAll(arr);
+    if (typeof janelaOculta === 'undefined' || !janelaOculta) renderAll(arr);
     } finally { collecting = false; }
   }
 
@@ -423,12 +474,12 @@
       else balls += +x.balls || 0;
       if (attention(x)) att++;
     });
-    $('#leafKpiOnline').textContent = `${online}/${arr.length || 0}`;
-    $('#leafKpiBalls').textContent = (inf && balls === 0) ? '∞' : (inf ? `${fmtCompact(balls)}+∞` : fmtCompact(balls));
-    $('#leafKpiAttention').textContent = String(att);
+    RebosteioPerformance.setText($('#leafKpiOnline'), `${online}/${arr.length || 0}`);
+    RebosteioPerformance.setText($('#leafKpiBalls'), (inf && balls === 0) ? '∞' : (inf ? `${fmtCompact(balls)}+∞` : fmtCompact(balls)));
+    RebosteioPerformance.setText($('#leafKpiAttention'), att);
     $('#leafKpiAttention').classList.toggle('warn',att>0);
-    $('#leafConnectedText').textContent = `${online}/${arr.length || 0} conectadas`;
-    $('#leafListCount').textContent = `${arr.length} conta${arr.length===1?'':'s'}`;
+    RebosteioPerformance.setText($('#leafConnectedText'), `${online}/${arr.length || 0} conectadas`);
+    RebosteioPerformance.setText($('#leafListCount'), `${arr.length} conta${arr.length===1?'':'s'}`);
     renderSidebar(arr);
     decoratePanels(arr);
     if (!$('#leafListView').hidden) renderList(arr);
@@ -563,19 +614,20 @@
       if (huntEl && huntEl.textContent !== huntText) huntEl.textContent = huntText;
       if (ballsEl && ballsEl.textContent !== ballsText) ballsEl.textContent = ballsText;
     });
-    try{grid.style.setProperty('--leaf-panels',String(arr.length||1));}catch{}
+    try{const value=String(arr.length||1);if(grid.style.getPropertyValue('--leaf-panels')!==value)grid.style.setProperty('--leaf-panels',value);}catch{}
   }
 
   function syncToggles(){
+    syncGameHudHint();
     const pairs=[['leafEco','eco'],['leafHuntOnly','cleanHud'],['leafSimple','cardsBtn'],['leafAlerts','alerts']];
-    pairs.forEach(([a,b])=>{const x=$('#'+a);if(x){const active=oldOn(b);x.classList.toggle('is-active',active);x.setAttribute('aria-pressed',String(active));}});
-    const stats = document.body.classList.contains('stats-open'); $('#leafMap')?.classList.toggle('is-active',stats); $('#leafMap')?.setAttribute('aria-pressed',String(stats));
+    pairs.forEach(([a,b])=>{const x=$('#'+a);if(x){const active=oldOn(b);x.classList.toggle('is-active',active);RebosteioPerformance.setAttribute(x,'aria-pressed',active);}});
+    const stats = document.body.classList.contains('stats-open'); $('#leafMap')?.classList.toggle('is-active',stats); RebosteioPerformance.setAttribute($('#leafMap'),'aria-pressed',stats);
     $$('#leafSettingsDrawer [data-old]').forEach(b=>b.classList.toggle('is-on',oldOn(b.dataset.old)));
   }
 
   const av = document.getElementById('appVer'); if(av) $('#leafVersion').textContent='PokeGrid '+av.textContent;
   const obs = new MutationObserver(()=>syncToggles()); obs.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:false});
-  ['eco','cleanHud','cardsBtn','alerts','statsBtn'].forEach(id=>{const e=document.getElementById(id);if(e)new MutationObserver(syncToggles).observe(e,{attributes:true,attributeFilter:['class']});});
+  ['eco','cleanHud','dock','cardsBtn','alerts','statsBtn'].forEach(id=>{const e=document.getElementById(id);if(e)new MutationObserver(syncToggles).observe(e,{attributes:true,attributeFilter:['class']});});
 
   // Original build/setCount can add/remove panels later. Decorate new panels and refresh immediately.
   let gridRefresh = 0;
@@ -596,9 +648,11 @@
     }
   });
   document.addEventListener('piw-window-count-changed', () => {
+    for (const i of states.keys()) if (i >= count) states.delete(i);
     syncWindowCount();
     collectAll();
   });
+  window.pokeAPI?.onJanela?.(visible => { if (visible) collectAll(); });
   if (window.PIWThemeManager) {
     window.PIWThemeManager.setTheme(window.PIWThemeManager.getCurrentTheme().id, false);
   }

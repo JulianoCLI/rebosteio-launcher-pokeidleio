@@ -1,0 +1,50 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Hunt fictícia</title>
+<style>
+  html,body { margin:0; height:100%; font:12px Tahoma; color:#ffe3c0; background:#281e2a; }
+  .hidden { display:none!important; }
+  #palco { position:relative; height:100%; background:#263f31; }
+  #hud-hunt { position:absolute; top:10px; left:10px; padding:6px; background:#291e2e; }
+  .hunt-saida { position:absolute; top:10px; right:10px; display:flex; align-items:flex-start; gap:6px; }
+  .hunt-saida-acoes { display:flex; flex-direction:column; gap:4px; }
+  .ir-centro,.desistir-combate,.escape-rope { display:flex; align-items:center; justify-content:center; gap:7px; height:34px; padding:0 14px; border:1px solid #302335; border-radius:5px; color:#ffe3c0; font:700 11.5px Tahoma; background:linear-gradient(#8f5964,#543037); cursor:pointer; }
+  .ir-centro:disabled { opacity:.5; cursor:default; }
+  #centro-curar { position:absolute; bottom:20px; left:20px; }
+  html.modo-economia #hunt-saida, html.modo-imersivo #hunt-saida { display:none!important; }
+</style>
+<div id="palco"><span id="hud-hunt">Larvitar · nível 30</span>
+  <div class="hunt-saida" id="hunt-saida">
+    <button class="escape-rope" id="escape-rope" type="button">Corda · 0</button>
+    <div class="hunt-saida-acoes">
+      <button class="ir-centro" id="ir-centro" type="button" disabled>Ir para o Centro Pokémon <span id="ir-centro-conta">3.0s</span></button>
+      <button class="desistir-combate" id="desistir-combate" type="button">Desistir do Combate</button>
+    </div>
+  </div>
+  <button id="centro-curar" class="hidden">Curar equipe</button>
+</div>
+<script>
+  // Local DOM/server-response simulation, never a real game request.
+  window.centerFixture = {
+    clicks:0, behavior:'hold', original:document.getElementById('ir-centro'),
+    unlock() { this.original.disabled=false; document.getElementById('ir-centro-conta').textContent=''; },
+    hit() { this.original.disabled=true; document.getElementById('ir-centro-conta').textContent='3.0s'; },
+    arrive() {
+      document.getElementById('centro-curar').classList.remove('hidden');
+      document.getElementById('palco').classList.add('centro-ativo');
+      document.getElementById('hunt-saida').classList.add('hidden');
+    },
+    reset() {
+      this.clicks=0; this.behavior='hold';
+      document.documentElement.classList.remove('modo-economia','modo-imersivo');
+      document.getElementById('centro-curar').classList.add('hidden');
+      document.getElementById('palco').classList.remove('centro-ativo');
+      document.getElementById('hunt-saida').classList.remove('hidden');
+      document.getElementById('hud-hunt').textContent='Larvitar · nível 30';
+      this.hit();
+    }
+  };
+  centerFixture.original.onclick=()=> {
+    centerFixture.clicks++;
+    if (centerFixture.behavior==='success') setTimeout(()=>centerFixture.arrive(),100);
+    if (centerFixture.behavior==='relock') centerFixture.hit();
+  };
+</script></html>
