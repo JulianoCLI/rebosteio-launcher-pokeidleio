@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.5.46
+
+- Ação de edição individual do Auto Supply refeita com ícone de lápis, texto curto e acabamento integrado ao cartão.
+
+## 1.5.45
+
+- Auto Supply: as contas marcadas definem a edição. Alterações são aplicadas a todas as selecionadas, inclusive contas com regras individuais.
+- Campos com valores diferentes são indicados e preservados até serem alterados. Atalho “Editar só esta” seleciona uma única conta.
+
+## 1.5.44
+
+- Auto Supply: seleção explícita das contas para reposição, separada da regra em edição.
+- Exibição das contas que usam a regra comum, destaque da conta em edição e botão de reabastecimento com a quantidade de contas marcadas.
+
+## 1.5.43
+
+- Removido o botão “Loja no Jogo” do Auto Supply e seu código de abertura da loja.
+
+## 1.5.42
+
+- Auto Supply: edição individual restaurada com atalho em cada conta, seleção do escopo e personalização explícita, preservando o formulário atual.
+- Prévia de estoque e compras usam a mesma regra efetiva por conta. Desativar a personalização retorna à regra comum; configurações antigas ocultas não são reativadas.
+
 ## 1.5.41
 
 - Bônus Twitch organizado em três áreas: tutorial por etapas à esquerda, conta selecionada ao centro e parceiros oficiais à direita.

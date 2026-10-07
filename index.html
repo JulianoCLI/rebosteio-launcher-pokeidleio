@@ -2522,6 +2522,7 @@
   <link rel="stylesheet" href="src/ui/kuromi-xp.css">
   <link rel="stylesheet" href="src/ui/panel-controls.css">
   <link rel="stylesheet" href="src/ui/twitch-bonus.css">
+  <link rel="stylesheet" href="src/ui/auto-supply-individual.css">
   <script src="src/ui/runtime-performance.js"></script>
   <script src="src/ui/game-hud-layout.js"></script>
   <script src="src/ui/center-scheduler.js"></script>
@@ -2756,7 +2757,7 @@
           <div class="supply-panel-header">
             <div class="supply-panel-title">
               <span class="supply-panel-badge">👥</span>
-              <h3>Suas Contas</h3>
+              <h3>Contas para reposição</h3>
               <span class="supply-acc-count-badge" id="autoSupplySelectedCount">0 ativas</span>
             </div>
             <div class="supply-batch-actions">
@@ -2765,6 +2766,7 @@
             </div>
           </div>
 
+          <p class="supply-selection-help">Marque as contas que deseja editar e reabastecer. Para editar só uma, use o atalho no cartão.</p>
           <div class="supply-accounts-list" id="autoSupplyAccountsGrid">
             <!-- Cards compactos renderizados dinamicamente pelo JS -->
           </div>
@@ -2775,11 +2777,13 @@
           <div class="supply-rules-head">
             <div class="supply-rules-title">
               <span class="supply-rules-icon">⚙️</span>
-              <h3>Regras de Suprimento</h3>
+              <h3>Regra em edição</h3>
             </div>
-            <span class="supply-rules-sub">Configurações para as contas selecionadas</span>
+            <span class="supply-rules-sub" id="supplyScopeSubtitle">Regra comum para as contas selecionadas</span>
           </div>
 
+          <div class="supply-scope-toolbar"><strong id="supplyEditingTitle">Editando contas selecionadas</strong><span id="supplyEditingNames"></span></div>
+          <p class="supply-scope-note" id="supplyScopeNote">Alterações são aplicadas a todas as contas marcadas.</p>
           <!-- Formulário com as 3 categorias de suprimentos -->
           <div id="autoSupplyFieldsWrap" class="supply-rules-form">
             <!-- 1. Pokébolas -->
@@ -2887,14 +2891,12 @@
             <input type="checkbox" id="autoSupplyBuyPartial">
             <span>Compra parcial segura</span>
           </label>
-          <button type="button" id="autoSupplyShopInGame" class="supply-btn-subtle"
-            title="Abre a tela de loja dentro dos jogos das contas ativas">🏪 Loja no Jogo</button>
         </div>
         <div class="supply-foot-right">
           <button type="button" id="autoSupplyBuyNow" class="supply-btn-restock"
             title="Executa a compra imediatamente para as contas selecionadas que precisam">🛒 Reabastecer Agora</button>
           <button type="button" id="autoSupplyCancel">Cancelar</button>
-          <button type="button" id="autoSupplySave" class="primary">💾 Salvar</button>
+          <button type="button" id="autoSupplySave" class="primary">Salvar configurações</button>
         </div>
       </div>
     </div>
@@ -6027,7 +6029,8 @@
       buyPartial: true,
       selectedAccounts: [0, 1, 2, 3],
       defaultCfg: JSON.parse(JSON.stringify(DEFAULT_ITEM_CONFIG)),
-      accountCfgs: {}
+      accountCfgs: {},
+      individualRulesVersion: 2
     };
 
     function loadAutoSupplyCfg() {
@@ -6059,8 +6062,16 @@
             else res.selectedAccounts = [+parsed.scope];
           }
 
+          // Old hidden overrides remain inactive until the user explicitly creates new rules.
+          if (parsed.individualRulesVersion !== 2) res.accountCfgs = {};
           if (!res.accountCfgs || typeof res.accountCfgs !== 'object') {
             res.accountCfgs = {};
+          }
+          res.individualRulesVersion = 2;
+          for (const key of Object.keys(res.accountCfgs)) {
+            const saved = res.accountCfgs[key];
+            if (!saved || !saved.custom) { delete res.accountCfgs[key]; continue; }
+            res.accountCfgs[key] = { custom: true, ...Object.fromEntries(['balls', 'potions', 'revives'].map(kind => [kind, Object.assign({}, res.defaultCfg[kind], saved[kind])])) };
           }
           return res;
         }
@@ -6089,7 +6100,6 @@
     const autoSupplyCancel = document.getElementById('autoSupplyCancel');
     const autoSupplySave = document.getElementById('autoSupplySave');
     const autoSupplyBuyNow = document.getElementById('autoSupplyBuyNow');
-    const autoSupplyShopInGame = document.getElementById('autoSupplyShopInGame');
     const autoSupplyStatusBar = document.getElementById('autoSupplyStatusBar');
     const autoSupplyStatusText = document.getElementById('autoSupplyStatusText');
 
@@ -6098,6 +6108,53 @@
 
     // Estado transitório da interface enquanto o modal está aberto
     let autoSupplyDraft = null;
+    let autoSupplyScope = 'selected';
+    let supplyFieldSnapshot = {};
+    const SUPPLY_EDIT_FIELDS = ['balls','potions','revives'].flatMap(kind => {
+      const prefix = 'supply' + kind[0].toUpperCase() + kind.slice(1);
+      return [{kind,key:'enabled',id:prefix+'Enable'}, {kind,key:'selectedId',id:prefix+'Select'}, {kind,key:'min',id:prefix+'Min'}, {kind,key:'target',id:prefix+'Target'}];
+    });
+    function getEffectiveSupplyConfig(cfg, index) {
+      const custom = cfg.individualRulesVersion === 2 && cfg.accountCfgs && cfg.accountCfgs[index];
+      return custom && custom.custom ? custom : cfg.defaultCfg;
+    }
+    function syncSupplySelectionSummary() {
+      if (!autoSupplyDraft) return;
+      const selected = autoSupplyDraft.selectedAccounts || [];
+      const label = selected.length ? 'Editando ' + selected.length + (selected.length === 1 ? ' conta' : ' contas') : 'Selecione uma conta';
+      const title = document.getElementById('supplyEditingTitle');
+      if (title) title.textContent = label;
+      const names = document.getElementById('supplyEditingNames');
+      if (names) names.textContent = selected.map(i => stName(i) || ('Conta ' + (i+1))).join(' · ');
+      const subtitle = document.getElementById('supplyScopeSubtitle');
+      if (subtitle) subtitle.textContent = selected.length === 1 ? 'Individual' : 'Em conjunto';
+      const note = document.getElementById('supplyScopeNote');
+      if (note) note.textContent = selected.length ? 'Cada alteração vale para todas as contas marcadas. Campos com valores diferentes permanecem como estão até você alterá-los.' : 'Marque uma ou mais contas à esquerda para editar as regras.';
+      const button = document.getElementById('autoSupplyBuyNow');
+      if (button) { button.textContent = 'Reabastecer ' + selected.length + (selected.length === 1 ? ' conta' : ' contas'); button.disabled = !selected.length; }
+      const grid = document.getElementById('autoSupplyAccountsGrid');
+      if (grid) grid.querySelectorAll('.supply-acc-card').forEach(card => {
+        const editing = selected.includes(+card.dataset.idx);
+        card.classList.toggle('is-editing',editing);
+        const selectionText = card.querySelector('.supply-individual-footer > span');
+        if (selectionText) selectionText.textContent = editing ? 'Incluída na edição' : 'Fora da seleção';
+        const edit = card.querySelector('[data-supply-edit]');
+        if (edit) {
+          const only = selected.length === 1 && editing;
+          edit.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15z"/></svg><span>' + (only ? 'Em edição' : 'Editar') + '</span>';
+          edit.title = only ? 'Esta conta está selecionada para edição' : 'Selecionar somente esta conta para editar suas regras';
+          edit.setAttribute('aria-label', only ? 'Conta em edição' : 'Editar somente ' + (stName(+card.dataset.idx) || ('Conta ' + (+card.dataset.idx + 1))));
+        }
+      });
+    }
+    function setAutoSupplyScope(scope) {
+      if (!autoSupplyDraft) return;
+      commitCurrentScopeInputs(true);
+      autoSupplyDraft.selectedAccounts = scope === 'common' ? [0,1,2,3] : [+scope];
+      autoSupplyScope = 'selected';
+      renderAutoSupplyAccountsPicker();
+      syncCurrentScopeUI();
+    }
 
     function syncAutoSupplyUI() {
       if (autoSupplyBtn) autoSupplyBtn.classList.toggle('on', autoSupplyOn);
@@ -6138,58 +6195,45 @@
 
     function getActiveScopeConfig() {
       if (!autoSupplyDraft) return DEFAULT_ITEM_CONFIG;
-      return autoSupplyDraft.defaultCfg || DEFAULT_ITEM_CONFIG;
+      const first = (autoSupplyDraft.selectedAccounts || [])[0];
+      return first == null ? autoSupplyDraft.defaultCfg : getEffectiveSupplyConfig(autoSupplyDraft,first);
     }
-
     function commitCurrentScopeInputs(finalize = false) {
       if (!autoSupplyDraft) return;
-      const targetObj = autoSupplyDraft.defaultCfg;
-      if (!targetObj) return;
-
-      const bSel = document.getElementById('supplyBallsSelect');
-      if (bSel && bSel.value) targetObj.balls.selectedId = +bSel.value;
-      const bEn = document.getElementById('supplyBallsEnable');
-      if (bEn) targetObj.balls.enabled = bEn.checked;
-      const bMin = document.getElementById('supplyBallsMin');
-      if (bMin && bMin.value !== '') {
-        const val = parseInt(bMin.value, 10);
-        if (!isNaN(val)) targetObj.balls.min = finalize ? Math.max(1, val) : val;
+      const changes = [];
+      for (const field of SUPPLY_EDIT_FIELDS) {
+        const input = document.getElementById(field.id);
+        if (!input || input.disabled) continue;
+        const current = field.key === 'enabled' ? input.checked : input.value;
+        const baseline = supplyFieldSnapshot[field.id];
+        if (!baseline || (current === baseline.value && !(field.key === 'enabled' && baseline.mixed && !input.indeterminate))) continue;
+        if (field.key !== 'enabled' && (current === '' || !Number.isFinite(+current))) continue;
+        changes.push({...field,value:field.key === 'enabled' ? current : Math.max(1,Math.trunc(+current))});
       }
-      const bTgt = document.getElementById('supplyBallsTarget');
-      if (bTgt && bTgt.value !== '') {
-        const val = parseInt(bTgt.value, 10);
-        if (!isNaN(val)) targetObj.balls.target = finalize ? Math.max(targetObj.balls.min || 1, val) : val;
+      if (!changes.length) {
+        if (finalize) for (const index of autoSupplyDraft.selectedAccounts || []) {
+          const cfg = autoSupplyDraft.accountCfgs[index];
+          if (cfg?.custom) for (const kind of ['balls','potions','revives']) cfg[kind].target = Math.max(cfg[kind].min,cfg[kind].target);
+        }
+        return;
       }
-
-      const pSel = document.getElementById('supplyPotionsSelect');
-      if (pSel && pSel.value) targetObj.potions.selectedId = +pSel.value;
-      const pEn = document.getElementById('supplyPotionsEnable');
-      if (pEn) targetObj.potions.enabled = pEn.checked;
-      const pMin = document.getElementById('supplyPotionsMin');
-      if (pMin && pMin.value !== '') {
-        const val = parseInt(pMin.value, 10);
-        if (!isNaN(val)) targetObj.potions.min = finalize ? Math.max(1, val) : val;
+      for (const index of autoSupplyDraft.selectedAccounts || []) {
+        const cfg = JSON.parse(JSON.stringify(getEffectiveSupplyConfig(autoSupplyDraft,index)));
+        cfg.custom = true;
+        for (const change of changes) cfg[change.kind][change.key] = change.value;
+        if (finalize) for (const kind of ['balls','potions','revives']) {
+          if (changes.some(c => c.kind === kind && (c.key === 'min' || c.key === 'target'))) cfg[kind].target = Math.max(cfg[kind].min,cfg[kind].target);
+        }
+        autoSupplyDraft.accountCfgs[index] = cfg;
       }
-      const pTgt = document.getElementById('supplyPotionsTarget');
-      if (pTgt && pTgt.value !== '') {
-        const val = parseInt(pTgt.value, 10);
-        if (!isNaN(val)) targetObj.potions.target = finalize ? Math.max(targetObj.potions.min || 1, val) : val;
+      autoSupplyDraft.individualRulesVersion = 2;
+      for (const change of changes) {
+        const input = document.getElementById(change.id);
+        supplyFieldSnapshot[change.id] = {value:change.key === 'enabled' ? input.checked : input.value,mixed:false};
+        input.classList.remove('supply-mixed-value');
+        input.title = '';
       }
-
-      const rSel = document.getElementById('supplyRevivesSelect');
-      if (rSel && rSel.value) targetObj.revives.selectedId = +rSel.value;
-      const rEn = document.getElementById('supplyRevivesEnable');
-      if (rEn) targetObj.revives.enabled = rEn.checked;
-      const rMin = document.getElementById('supplyRevivesMin');
-      if (rMin && rMin.value !== '') {
-        const val = parseInt(rMin.value, 10);
-        if (!isNaN(val)) targetObj.revives.min = finalize ? Math.max(1, val) : val;
-      }
-      const rTgt = document.getElementById('supplyRevivesTarget');
-      if (rTgt && rTgt.value !== '') {
-        const val = parseInt(rTgt.value, 10);
-        if (!isNaN(val)) targetObj.revives.target = finalize ? Math.max(targetObj.revives.min || 1, val) : val;
-      }
+      updateAllAccountCardChips();
     }
 
     function getAccountLeadPokemon(i) {
@@ -6209,7 +6253,7 @@
     function getAccountCardChipsHtml(i) {
       if (!autoSupplyDraft) return '';
       const isOff = Boolean(off[i] || !webviews[i]);
-      const activeCfg = autoSupplyDraft.defaultCfg;
+      const activeCfg = getEffectiveSupplyConfig(autoSupplyDraft, i);
 
       const bItem = SUPPLY_BALLS.find(x => x.id === +activeCfg.balls.selectedId) || SUPPLY_BALLS[0];
       const pItem = SUPPLY_POTIONS.find(x => x.id === +activeCfg.potions.selectedId) || SUPPLY_POTIONS[0];
@@ -6255,7 +6299,7 @@
       if (!autoSupplyDraft) return '';
       const isOff = Boolean(off[i] || !webviews[i]);
       const isSelected = (autoSupplyDraft.selectedAccounts || []).includes(i);
-      const activeCfg = autoSupplyDraft.defaultCfg;
+      const activeCfg = getEffectiveSupplyConfig(autoSupplyDraft, i);
 
       const st = stCache[i];
       const d = st && (st.d || st);
@@ -6310,17 +6354,20 @@
       const totalAccounts = Math.max(4, typeof count === 'number' ? count : 4);
       const selectedSet = new Set(autoSupplyDraft.selectedAccounts || []);
       if (countBadge) {
-        countBadge.textContent = selectedSet.size + ' de ' + totalAccounts + ' ativas';
+        countBadge.textContent = selectedSet.size + '/' + totalAccounts + ' marcadas';
       }
 
       grid.querySelectorAll('.supply-acc-card').forEach(card => {
         const idx = +card.dataset.idx;
         const isSelected = selectedSet.has(idx);
         card.classList.toggle('is-selected', isSelected);
-        card.title = 'Clique para ' + (isSelected ? 'desmarcar' : 'selecionar') + ' esta conta';
+        card.title = '';
+        const recipient = card.querySelector('[data-supply-recipient]');
+        if (recipient) recipient.checked = isSelected;
         const statusContainer = card.querySelector('.supply-status-container');
         if (statusContainer) statusContainer.innerHTML = getAccountCardStatusHtml(idx);
       });
+      syncSupplySelectionSummary();
     }
 
     function renderAutoSupplyAccountsPicker() {
@@ -6331,7 +6378,7 @@
       const totalAccounts = Math.max(4, typeof count === 'number' ? count : 4);
       const selectedSet = new Set(autoSupplyDraft.selectedAccounts || []);
       if (countBadge) {
-        countBadge.textContent = selectedSet.size + ' de ' + totalAccounts + ' ativas';
+        countBadge.textContent = selectedSet.size + '/' + totalAccounts + ' marcadas';
       }
 
       grid.innerHTML = Array.from({ length: totalAccounts }, (_, i) => {
@@ -6351,12 +6398,12 @@
         const chipsHtml = getAccountCardChipsHtml(i);
         const statusTagHtml = getAccountCardStatusHtml(i);
 
-        return '<div class="supply-acc-card ' + (isSelected ? 'is-selected' : '') + ' ' + (isOff ? 'is-off' : '') + '" data-idx="' + i + '" title="Clique para ' + (isSelected ? 'desmarcar' : 'selecionar') + ' esta conta">'
+        return '<div class="supply-acc-card ' + (isSelected ? 'is-selected' : '') + ' ' + (isOff ? 'is-off' : '') + '" data-idx="' + i + '">'
           + '<div class="supply-acc-card-main">'
           +   '<span class="supply-acc-avatar-num" style="background:' + (ACOR[i % ACOR.length] || '#3b82f6') + '">' + (i + 1) + '</span>'
           +   '<div class="supply-acc-card-info">'
           +     '<div class="supply-acc-card-header">'
-          +       '<span class="supply-acc-name">' + esc(accName) + '</span>'
+          +       '<label class="supply-recipient"><input type="checkbox" data-supply-recipient="' + i + '" ' + (isSelected ? 'checked' : '') + ' aria-label="Incluir ' + esc(accName) + ' na reposição"><span class="supply-acc-name">' + esc(accName) + '</span></label>'
           +       '<span class="supply-acc-gold">💰 ' + nf(gold) + 'g</span>'
           +     '</div>'
           +     '<div class="supply-acc-card-sub">'
@@ -6368,22 +6415,23 @@
           + '<div class="supply-acc-chips-row">'
           +   chipsHtml
           + '</div>'
+          + '<div class="supply-individual-footer"><span>' + (isSelected ? 'Incluída na edição' : 'Fora da seleção') + '</span><button type="button" class="supply-edit-account" data-supply-edit="' + i + '">Editar regras</button></div>'
           + '</div>';
       }).join('');
 
-      grid.querySelectorAll('.supply-acc-card').forEach(card => {
-        card.onclick = () => {
-          const idx = +card.dataset.idx;
+      grid.querySelectorAll('[data-supply-edit]').forEach(btn => { btn.onclick = event => { event.stopPropagation(); setAutoSupplyScope(btn.dataset.supplyEdit); }; });
+      grid.querySelectorAll('[data-supply-recipient]').forEach(input => {
+        input.onchange = () => {
+          commitCurrentScopeInputs(true);
+          const idx = +input.dataset.supplyRecipient;
           const set = new Set(autoSupplyDraft.selectedAccounts || []);
-          if (set.has(idx)) {
-            set.delete(idx);
-          } else {
-            set.add(idx);
-          }
-          autoSupplyDraft.selectedAccounts = Array.from(set).sort((a, b) => a - b);
+          if (input.checked) set.add(idx); else set.delete(idx);
+          autoSupplyDraft.selectedAccounts = Array.from(set).sort((a,b) => a-b);
           updateAccountCardsSelectionState();
+          syncCurrentScopeUI();
         };
       });
+      syncSupplySelectionSummary();
     }
 
     function populateItemSelects() {
@@ -6394,7 +6442,6 @@
         bSel.onchange = () => {
           const cfg = getActiveScopeConfig();
           if (cfg && cfg.balls) {
-            cfg.balls.selectedId = +bSel.value;
             commitCurrentScopeInputs(true);
             updateAllAccountCardChips();
           }
@@ -6406,7 +6453,6 @@
         pSel.onchange = () => {
           const cfg = getActiveScopeConfig();
           if (cfg && cfg.potions) {
-            cfg.potions.selectedId = +pSel.value;
             commitCurrentScopeInputs(true);
             updateAllAccountCardChips();
           }
@@ -6418,7 +6464,6 @@
         rSel.onchange = () => {
           const cfg = getActiveScopeConfig();
           if (cfg && cfg.revives) {
-            cfg.revives.selectedId = +rSel.value;
             commitCurrentScopeInputs(true);
             updateAllAccountCardChips();
           }
@@ -6429,35 +6474,29 @@
     function syncCurrentScopeUI() {
       if (!autoSupplyDraft) return;
       populateItemSelects();
-
-      const activeCfg = autoSupplyDraft.defaultCfg;
-
-      const bSel = document.getElementById('supplyBallsSelect');
-      if (bSel) bSel.value = activeCfg.balls.selectedId;
-      const bEn = document.getElementById('supplyBallsEnable');
-      if (bEn) bEn.checked = Boolean(activeCfg.balls.enabled);
-      const bMin = document.getElementById('supplyBallsMin');
-      if (bMin) bMin.value = activeCfg.balls.min;
-      const bTgt = document.getElementById('supplyBallsTarget');
-      if (bTgt) bTgt.value = activeCfg.balls.target;
-
-      const pSel = document.getElementById('supplyPotionsSelect');
-      if (pSel) pSel.value = activeCfg.potions.selectedId;
-      const pEn = document.getElementById('supplyPotionsEnable');
-      if (pEn) pEn.checked = Boolean(activeCfg.potions.enabled);
-      const pMin = document.getElementById('supplyPotionsMin');
-      if (pMin) pMin.value = activeCfg.potions.min;
-      const pTgt = document.getElementById('supplyPotionsTarget');
-      if (pTgt) pTgt.value = activeCfg.potions.target;
-
-      const rSel = document.getElementById('supplyRevivesSelect');
-      if (rSel) rSel.value = activeCfg.revives.selectedId;
-      const rEn = document.getElementById('supplyRevivesEnable');
-      if (rEn) rEn.checked = Boolean(activeCfg.revives.enabled);
-      const rMin = document.getElementById('supplyRevivesMin');
-      if (rMin) rMin.value = activeCfg.revives.min;
-      const rTgt = document.getElementById('supplyRevivesTarget');
-      if (rTgt) rTgt.value = activeCfg.revives.target;
+      const selected = autoSupplyDraft.selectedAccounts || [];
+      supplyFieldSnapshot = {};
+      for (const field of SUPPLY_EDIT_FIELDS) {
+        const input = document.getElementById(field.id);
+        if (!input) continue;
+        const values = selected.map(i => getEffectiveSupplyConfig(autoSupplyDraft,i)[field.kind][field.key]);
+        const mixed = values.length > 1 && values.some(value => value !== values[0]);
+        input.disabled = !selected.length;
+        input.classList.toggle('supply-mixed-value',mixed);
+        input.title = mixed ? 'Valores diferentes entre as contas. Alterar aplica o novo valor a todas as marcadas.' : '';
+        if (field.key === 'enabled') { input.checked = mixed ? false : Boolean(values[0]); input.indeterminate = mixed; }
+        else {
+          if (field.key === 'selectedId') {
+            let option = input.querySelector('option[value=""]');
+            if (!option) { option = document.createElement('option'); option.value = ''; input.prepend(option); }
+            option.textContent = mixed ? 'Itens diferentes — manter' : 'Selecione';
+          }
+          input.value = mixed || !values.length ? '' : String(values[0]);
+          input.placeholder = mixed ? 'Valores diferentes' : '';
+        }
+        supplyFieldSnapshot[field.id] = {value:field.key === 'enabled' ? input.checked : input.value,mixed};
+      }
+      syncSupplySelectionSummary();
     }
 
     function renderAutoSupplyAccountsPreview() {
@@ -6467,6 +6506,7 @@
     function openAutoSupplyModal() {
       autoSupplyCfg = loadAutoSupplyCfg();
       autoSupplyDraft = JSON.parse(JSON.stringify(autoSupplyCfg));
+      autoSupplyScope = 'selected';
 
       const masterChk = document.getElementById('autoSupplyMasterToggle');
       if (masterChk) masterChk.checked = Boolean(autoSupplyDraft.enabled);
@@ -6534,17 +6574,6 @@
     return res;
   })()`;
 
-    const OPEN_INGAME_SHOP_JS = `(() => {
-    const btn = [...document.querySelectorAll('nav.game-dock button, .dock-btn')].find(el => {
-      const txt = (el.title || '') + ' ' + (el.getAttribute ? (el.getAttribute('aria-label') || '') : '');
-      const img = el.querySelector ? el.querySelector('img') : null;
-      const alt = img ? ((img.getAttribute('alt') || '') + ' ' + (img.getAttribute('src') || '')) : '';
-      return /loja|shop|mercado|market/i.test(txt + ' ' + alt);
-    });
-    if (btn) { btn.click(); return 'abriu'; }
-    return 'nao_encontrado';
-  })()`;
-
     let autoSupplyExecuting = false;
     async function executeAutoSupply(manual = false) {
       if (!autoSupplyOn && !manual) return;
@@ -6577,8 +6606,7 @@
           let gold = +d.gold || 0;
           const orders = [];
 
-          // O modal edita uma regra comum; overrides legados não podem governar compras ocultas.
-          const accCfg = cfg.defaultCfg;
+          const accCfg = getEffectiveSupplyConfig(cfg, i);
 
           // 1. Pokébolas
           if (accCfg.balls && accCfg.balls.enabled) {
@@ -6738,35 +6766,24 @@
       };
     }
 
-    if (autoSupplyShopInGame) {
-      autoSupplyShopInGame.onclick = () => {
-        const targets = autoSupplyDraft && Array.isArray(autoSupplyDraft.selectedAccounts)
-          ? autoSupplyDraft.selectedAccounts
-          : (autoSupplyCfg.selectedAccounts || [0, 1, 2, 3]);
-
-        targets.forEach(idx => {
-          if (!off[idx] && webviews[idx]) {
-            webviews[idx].executeJavaScript(OPEN_INGAME_SHOP_JS).catch(() => { });
-          }
-        });
-        showAutoSupplyFeedback('🏪 Comando para abrir a loja do jogo enviado.');
-      };
-    }
-
     if (autoSupplySelectAll) {
       autoSupplySelectAll.onclick = () => {
         if (!autoSupplyDraft) return;
+        commitCurrentScopeInputs(true);
         const totalAccounts = Math.max(4, typeof count === 'number' ? count : 4);
         autoSupplyDraft.selectedAccounts = Array.from({ length: totalAccounts }, (_, i) => i);
         updateAccountCardsSelectionState();
+        syncCurrentScopeUI();
       };
     }
 
     if (autoSupplyDeselectAll) {
       autoSupplyDeselectAll.onclick = () => {
         if (!autoSupplyDraft) return;
+        commitCurrentScopeInputs(true);
         autoSupplyDraft.selectedAccounts = [];
         updateAccountCardsSelectionState();
+        syncCurrentScopeUI();
       };
     }
 

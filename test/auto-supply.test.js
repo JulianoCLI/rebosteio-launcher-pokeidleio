@@ -88,6 +88,19 @@ function harness({ rejected = false, offline = false, gold = 200000, stocks = {}
   assert.equal(h.sent.length, 8, 'confirmed stock prevents duplicate purchases');
   for (const socket of h.sockets) assert.equal(socket.listenerCount('message') + socket.listenerCount('close'), 0);
 
+  const individual = harness();
+  individual.run('autoSupplyCfg.individualRulesVersion = 2; autoSupplyCfg.accountCfgs = {1: {custom:true, balls:{enabled:true,selectedId:3,min:950,target:1200},potions:{enabled:false,selectedId:200,min:5,target:100},revives:{enabled:false,selectedId:205,min:10,target:50}}}');
+  individual.run('saveAutoSupplyCfg(autoSupplyCfg)');
+  await individual.run('executeAutoSupply(false)');
+  assert.deepEqual(individual.sent.filter(o => o.i === 1), [{i:1,t:'shop.buy',kind:'ball',id:3,qty:300}], 'explicit individual policy controls its own item, minimum and target');
+  assert.equal(individual.sent.filter(o => o.i === 0).length, 2, 'other accounts retain the common policy');
+  individual.run('autoSupplyDraft=JSON.parse(JSON.stringify(autoSupplyCfg));autoSupplyDraft.selectedAccounts=[1];autoSupplyScope="selected"');
+  assert.equal(individual.run('getActiveScopeConfig().balls.selectedId'), 3);
+  individual.run('delete autoSupplyDraft.accountCfgs[1]');
+  assert.equal(individual.run('getActiveScopeConfig().balls.selectedId'), 4, 'disabling customization returns to common rules');
+  individual.run('saveAutoSupplyCfg(autoSupplyCfg)');
+  assert.equal(individual.run('loadAutoSupplyCfg().accountCfgs[1].balls.target'),1200,'individual rules survive reload');
+
   const failed = harness({ rejected: true });
   await failed.run('executeAutoSupply(false)');
   assert.equal(failed.sent.length, 4, 'no further orders after an unconfirmed purchase');

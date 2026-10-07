@@ -70,6 +70,44 @@ app.whenReady().then(async () => {
   await read('executeAutoSupply(false)');
   for (let i = 0; i < 4; i++) assert.equal(await guest(i, 'window.__supplyOrders.length'), 2);
   assert.equal(await read('autoSupplyExecuting'), false);
+  await read('openAutoSupplyModal()');
+  assert.equal(await read('document.getElementById("supplyEditingTitle").textContent'),'Editando 4 contas');
+  await read(`document.querySelector('[data-supply-edit="1"]').click()`);
+  assert.deepEqual(await read('autoSupplyDraft.selectedAccounts'),[1]);
+  assert.equal(await read('document.getElementById("supplyBallsSelect").disabled'),false);
+  await read('document.getElementById("supplyBallsSelect").value="3";document.getElementById("supplyBallsMin").value="950";document.getElementById("supplyBallsTarget").value="1200";document.getElementById("supplyPotionsEnable").checked=false;commitCurrentScopeInputs(true);document.getElementById("autoSupplySelectAll").click()');
+  assert.equal(await read('document.getElementById("supplyEditingTitle").textContent'),'Editando 4 contas');
+  assert.equal(await read('document.getElementById("supplyBallsSelect").value'),'','different items are shown as mixed');
+  assert.equal(await read('document.getElementById("supplyPotionsEnable").indeterminate'),true);
+  await read('commitCurrentScopeInputs(true)');
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,0).balls.selectedId'),4,'untouched mixed value retained');
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,1).balls.selectedId'),3);
+  await read('document.getElementById("supplyBallsSelect").value="3";document.getElementById("supplyBallsMin").value="950";document.getElementById("supplyBallsTarget").value="1200";commitCurrentScopeInputs(true)');
+  for(let i=0;i<4;i++) assert.equal(await read(`getEffectiveSupplyConfig(autoSupplyDraft,${i}).balls.target`),1200,'batch edit includes prior individual rule');
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,0).potions.enabled'),true,'untouched mixed checkbox retained');
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,1).potions.enabled'),false);
+  await read('document.getElementById("supplyBallsTarget").value="1300";commitCurrentScopeInputs();document.getElementById("supplyBallsTarget").value="1200";commitCurrentScopeInputs(true)');
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,0).balls.target'),1200,'reverting a typed value is applied');
+  for (const theme of ['absol-night','pkmn-gengar','creme-vanilla']) {
+    await read(`window.PIWThemeManager.selectTheme(${JSON.stringify(theme)})`);
+    for (const [width,height] of [[1920,1032],[1600,950],[820,720]]) {
+      win.setContentSize(width,height);await pause(120);
+      fs.writeFileSync(path.join(profile,theme+'-'+width+'.png'),(await win.webContents.capturePage()).toPNG());
+    }
+  }
+  await read('saveAutoSupplyCfg(autoSupplyDraft);closeAutoSupplyModal();openAutoSupplyModal()');
+  assert.equal(await read('document.getElementById("supplyBallsTarget").value'),'1200');
+  await read('executeAutoSupply(false)');
+  for(let i=0;i<4;i++) assert.deepEqual((await guest(i,'window.__supplyOrders')).slice(2),[{t:'shop.buy',kind:'ball',id:3,qty:300}]);
+  await read(`document.querySelector('[data-supply-edit="1"]').click();document.getElementById('supplyBallsTarget').value='1500';commitCurrentScopeInputs(true)`);
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,1).balls.target'),1500);
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,0).balls.target'),1200,'single edit excludes other accounts');
+  await read('closeAutoSupplyModal();openAutoSupplyModal()');
+  assert.equal(await read('getEffectiveSupplyConfig(autoSupplyDraft,1).balls.target'),1200,'cancel discards edits');
+  await read('document.getElementById("autoSupplyDeselectAll").click()');
+  assert.equal(await read('document.getElementById("supplyBallsSelect").disabled'),true);
+  assert.equal(await read('document.getElementById("autoSupplyBuyNow").disabled'),true);
+  console.log('Batch and single editing, mixed values, save/cancel, effective purchases: PASS. Captures: '+profile);
   console.log('PASS: real launcher, collector, modal rules, four webviews, WebSocket inventory confirmations and no duplicate restock. Isolated profile; no real account or network access.');
   app.exit(0);
 }).catch(e => { console.error(e.stack); console.error(JSON.stringify(logs)); app.exit(1); });
