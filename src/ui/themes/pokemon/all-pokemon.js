@@ -2318,7 +2318,7 @@ window.PIW_ALL_POKEMON_THEMES = [
     },
     "assets": {
       "panorama": "src/ui/themes/pokemon/psyduck/panorama-water-v2.png",
-      "cutout": "src/ui/themes/pokemon/psyduck/cutout-catalog.png"
+      "cutout": "src/ui/themes/pokemon/psyduck/cutout-exclusive.png"
     },
     "exclusive": true,
     "schemaVersion": 1,
@@ -2327,13 +2327,10 @@ window.PIW_ALL_POKEMON_THEMES = [
     "footerQuote": "CADA JORNADA TEM SEU PRÓPRIO RITMO.",
     "artworkProvenance": {
       "panorama": "Built-in image generation, 2026-10-07",
-      "cutout": "Existing catalog artwork from PokeAPI sprites, cached locally; not generated"
+      "cutout": "User-supplied Psyduck floating illustration, background extracted with BiRefNet"
     },
-    "productionStatus": "integrated-background-pending-generated-cutouts",
-    "missingAssets": [
-      "generated-main-cutout",
-      "generated-seated-cutout"
-    ]
+    "productionStatus": "integrated-local-review",
+    "missingAssets": []
   },
   {
     "id": "pkmn-golduck",
@@ -19820,7 +19817,7 @@ window.PIW_ALL_POKEMON_THEMES = [
     },
     "assets": {
       "panorama": "src/ui/themes/pokemon/magnezone/panorama-exclusive.png",
-      "cutout": "src/ui/themes/pokemon/magnezone/cutout-catalog.png"
+      "cutout": "src/ui/themes/pokemon/magnezone/cutout-exclusive.png"
     },
     "exclusive": true,
     "schemaVersion": 1,
@@ -19829,7 +19826,7 @@ window.PIW_ALL_POKEMON_THEMES = [
     "footerQuote": "SOB O MESMO CÉU, CADA JORNADA ENCONTRA SUA DIREÇÃO.",
     "artworkProvenance": {
       "panorama": "Built-in image generation, 2026-10-07; prompt recorded in ARTWORK.md",
-      "cutout": "Existing official artwork catalog source, cached locally: https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/462.png"
+      "cutout": "Generated metallic saucer cutout with BiRefNet alpha extraction, 2026-10-07"
     },
     "productionStatus": "integrated-local-review",
     "missingAssets": []

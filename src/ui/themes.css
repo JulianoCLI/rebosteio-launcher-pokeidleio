@@ -1622,7 +1622,7 @@ body[data-pokemon="pkmn-alakazam"] .leaf-sidebar:before { bottom:-45px; }
  body[data-pokemon="pkmn-alakazam"] .leaf-sidebar:before { bottom:-15px; }
 }
 
-/* Psyduck: lago ao entardecer. Arte do catálogo enquanto os cutouts estão pendentes. */
+/* Psyduck: lago ao entardecer com Psyduck flutuando na boia. */
 body[data-theme="pkmn-psyduck"] {
   --theme-shell-overlay: linear-gradient(180deg,rgba(16,31,42,.12),rgba(16,31,42,.3));
   --theme-cutout-opacity: 1;
@@ -1630,20 +1630,23 @@ body[data-theme="pkmn-psyduck"] {
 body[data-theme="pkmn-psyduck"] .leaf-sidebar {
   background: linear-gradient(180deg,rgba(16,31,42,.86),rgba(16,31,42,.81) 64%,rgba(16,31,42,.70)) !important;
 }
+body[data-pokemon="pkmn-psyduck"] .leaf-sidebar {
+  overflow: visible; z-index: 2;
+}
 body[data-pokemon="pkmn-psyduck"] #leafAccountList {
   flex: 0 1 auto;
   max-height: calc(100vh - 390px);
 }
 body[data-pokemon="pkmn-psyduck"] .leaf-side-footer { margin-top: auto; }
 body[data-pokemon="pkmn-psyduck"] .leaf-sidebar:before {
-  top: auto; right: auto; left: -48px; bottom: -12px;
-  width: 285px; height: 300px;
+  top: auto; right: auto; left: 0px; bottom: 56px;
+  width: 235px; height: 230px;
   background-size: contain; background-position: center bottom;
   mask-image: none; opacity: 1; z-index: 2; pointer-events: none;
 }
 body[data-pokemon="pkmn-psyduck"] .leaf-aside-epilogue {
-  position: absolute; left: auto; right: 12px; bottom: 244px;
-  padding: 0; max-width: 110px; align-items: flex-end; text-align: right;
+  position: absolute; left: auto; right: 12px; bottom: 285px;
+  padding: 0; max-width: 120px; align-items: flex-end; text-align: right;
   z-index: 3; pointer-events: none;
 }
 body[data-pokemon="pkmn-psyduck"] .leaf-aside-epilogue strong {
@@ -1652,12 +1655,12 @@ body[data-pokemon="pkmn-psyduck"] .leaf-aside-epilogue strong {
 body[data-pokemon="pkmn-psyduck"] .leaf-epilogue-kicker { font-size: 6px; letter-spacing: 1px; }
 body[data-pokemon="pkmn-psyduck"] .leaf-epilogue-line { width: 60px; align-self: flex-end; }
 @media (min-height: 1000px) {
-  body[data-pokemon="pkmn-psyduck"] .leaf-sidebar:before { width: 320px; height: 350px; left: -54px; }
-  body[data-pokemon="pkmn-psyduck"] .leaf-aside-epilogue { bottom: 296px; }
+  body[data-pokemon="pkmn-psyduck"] .leaf-sidebar:before { width: 265px; height: 260px; left: -4px; bottom: 58px; }
+  body[data-pokemon="pkmn-psyduck"] .leaf-aside-epilogue { bottom: 330px; }
 }
 @media (max-height: 760px) {
   body[data-pokemon="pkmn-psyduck"] #leafAccountList { flex: 1 1 auto; max-height: none; }
-  body[data-pokemon="pkmn-psyduck"] .leaf-sidebar:before { width: 130px; height: 140px; left: -25px; bottom: 4px; }
+  body[data-pokemon="pkmn-psyduck"] .leaf-sidebar:before { width: 140px; height: 140px; left: -4px; bottom: 10px; }
   body[data-pokemon="pkmn-psyduck"] .leaf-aside-epilogue { display: none; }
 }
 @media (max-width: 850px) {
@@ -1665,7 +1668,7 @@ body[data-pokemon="pkmn-psyduck"] .leaf-epilogue-line { width: 60px; align-self:
   body[data-pokemon="pkmn-psyduck"] .leaf-account-top > * { min-width: 0; }
 }
 
-/* Magnezone: aço azulado, observatório e silhueta horizontal na área decorativa. */
+/* Magnezone: aço azulado, observatório e silhueta do disco flutuante. */
 body[data-theme="pkmn-magnezone"] {
   --theme-shell-overlay: linear-gradient(180deg,rgba(16,27,38,.10),rgba(16,27,38,.22));
   --theme-cutout-opacity: 1;
@@ -1673,16 +1676,19 @@ body[data-theme="pkmn-magnezone"] {
 body[data-theme="pkmn-magnezone"] .leaf-sidebar {
   background: linear-gradient(180deg,rgba(16,27,38,.86),rgba(16,27,38,.81) 64%,rgba(16,27,38,.70)) !important;
 }
+body[data-pokemon="pkmn-magnezone"] .leaf-sidebar {
+  overflow: visible; z-index: 2;
+}
 body[data-pokemon="pkmn-magnezone"] #leafShell:after { display: none; }
 body[data-pokemon="pkmn-magnezone"] #leafAccountList { flex: 0 1 auto; max-height: calc(100vh - 390px); }
 body[data-pokemon="pkmn-magnezone"] .leaf-side-footer { margin-top: auto; }
 body[data-pokemon="pkmn-magnezone"] .leaf-sidebar:before {
-  top: auto; right: auto; left: -30px; bottom: 12px; width: 320px; height: 265px;
+  top: auto; right: auto; left: -2px; bottom: 62px; width: 245px; height: 165px;
   background-size: contain; background-position: center bottom;
   mask-image: none; opacity: 1; z-index: 2; pointer-events: none;
 }
 body[data-pokemon="pkmn-magnezone"] .leaf-aside-epilogue {
-  position: absolute; left: 18px; right: auto; bottom: 252px; padding: 0;
+  position: absolute; left: 16px; right: auto; bottom: 232px; padding: 0;
   max-width: 220px; align-items: flex-start; text-align: left; z-index: 3; pointer-events: none;
 }
 body[data-pokemon="pkmn-magnezone"] .leaf-aside-epilogue strong {
@@ -1693,12 +1699,12 @@ body[data-pokemon="pkmn-magnezone"] .leaf-epilogue-line {
   width: 85px; align-self: flex-start; background: linear-gradient(90deg,#8bd6ee,transparent);
 }
 @media (min-height: 1000px) {
-  body[data-pokemon="pkmn-magnezone"] .leaf-sidebar:before { width: 350px; height: 310px; left: -38px; bottom: 10px; }
-  body[data-pokemon="pkmn-magnezone"] .leaf-aside-epilogue { bottom: 290px; }
+  body[data-pokemon="pkmn-magnezone"] .leaf-sidebar:before { width: 300px; height: 210px; left: -20px; bottom: 50px; }
+  body[data-pokemon="pkmn-magnezone"] .leaf-aside-epilogue { bottom: 275px; }
 }
 @media (max-height: 920px) {
   body[data-pokemon="pkmn-magnezone"] #leafAccountList { flex: 1 1 auto; max-height: none; }
-  body[data-pokemon="pkmn-magnezone"] .leaf-sidebar:before { width: 155px; height: 140px; left: -25px; bottom: 2px; }
+  body[data-pokemon="pkmn-magnezone"] .leaf-sidebar:before { width: 170px; height: 120px; left: -12px; bottom: 6px; }
   body[data-pokemon="pkmn-magnezone"] .leaf-aside-epilogue { display: none; }
 }
 @media (max-width: 850px) {
