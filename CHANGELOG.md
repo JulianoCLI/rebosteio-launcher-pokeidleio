@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.5.35
+
+- **Tema Magnezone — observatório magnético.** Panorama original de montanhas, aurora e observatório elétrico; paleta de aço azulado com acentos ciano. Arte oficial do catálogo armazenada localmente, composição própria e frase decorativa sem encobrir os cartões. Seleção pelo catálogo existente, preservando as quatro contas e os logos compartilhados.
+
+## 1.5.34
+
+- Panorama do Psyduck ajustado para água contínua na base e no canto inferior esquerdo, removendo pedras e margem seca. Recorte da imagem enviada do Psyduck na boia pendente: as duas tentativas pela ferramenta de imagem foram bloqueadas; nenhuma substituição manual foi feita.
+
+## 1.5.33
+
+- Frase do header do tema Psyduck alterada para “Psy… ain, ain, ain…”.
+
+## 1.5.32
+
+- **Tema Psyduck — lago ao entardecer.** Novo panorama gerado, paleta azul petróleo com detalhes dourados e composição própria na sidebar. A arte transparente existente do catálogo foi salva localmente. A geração dos dois novos cutouts foi bloqueada pelo serviço de imagem e permanece pendente; a arte atual não é apresentada como gerada.
+
 ## 1.5.31
 
 - **Sistema Headless de Bônus da Twitch para as 4 Contas (+15% a +25% de XP).** Implementado suporte completo ao bônus de parceiro do PokeIdle sem necessidade de assistir transmissões pesadas em vídeo ou abrir navegadores de terceiros (`multistreamer.tv`). O inicializador gerencia até 4 contas Twitch conectadas diretamente via WebSockets IRC nativos (`wss://irc-ws.chat.twitch.tv`), entrando automaticamente nas salas de chat de todos os canais parceiros oficiais online da Twitch. Como a validação do bot do jogo (`faasii`) ocorre checando a presença no chat (`chatters`), as contas recebem o bônus máximo de XP consumindo menos de 15 MB de RAM no total.

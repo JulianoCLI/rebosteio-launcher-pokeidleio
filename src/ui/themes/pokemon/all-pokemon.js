@@ -2286,40 +2286,54 @@ window.PIW_ALL_POKEMON_THEMES = [
     "t1": "WATER",
     "t2": "",
     "isMega": false,
-    "tone": "mid",
-    "toneLabel": "Interm.",
+    "tone": "dark",
+    "toneLabel": "Escuro",
     "category": "pokemon",
-    "glyph": "🌊",
+    "glyph": "≈",
     "brandTitle": "PSYDUCK <span>LAUNCHER</span>",
     "brandSub": "O GUARDIÃO DE WATER",
-    "quote": "O guardião elemental de WATER que acompanha sua jornada.",
+    "quote": "Psy… ain, ain, ain…",
     "swatches": [
-      "#0a1c2e",
-      "#163352",
-      "#38bdf8"
+      "#101f2a",
+      "#25434d",
+      "#e8bd65"
     ],
     "colors": {
-      "tone": "mid",
-      "bgBase": "#0a1c2e",
-      "bgElevated": "#0f263e",
-      "surface1": "#163352",
-      "surface2": "#1d4269",
-      "surfaceHover": "#265586",
-      "surfaceSelected": "#214c77",
-      "textPrimary": "#e0f2fe",
-      "textSecondary": "#bae6fd",
-      "textMuted": "#7dd3fc",
-      "accent": "#38bdf8",
-      "accentSoft": "rgba(56, 189, 248, 0.16)",
-      "actionPrimary": "#0284c7",
-      "actionPrimaryHover": "#0369a1",
-      "borderSubtle": "#26496d",
-      "borderStrong": "#4178ae"
+      "tone": "dark",
+      "bgBase": "#101f2a",
+      "bgElevated": "#182e39",
+      "surface1": "#203c47",
+      "surface2": "#294c56",
+      "surfaceHover": "#355f68",
+      "surfaceSelected": "#38555a",
+      "textPrimary": "#f6f4e9",
+      "textSecondary": "#c4d8d8",
+      "textMuted": "#91b4ba",
+      "accent": "#e8bd65",
+      "accentSoft": "rgba(232,189,101,.16)",
+      "actionPrimary": "#946e2f",
+      "actionPrimaryHover": "#ac8038",
+      "borderSubtle": "#3d5e69",
+      "borderStrong": "#809e9d"
     },
     "assets": {
-      "panorama": "src/ui/themes/biomes/water.jpg",
-      "cutout": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png"
-    }
+      "panorama": "src/ui/themes/pokemon/psyduck/panorama-water-v2.png",
+      "cutout": "src/ui/themes/pokemon/psyduck/cutout-catalog.png"
+    },
+    "exclusive": true,
+    "schemaVersion": 1,
+    "sideQuote": "Devagar.\nO lago espera.",
+    "sideKicker": "À MARGEM DO ENTARDECER",
+    "footerQuote": "CADA JORNADA TEM SEU PRÓPRIO RITMO.",
+    "artworkProvenance": {
+      "panorama": "Built-in image generation, 2026-10-07",
+      "cutout": "Existing catalog artwork from PokeAPI sprites, cached locally; not generated"
+    },
+    "productionStatus": "integrated-background-pending-generated-cutouts",
+    "missingAssets": [
+      "generated-main-cutout",
+      "generated-seated-cutout"
+    ]
   },
   {
     "id": "pkmn-golduck",
@@ -19780,34 +19794,45 @@ window.PIW_ALL_POKEMON_THEMES = [
     "glyph": "⚡",
     "brandTitle": "MAGNEZONE <span>LAUNCHER</span>",
     "brandSub": "O GUARDIÃO DE ELECTRIC / STEEL",
-    "quote": "O guardião elemental de ELECTRIC que acompanha sua jornada.",
+    "quote": "Uma força silenciosa.<br>Um horizonte elétrico.",
     "swatches": [
-      "#1a180e",
-      "#322d1b",
-      "#facc15"
+      "#101b26",
+      "#2c4052",
+      "#8bd6ee"
     ],
     "colors": {
       "tone": "dark",
-      "bgBase": "#1a180e",
-      "bgElevated": "#242114",
-      "surface1": "#322d1b",
-      "surface2": "#423b24",
-      "surfaceHover": "#564d2f",
-      "surfaceSelected": "#4c442a",
-      "textPrimary": "#fefce8",
-      "textSecondary": "#fef08a",
-      "textMuted": "#facc15",
-      "accent": "#facc15",
-      "accentSoft": "rgba(250, 204, 21, 0.18)",
-      "actionPrimary": "#eab308",
-      "actionPrimaryHover": "#ca8a04",
-      "borderSubtle": "#4d4323",
-      "borderStrong": "#84733b"
+      "bgBase": "#101b26",
+      "bgElevated": "#192735",
+      "surface1": "#223444",
+      "surface2": "#2c4052",
+      "surfaceHover": "#3a5267",
+      "surfaceSelected": "#304c60",
+      "textPrimary": "#f1f6fa",
+      "textSecondary": "#c2d5e2",
+      "textMuted": "#94adbf",
+      "accent": "#8bd6ee",
+      "accentSoft": "rgba(139,214,238,.16)",
+      "actionPrimary": "#326a85",
+      "actionPrimaryHover": "#40809d",
+      "borderSubtle": "#425b70",
+      "borderStrong": "#7898ae"
     },
     "assets": {
-      "panorama": "src/ui/themes/biomes/electric.jpg",
-      "cutout": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/462.png"
-    }
+      "panorama": "src/ui/themes/pokemon/magnezone/panorama-exclusive.png",
+      "cutout": "src/ui/themes/pokemon/magnezone/cutout-catalog.png"
+    },
+    "exclusive": true,
+    "schemaVersion": 1,
+    "sideQuote": "A força que une.\nO campo que guia.",
+    "sideKicker": "ALÉM DO CAMPO MAGNÉTICO",
+    "footerQuote": "SOB O MESMO CÉU, CADA JORNADA ENCONTRA SUA DIREÇÃO.",
+    "artworkProvenance": {
+      "panorama": "Built-in image generation, 2026-10-07; prompt recorded in ARTWORK.md",
+      "cutout": "Existing official artwork catalog source, cached locally: https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/462.png"
+    },
+    "productionStatus": "integrated-local-review",
+    "missingAssets": []
   },
   {
     "id": "pkmn-lickilicky",
