@@ -153,7 +153,8 @@
     <div class="leaf-tool-sep"></div>
     <button class="leaf-tool-item" data-old="autoSellBtn"><span class="ico">💰</span><span>Venda Automática</span><span class="leaf-tool-badge" id="leafAutoSellBadge">OFF</span></button>
     <button class="leaf-tool-item" data-old="autoSupplyBtn"><span class="ico">📦</span><span>Auto Supply</span><span class="leaf-tool-badge" id="leafAutoSupplyBadge">OFF</span></button>
-    <button class="leaf-tool-item" data-old="dispatchHuntBtn"><span class="ico">🎯</span><span>Despachar Contas</span></button>`;
+    <button class="leaf-tool-item" data-old="dispatchHuntBtn"><span class="ico">🎯</span><span>Despachar Contas</span></button>
+    <button class="leaf-tool-item" data-old="twitchBonusBtn" id="leafTwitchBonusBtn"><span class="ico">🟣</span><span>Bônus Twitch</span><span class="leaf-tool-badge" id="leafTwitchBonusBadge">OFF</span></button>`;
   document.body.appendChild(tools);
   tools.inert = true;
 
@@ -302,15 +303,30 @@
     badge.textContent = isOn ? 'ON' : 'OFF';
     badge.classList.toggle('is-on', isOn);
   }
-  window.__syncAutoSupplyBadge = syncAutoSupplyBadge;
+  function syncTwitchBonusBadge() {
+    const badge = $('#leafTwitchBonusBadge');
+    if (!badge) return;
+    const st = window.__twitchBonusStatus;
+    const isOn = st && st.masterEnabled;
+    const bonusTxt = window.__twitchBonusPctTxt || '';
+    if (!isOn) {
+      badge.textContent = 'OFF';
+      badge.classList.remove('is-on');
+    } else {
+      badge.textContent = bonusTxt || 'ON';
+      badge.classList.add('is-on');
+    }
+  }
+  window.__syncTwitchBonusBadge = syncTwitchBonusBadge;
   syncAutoSellBadge();
   syncAutoSupplyBadge();
+  syncTwitchBonusBadge();
 
   $('#leafToolsBtn').onclick = (e) => {
     e.stopPropagation();
     const opening = !document.body.classList.contains('leaf-tools-open');
     closeSurfaces();
-    if (opening) { document.body.classList.add('leaf-tools-open'); tools.inert = false; $('#leafToolsBtn').setAttribute('aria-expanded', 'true'); syncAutoSellBadge(); syncAutoSupplyBadge(); tools.querySelector('button')?.focus(); }
+    if (opening) { document.body.classList.add('leaf-tools-open'); tools.inert = false; $('#leafToolsBtn').setAttribute('aria-expanded', 'true'); syncAutoSellBadge(); syncAutoSupplyBadge(); syncTwitchBonusBadge(); tools.querySelector('button')?.focus(); }
   };
   $('#leafSettingsBtn').onclick = () => {
     const opening = !document.body.classList.contains('leaf-settings-open');
@@ -319,7 +335,7 @@
   };
   $('#leafMoreBtn').onclick = () => $('#leafSettingsBtn').click();
   $('#leafDrawerClose').onclick = () => closeSurfaces(true);
-  $$('#leafToolsMenu [data-old],#leafSettingsDrawer [data-old]').forEach(b => b.onclick = () => { clickOld(b.dataset.old); closeSurfaces(); syncAutoSellBadge(); syncAutoSupplyBadge(); });
+  $$('#leafToolsMenu [data-old],#leafSettingsDrawer [data-old]').forEach(b => b.onclick = () => { clickOld(b.dataset.old); closeSurfaces(); syncAutoSellBadge(); syncAutoSupplyBadge(); syncTwitchBonusBadge(); });
   document.addEventListener('click', e => { if (!tools.contains(e.target) && e.target !== $('#leafToolsBtn') && document.body.classList.contains('leaf-tools-open')) closeSurfaces(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSurfaces(true); });
 

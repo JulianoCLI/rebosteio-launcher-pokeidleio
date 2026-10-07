@@ -156,7 +156,7 @@ html,body {background:#081224!important;color:var(--leaf-text)!important}
 .leaf-drawer-close {width:32px;height:32px;font-size:20px}.leaf-setting-btn {font-size:11px;min-height:44px;transition:background-color var(--motion-fast) var(--ease-standard),border-color var(--motion-fast) var(--ease-standard),transform var(--motion-fast) var(--ease-standard)}.leaf-setting-btn:hover,.leaf-setting-btn.is-on {background:#29496c;border-color:#82a6d0;color:white}
 #leafSettingsDrawer {transition:transform var(--motion-slow) var(--ease-enter)}
 .leaf-settings-open #leafSettingsDrawer {box-shadow:var(--shadow-overlay)}
-#overlay,#scOverlay,#tlOverlay,#dtOverlay,#atOverlay,#autoSupplyOverlay {background:#030a19d9!important;backdrop-filter:none!important}
+#overlay,#scOverlay,#tlOverlay,#dtOverlay,#atOverlay,#autoSupplyOverlay,#twitchBonusOverlay {background:#030a19d9!important;backdrop-filter:none!important}
 #modal,#scModal,#tlModal,#dtModal,#atModal,#autoSupplyModal,#stats {background:#e8eef7!important;color:#1c304d!important;border-color:#b6c7dc!important}
 #ivCard {background:#101f35!important;color:#e8f1fd!important;border-color:#6e91bb!important}
 #ivCard .iv-hd {border-color:#405a7d}

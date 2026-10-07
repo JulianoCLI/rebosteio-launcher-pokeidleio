@@ -740,12 +740,12 @@ body[data-theme] .leaf-layout-options button.is-on {
 }
 
 /* Modais & Inputs (Compatibilidade Universal com Todos os 12 Temas e 800+ Pokémon) */
-body[data-theme] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay) {
+body[data-theme] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay, #twitchBonusOverlay) {
   background: rgba(0, 0, 0, 0.72) !important;
   backdrop-filter: blur(8px) !important;
 }
 
-body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal) {
+body[data-theme] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal, #twitchBonusModal) {
   background: var(--color-bg-elevated) !important;
   border: 1px solid var(--border-subtle) !important;
   color: var(--color-text-primary) !important;
@@ -1026,11 +1026,11 @@ body[data-theme-tone="light"] #leafAccountList::-webkit-scrollbar-thumb {
   background: var(--border-strong) !important;
 }
 
-body[data-theme-tone="light"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay) {
+body[data-theme-tone="light"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay, #twitchBonusOverlay) {
   background: rgba(15, 23, 42, 0.45) !important;
 }
 
-body[data-theme-tone="light"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal) {
+body[data-theme-tone="light"] :is(#modal, #scModal, #tlModal, #dtModal, #atModal, #dispatchModal, #autoSupplyModal, #twitchBonusModal) {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16), 0 0 0 1px var(--border-subtle) !important;
 }
 

@@ -87,7 +87,6 @@ docs/
 tools/*
 !tools/turnstile_solver.py
 !tools/ensure-electron.js
-src/domain/
 src/ui/themes/pokemon/**/*.json
 src/ui/themes/pokemon/**/*.md
 

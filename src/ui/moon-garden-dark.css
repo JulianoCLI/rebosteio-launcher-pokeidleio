@@ -1466,7 +1466,7 @@ html,body {background:#091522!important;color:#edf4ef!important;color-scheme:dar
 /* =========================================================================
    AUTO SUPPLY MODAL & COMPONENTS
    ========================================================================= */
-#autoSupplyOverlay {
+#autoSupplyOverlay, #twitchBonusOverlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.76);
@@ -1477,7 +1477,7 @@ html,body {background:#091522!important;color:#edf4ef!important;color-scheme:dar
   z-index: 110;
 }
 
-#autoSupplyOverlay.show {
+#autoSupplyOverlay.show, #twitchBonusOverlay.show {
   display: flex;
 }
 

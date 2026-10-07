@@ -24,6 +24,12 @@ contextBridge.exposeInMainWorld('pokeAPI', {
   camoufoxLogin: (accountData) => ipcRenderer.invoke('auth:camoufox-login', accountData),
   cancelLogin: (index) => ipcRenderer.invoke('auth:cancel-login', index),
   camoufoxCheck: () => ipcRenderer.invoke('auth:camoufox-check'),
+  twitchLoadCreds: () => ipcRenderer.invoke('twitch:creds:load'),
+  twitchSaveCreds: (data) => ipcRenderer.invoke('twitch:creds:save', data),
+  twitchTestConnection: (username, token) => ipcRenderer.invoke('twitch:test', username, token),
+  twitchSyncLives: (lives) => ipcRenderer.invoke('twitch:sync-lives', lives),
+  twitchGetStatus: () => ipcRenderer.invoke('twitch:status:get'),
+  onTwitchStatus: (cb) => ipcRenderer.on('twitch:status:update', (_e, st) => cb(st)),
   // versao do app: vem do processo principal (a UA nao carrega mais o token pokegrid/x, e o
   // preload roda em sandbox, entao require de arquivo local nao e confiavel)
   appVersion: (() => { try { return ipcRenderer.sendSync('app:version'); } catch { return ''; } })()

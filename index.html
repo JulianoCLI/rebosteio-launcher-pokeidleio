@@ -2574,6 +2574,8 @@
           Auto Supply</button>
         <button id="dispatchHuntBtn" title="Despacha contas selecionadas direto para a Hunt (sem sair do Modo Eco)">🎯
           Despachar Contas</button>
+        <button id="twitchBonusBtn" title="Presença automática nos chats dos streamers oficiais para bônus de +15% a +25% XP">🟣
+          Bônus Twitch</button>
         <button id="awake" title="Impede o PC de dormir enquanto farma (a tela ainda pode desligar)">💤 Dormir</button>
         <button id="minTray"
           title="O que o botão minimizar faz: esconder na bandeja ou minimizar normal na barra de tarefas">📥 Minimiza
@@ -2718,169 +2720,158 @@
   <!-- Modal Auto Supply (Pokébolas, Poções & Revives) -->
   <div id="autoSupplyOverlay">
     <div id="autoSupplyModal">
+      <!-- Cabeçalho -->
       <div class="supply-head">
-        <h2>
-          <span class="supply-head-icon">📦</span>
-          <span>Auto Supply — Pokébolas, Poções & Revives</span>
-        </h2>
-        <span class="supply-close" id="autoSupplyCloseBtn" title="Fechar">&times;</span>
-      </div>
-      <p class="hint">Configure o reabastecimento automático de suprimentos com verificação de saldo. Escolha quais
-        contas participam e personalize itens, estoques mínimos e alvos para cada uma ou use a regra padrão.</p>
-
-      <div class="supply-content">
-        <!-- Master Controls & Budget Mode -->
-        <div class="supply-global-card">
-          <div class="supply-global-toggles">
-            <label class="supply-toggle-label">
-              <input type="checkbox" id="autoSupplyMasterToggle">
-              <span class="supply-toggle-text"><b>Ativar Auto Supply</b> (monitoramento e reabastecimento contínuo em
-                segundo plano)</span>
-            </label>
-            <label class="supply-toggle-label supply-budget-label"
-              title="Se faltar ouro em alguma conta, compra o máximo acessível em vez de falhar o pedido">
-              <input type="checkbox" id="autoSupplyBuyPartial">
-              <span class="supply-toggle-text"><b>Compra Parcial Segura</b> (se faltar dinheiro na conta, compra apenas
-                o que o saldo permitir)</span>
-            </label>
-          </div>
+        <div class="supply-head-left">
+          <h2>
+            <span class="supply-head-icon">📦</span>
+            <span>Auto Supply</span>
+          </h2>
+          <span class="supply-head-sub">Reposição contínua de suprimentos com controle de saldo</span>
         </div>
+        <div class="supply-head-right">
+          <label class="supply-toggle-master" title="Ativa ou pausa o monitoramento automático do Auto Supply">
+            <input type="checkbox" id="autoSupplyMasterToggle">
+            <span class="supply-toggle-pill">
+              <span class="supply-toggle-dot"></span>
+              <span class="supply-toggle-text">AUTO SUPPLY</span>
+              <b id="supplyMasterStatusText">OFF</b>
+            </span>
+          </label>
+          <span class="supply-close" id="autoSupplyCloseBtn" title="Fechar">&times;</span>
+        </div>
+      </div>
 
-        <!-- SEÇÃO: Contas Selecionadas no Auto Supply -->
-        <div class="supply-section supply-accounts-picker-section">
-          <div class="supply-section-header">
-            <div class="supply-sec-title">
-              <span class="supply-sec-badge">👥</span>
-              <h3>Contas no Auto Supply</h3>
+      <!-- Corpo Principal em 2 Colunas (Split View) -->
+      <div class="supply-split-body">
+        <!-- Coluna Esquerda: Suas Contas (Unificado: Seleção + Status + Estoque) -->
+        <div class="supply-col-accounts">
+          <div class="supply-panel-header">
+            <div class="supply-panel-title">
+              <span class="supply-panel-badge">👥</span>
+              <h3>Suas Contas</h3>
               <span class="supply-acc-count-badge" id="autoSupplySelectedCount">0 ativas</span>
             </div>
             <div class="supply-batch-actions">
-              <button type="button" class="supply-mini-btn" id="autoSupplySelectAll"
-                title="Selecionar todas as contas">☑️ Todas</button>
-              <button type="button" class="supply-mini-btn" id="autoSupplyDeselectAll"
-                title="Desmarcar todas as contas">◻️ Nenhuma</button>
+              <button type="button" class="supply-mini-btn" id="autoSupplySelectAll" title="Selecionar todas">Todas</button>
+              <button type="button" class="supply-mini-btn" id="autoSupplyDeselectAll" title="Desmarcar todas">Nenhuma</button>
             </div>
           </div>
-          <div class="supply-accounts-grid" id="autoSupplyAccountsGrid">
-            <!-- Cards interativos com checkbox para cada conta -->
+
+          <div class="supply-accounts-list" id="autoSupplyAccountsGrid">
+            <!-- Cards compactos renderizados dinamicamente pelo JS -->
           </div>
         </div>
 
-        <!-- SEÇÃO: Parâmetros de Suprimento com Abas (Padrão Global vs Cada Conta) -->
-        <div class="supply-section supply-config-scope-section">
-          <div class="supply-section-header">
-            <div class="supply-sec-title">
-              <span class="supply-sec-badge">⚙️</span>
-              <h3>Configuração de Suprimentos</h3>
+        <!-- Coluna Direita: Regras de Reposição (Padrão ou Customizada) -->
+        <div class="supply-col-rules">
+          <!-- Barra de Escopo: Seleção de Regra Global vs Individual -->
+          <div class="supply-scope-bar">
+            <div class="supply-scope-select-wrap">
+              <label for="autoSupplyScopeSelect">Configurando:</label>
+              <select id="autoSupplyScopeSelect" title="Escolha se deseja configurar a regra padrão ou uma conta específica"></select>
             </div>
-          </div>
-
-          <!-- Barra de Abas: [🌐 Regra Padrão] [👤 Conta 1] [👤 Conta 2] ... -->
-          <div class="supply-scope-tab-bar" id="autoSupplyScopeTabBar"></div>
-
-          <!-- Banner de contexto da aba ativa -->
-          <div class="supply-scope-context-banner" id="autoSupplyScopeBanner">
-            <div class="supply-scope-banner-info">
-              <span class="supply-scope-badge" id="autoSupplyScopeBadge">🌐 Padrão</span>
-              <span class="supply-scope-title" id="autoSupplyScopeTitle">Configurando Regra Padrão (Global)</span>
-            </div>
-            <div class="supply-scope-banner-controls" id="autoSupplyScopeControls" style="display:none">
-              <label class="supply-toggle-label"
-                title="Se marcado, esta conta usa itens, mínimos e alvos próprios em vez da regra padrão">
+            <div class="supply-scope-actions" id="autoSupplyScopeControls" style="display:none">
+              <label class="supply-scope-custom-chk" title="Permite que esta conta use itens e limites próprios em vez da regra padrão">
                 <input type="checkbox" id="autoSupplyScopeCustomToggle">
-                <span><b>Personalizar para esta conta</b></span>
+                <span>Personalizar</span>
               </label>
-              <button type="button" class="supply-mini-btn" id="autoSupplyCopyCurrentToAll"
-                title="Copia as configurações desta conta para todas as contas selecionadas">📋 Replicar p/
-                Selecionadas</button>
+              <button type="button" class="supply-mini-btn" id="autoSupplyCopyCurrentToAll" title="Replicar regras desta conta para todas as contas selecionadas">📋 Replicar</button>
             </div>
           </div>
 
-          <div id="autoSupplyFieldsWrap" class="supply-fields-wrap">
-            <!-- Seção 1: Pokébolas -->
-            <div class="supply-sub-section">
-              <div class="supply-section-header">
-                <div class="supply-sec-title">
-                  <span class="supply-sec-badge">🔴</span>
-                  <h4>Pokébolas</h4>
-                </div>
-                <label class="supply-sec-enable">
+          <!-- Formulário com as 3 categorias de suprimentos -->
+          <div id="autoSupplyFieldsWrap" class="supply-rules-form">
+            <!-- 1. Pokébolas -->
+            <div class="supply-rule-row">
+              <div class="supply-rule-header">
+                <label class="supply-rule-check">
                   <input type="checkbox" id="supplyBallsEnable" checked>
-                  <span>Ativar reabastecimento de bolas</span>
+                  <span class="supply-rule-icon">🔴</span>
+                  <b>Pokébolas</b>
                 </label>
-              </div>
-              <div class="supply-cards-grid" id="supplyBallsGrid"></div>
-              <div class="supply-thresholds-row">
-                <div class="supply-thresh-col">
-                  <label for="supplyBallsMin">Reabastecer quando estiver abaixo de:</label>
-                  <input type="number" id="supplyBallsMin" min="10" max="50000" step="50" value="150">
+                <div class="supply-rule-select-wrap">
+                  <select id="supplyBallsSelect" class="supply-item-select"></select>
                 </div>
-                <div class="supply-thresh-col">
-                  <label for="supplyBallsTarget">Comprar até atingir (Estoque Alvo):</label>
-                  <input type="number" id="supplyBallsTarget" min="50" max="50000" step="100" value="1000">
+              </div>
+              <div class="supply-rule-inputs">
+                <div class="supply-input-field">
+                  <label for="supplyBallsMin">Reabastecer abaixo de:</label>
+                  <div class="supply-num-input-wrap">
+                    <input type="number" id="supplyBallsMin" min="10" max="50000" step="50" value="150">
+                    <span class="supply-unit-tag">un</span>
+                  </div>
+                </div>
+                <div class="supply-input-field">
+                  <label for="supplyBallsTarget">Comprar até atingir:</label>
+                  <div class="supply-num-input-wrap">
+                    <input type="number" id="supplyBallsTarget" min="50" max="50000" step="100" value="1000">
+                    <span class="supply-unit-tag">un</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Seção 2: Poções -->
-            <div class="supply-sub-section">
-              <div class="supply-section-header">
-                <div class="supply-sec-title">
-                  <span class="supply-sec-badge">🧪</span>
-                  <h4>Poções de Cura</h4>
-                </div>
-                <label class="supply-sec-enable">
+            <!-- 2. Poções -->
+            <div class="supply-rule-row">
+              <div class="supply-rule-header">
+                <label class="supply-rule-check">
                   <input type="checkbox" id="supplyPotionsEnable" checked>
-                  <span>Ativar reabastecimento de poções</span>
+                  <span class="supply-rule-icon">🧪</span>
+                  <b>Poções de Cura</b>
                 </label>
-              </div>
-              <div class="supply-cards-grid" id="supplyPotionsGrid"></div>
-              <div class="supply-thresholds-row">
-                <div class="supply-thresh-col">
-                  <label for="supplyPotionsMin">Reabastecer quando estiver abaixo de:</label>
-                  <input type="number" id="supplyPotionsMin" min="5" max="10000" step="10" value="30">
+                <div class="supply-rule-select-wrap">
+                  <select id="supplyPotionsSelect" class="supply-item-select"></select>
                 </div>
-                <div class="supply-thresh-col">
-                  <label for="supplyPotionsTarget">Comprar até atingir (Estoque Alvo):</label>
-                  <input type="number" id="supplyPotionsTarget" min="20" max="10000" step="20" value="200">
+              </div>
+              <div class="supply-rule-inputs">
+                <div class="supply-input-field">
+                  <label for="supplyPotionsMin">Reabastecer abaixo de:</label>
+                  <div class="supply-num-input-wrap">
+                    <input type="number" id="supplyPotionsMin" min="5" max="10000" step="10" value="30">
+                    <span class="supply-unit-tag">un</span>
+                  </div>
+                </div>
+                <div class="supply-input-field">
+                  <label for="supplyPotionsTarget">Comprar até atingir:</label>
+                  <div class="supply-num-input-wrap">
+                    <input type="number" id="supplyPotionsTarget" min="20" max="10000" step="20" value="200">
+                    <span class="supply-unit-tag">un</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Seção 3: Revives -->
-            <div class="supply-sub-section">
-              <div class="supply-section-header">
-                <div class="supply-sec-title">
-                  <span class="supply-sec-badge">✨</span>
-                  <h4>Revives</h4>
-                </div>
-                <label class="supply-sec-enable">
+            <!-- 3. Revives -->
+            <div class="supply-rule-row">
+              <div class="supply-rule-header">
+                <label class="supply-rule-check">
                   <input type="checkbox" id="supplyRevivesEnable" checked>
-                  <span>Ativar reabastecimento de revives</span>
+                  <span class="supply-rule-icon">✨</span>
+                  <b>Revives</b>
                 </label>
-              </div>
-              <div class="supply-cards-grid" id="supplyRevivesGrid"></div>
-              <div class="supply-thresholds-row">
-                <div class="supply-thresh-col">
-                  <label for="supplyRevivesMin">Reabastecer quando estiver abaixo de:</label>
-                  <input type="number" id="supplyRevivesMin" min="1" max="1000" step="5" value="10">
+                <div class="supply-rule-select-wrap">
+                  <select id="supplyRevivesSelect" class="supply-item-select"></select>
                 </div>
-                <div class="supply-thresh-col">
-                  <label for="supplyRevivesTarget">Comprar até atingir (Estoque Alvo):</label>
-                  <input type="number" id="supplyRevivesTarget" min="5" max="1000" step="10" value="50">
+              </div>
+              <div class="supply-rule-inputs">
+                <div class="supply-input-field">
+                  <label for="supplyRevivesMin">Reabastecer abaixo de:</label>
+                  <div class="supply-num-input-wrap">
+                    <input type="number" id="supplyRevivesMin" min="1" max="1000" step="5" value="10">
+                    <span class="supply-unit-tag">un</span>
+                  </div>
+                </div>
+                <div class="supply-input-field">
+                  <label for="supplyRevivesTarget">Comprar até atingir:</label>
+                  <div class="supply-num-input-wrap">
+                    <input type="number" id="supplyRevivesTarget" min="5" max="1000" step="10" value="50">
+                    <span class="supply-unit-tag">un</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Seção 4: Visão Geral / Estoque em Tempo Real por Conta -->
-        <div class="supply-section">
-          <div class="supply-sec-title" style="margin-bottom:8px">
-            <span class="supply-sec-badge">📊</span>
-            <h3>Visão Geral & Estoques em Tempo Real</h3>
-          </div>
-          <div class="supply-accounts-status" id="supplyAccountsPreview"></div>
         </div>
       </div>
 
@@ -2889,13 +2880,82 @@
         <span id="autoSupplyStatusText"></span>
       </div>
 
+      <!-- Rodapé / Ações -->
+      <div class="supply-foot">
+        <div class="supply-foot-left">
+          <label class="supply-foot-opt" title="Se faltar ouro em alguma conta, compra o máximo que o saldo permitir em vez de falhar o pedido">
+            <input type="checkbox" id="autoSupplyBuyPartial">
+            <span>Compra parcial segura</span>
+          </label>
+          <button type="button" id="autoSupplyShopInGame" class="supply-btn-subtle"
+            title="Abre a tela de loja dentro dos jogos das contas ativas">🏪 Loja no Jogo</button>
+        </div>
+        <div class="supply-foot-right">
+          <button type="button" id="autoSupplyBuyNow" class="supply-btn-restock"
+            title="Executa a compra imediatamente para as contas selecionadas que precisam">🛒 Reabastecer Agora</button>
+          <button type="button" id="autoSupplyCancel">Cancelar</button>
+          <button type="button" id="autoSupplySave" class="primary">💾 Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Bônus Twitch (Presença Headless em Chats Oficiais) -->
+  <div id="twitchBonusOverlay">
+    <div id="twitchBonusModal">
+      <div class="twitch-bonus-head">
+        <h2>
+          <span class="twitch-bonus-icon">🟣</span>
+          <span>Bônus Twitch — Presença em Lives de Parceiros (+15% a +25% XP)</span>
+        </h2>
+        <span class="twitch-bonus-close" id="twitchBonusCloseBtn" title="Fechar">&times;</span>
+      </div>
+      <p class="hint">Ganhe bônus de XP de treinador e Pokémon mantendo suas contas conectadas nos chats dos streamers oficiais. <b>Sem vídeo, sem áudio e sem gastar RAM</b> (&lt;15 MB total em segundo plano).</p>
+
+      <div class="twitch-bonus-content">
+        <!-- Master Card -->
+        <div class="twitch-global-card">
+          <div class="twitch-global-row">
+            <label class="twitch-toggle-label">
+              <input type="checkbox" id="twitchMasterToggle">
+              <span class="twitch-toggle-text"><b>Ativar Presença Automática</b> (conectar nos chats dos streamers oficiais que estiverem ao vivo com bônus)</span>
+            </label>
+            <div class="twitch-global-kpis">
+              <span class="twitch-kpi-pill" id="twitchGlobalStatusPill">● Desconectado</span>
+              <span class="twitch-kpi-pill twitch-kpi-bonus" id="twitchGlobalBonusPill">⚡ Bônus no Jogo: 0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção das 4 Contas -->
+        <div class="twitch-section">
+          <div class="twitch-sec-head">
+            <label class="twitch-sec-title">Suas 4 Contas (Twitch vinculada e Token de Chat):</label>
+            <a href="https://twitchtokengenerator.com/" target="_blank" class="twitch-token-help-link" id="twitchTokenHelpLink">🔑 Gerar Token de Chat (1 clique) ↗</a>
+          </div>
+          <div class="twitch-accounts-grid" id="twitchAccountsGrid"></div>
+        </div>
+
+        <!-- Seção Streamers Parceiros -->
+        <div class="twitch-section">
+          <div class="twitch-sec-head">
+            <label class="twitch-sec-title">Streamers Parceiros Oficiais (Sincronizado do PokeIdle):</label>
+            <span class="twitch-streamers-count" id="twitchStreamersCount">0 no ar</span>
+          </div>
+          <div class="twitch-streamers-list" id="twitchStreamersList">
+            <div class="twitch-empty-streamers">Aguardando dados do jogo ou nenhum streamer parceiro ao vivo no momento.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Status / Feedback -->
+      <div class="twitch-status-bar" id="twitchBonusStatusBar" style="display:none">
+        <span id="twitchBonusStatusText"></span>
+      </div>
+
       <div class="modal-actions">
-        <button type="button" id="autoSupplyShopInGame"
-          title="Abre a tela de loja dentro dos jogos das contas ativas">🏪 Abrir Loja no Jogo</button>
-        <button type="button" id="autoSupplyBuyNow" class="supply-btn-restock"
-          title="Executa a compra imediatamente para as contas selecionadas que precisam">🛒 Reabastecer Agora</button>
-        <button type="button" id="autoSupplyCancel">Cancelar</button>
-        <button type="button" id="autoSupplySave" class="primary">💾 Salvar Configurações</button>
+        <button type="button" id="twitchBonusCancel">Fechar</button>
+        <button type="button" id="twitchBonusSave" class="primary">💾 Salvar e Aplicar</button>
       </div>
     </div>
   </div>
@@ -3332,6 +3392,7 @@
             const d = stSane(JSON.parse(m.slice(8)));
             if (d) {
               stCache[i] = { t: Date.now(), d };
+              if (d.twitch && typeof handleTwitchGameTelemetry === 'function') handleTwitchGameTelemetry(i, d.twitch);
               dtPush();
               if (cardsOn) {
                 clearTimeout(cardsRefreshTimer);
@@ -4107,6 +4168,17 @@
       const inv2 = {}; let nInv = 0;
       for (const k in im) { if (k === '__proto__' || k === 'constructor') continue; if (++nInv > 500) break; inv2[String(k).slice(0, 12)] = num(im[k]); }
       d.invMap = inv2;
+      if (d.twitch && typeof d.twitch === 'object') {
+        d.twitch = {
+          login: String(d.twitch.login || '').slice(0, 40),
+          assistindo: !!d.twitch.assistindo,
+          assistindoEm: Array.isArray(d.twitch.assistindoEm) ? d.twitch.assistindoEm.slice(0, 20).map(x => String(x).slice(0, 40)) : [],
+          emLives: num(d.twitch.emLives),
+          pctAtual: num(d.twitch.pctAtual),
+          lives: Array.isArray(d.twitch.lives) ? d.twitch.lives.slice(0, 20).map(l => ({ login: String(l.login || '').slice(0, 40), espectadores: num(l.espectadores), aoVivo: !!l.aoVivo })) : [],
+          oficiais: Array.isArray(d.twitch.oficiais) ? d.twitch.oficiais.slice(0, 20).map(o => ({ login: String(o.login || '').slice(0, 40), bonus: !!o.bonus })) : []
+        };
+      }
       return d;
     }
     const ecoBtn = document.getElementById('eco');
@@ -6713,6 +6785,330 @@
       if (autoSupplyOn) executeAutoSupply(false);
     }, 20000);
 
+    // ===== Sistema de Bônus Twitch (Presença Headless em Chats Oficiais) =====
+    const twitchBonusBtn = document.getElementById('twitchBonusBtn');
+    const twitchBonusOverlay = document.getElementById('twitchBonusOverlay');
+    const twitchBonusCloseBtn = document.getElementById('twitchBonusCloseBtn');
+    const twitchBonusCancel = document.getElementById('twitchBonusCancel');
+    const twitchBonusSave = document.getElementById('twitchBonusSave');
+    const twitchMasterToggle = document.getElementById('twitchMasterToggle');
+    const twitchAccountsGrid = document.getElementById('twitchAccountsGrid');
+    const twitchStreamersList = document.getElementById('twitchStreamersList');
+    const twitchStreamersCount = document.getElementById('twitchStreamersCount');
+    const twitchGlobalStatusPill = document.getElementById('twitchGlobalStatusPill');
+    const twitchGlobalBonusPill = document.getElementById('twitchGlobalBonusPill');
+    const twitchBonusStatusBar = document.getElementById('twitchBonusStatusBar');
+    const twitchBonusStatusText = document.getElementById('twitchBonusStatusText');
+
+    const twitchBonusConfig = {
+      masterEnabled: false,
+      accounts: Array.from({ length: 4 }, () => ({ username: '', token: '', enabled: true }))
+    };
+    let twitchBonusLiveState = null;
+    const twitchCachedGameData = Array(4).fill(null);
+
+    function showTwitchFeedback(msg, isError = false) {
+      if (!twitchBonusStatusBar || !twitchBonusStatusText) return;
+      twitchBonusStatusText.textContent = msg;
+      twitchBonusStatusBar.style.display = 'block';
+      twitchBonusStatusBar.className = 'twitch-status-bar' + (isError ? ' error' : ' success');
+      setTimeout(() => { if (twitchBonusStatusBar) twitchBonusStatusBar.style.display = 'none'; }, 4000);
+    }
+
+    async function loadTwitchBonusConfig() {
+      try {
+        if (window.pokeAPI && window.pokeAPI.twitchLoadCreds) {
+          const res = await window.pokeAPI.twitchLoadCreds();
+          if (res) {
+            twitchBonusConfig.masterEnabled = !!res.masterEnabled;
+            if (Array.isArray(res.accounts)) {
+              for (let i = 0; i < 4; i++) {
+                if (res.accounts[i]) {
+                  twitchBonusConfig.accounts[i] = Object.assign({ username: '', token: '', enabled: true }, res.accounts[i]);
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderTwitchBonusUI() {
+      if (twitchMasterToggle) twitchMasterToggle.checked = twitchBonusConfig.masterEnabled;
+
+      const isRunning = twitchBonusConfig.masterEnabled && twitchBonusLiveState && twitchBonusLiveState.accounts && twitchBonusLiveState.accounts.some(a => a.status === 'connected');
+      if (twitchGlobalStatusPill) {
+        twitchGlobalStatusPill.textContent = !twitchBonusConfig.masterEnabled ? '● Desativado' : (isRunning ? '● Conectado nos Chats' : '● Aguardando Conexão');
+        twitchGlobalStatusPill.className = 'twitch-kpi-pill' + (isRunning ? ' active' : '');
+      }
+
+      let maxBonus = 0;
+      twitchCachedGameData.forEach(tw => {
+        if (tw && tw.pctAtual && tw.pctAtual > maxBonus) maxBonus = tw.pctAtual;
+      });
+      if (twitchGlobalBonusPill) {
+        twitchGlobalBonusPill.textContent = maxBonus > 0 ? `⚡ Bônus no Jogo: +${maxBonus}% XP` : '⚡ Bônus no Jogo: 0%';
+      }
+
+      window.__twitchBonusStatus = twitchBonusConfig;
+      window.__twitchBonusPctTxt = maxBonus > 0 ? `+${maxBonus}%` : '';
+      if (window.__syncTwitchBonusBadge) window.__syncTwitchBonusBadge();
+
+      if (twitchAccountsGrid) {
+        twitchAccountsGrid.innerHTML = '';
+        for (let i = 0; i < 4; i++) {
+          const acc = twitchBonusConfig.accounts[i] || { username: '', token: '', enabled: true };
+          const liveAcc = (twitchBonusLiveState && twitchBonusLiveState.accounts && twitchBonusLiveState.accounts[i]) || { status: 'disconnected', joinedChannels: [] };
+          const gameTwitch = twitchCachedGameData[i] || null;
+
+          if (!acc.username && gameTwitch && gameTwitch.login) {
+            acc.username = gameTwitch.login;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'twitch-account-card' + (acc.enabled ? ' is-active' : ' is-disabled');
+
+          const statusColor = liveAcc.status === 'connected' ? '#22c55e' : (liveAcc.status === 'connecting' ? '#eab308' : (liveAcc.status === 'error' ? '#ef4444' : '#8b949e'));
+          const statusText = liveAcc.status === 'connected' ? 'Ativo no Chat' : (liveAcc.status === 'connecting' ? 'Conectando...' : (liveAcc.status === 'error' ? (liveAcc.lastError || 'Erro') : 'Desconectado'));
+
+          const joinedBadges = (liveAcc.joinedChannels && liveAcc.joinedChannels.length > 0)
+            ? liveAcc.joinedChannels.map(ch => `<span class="twitch-chan-badge">✓ #${ch}</span>`).join(' ')
+            : '<span class="twitch-chan-none">Nenhum canal ativo</span>';
+
+          const inGameBonus = (gameTwitch && gameTwitch.assistindo && gameTwitch.pctAtual) ? `<span class="twitch-ingame-tag">+${gameTwitch.pctAtual}% XP</span>` : '';
+
+          card.innerHTML = `
+            <div class="twitch-acc-header">
+              <div class="twitch-acc-title">
+                <span class="twitch-acc-badge" style="background:${ACOR[i % ACOR.length] || '#8b949e'}">${i + 1}</span>
+                <span class="twitch-acc-name">${shownAccountName(i, (accounts[i] && accounts[i].name) || defName(i))}</span>
+                ${inGameBonus}
+              </div>
+              <label class="twitch-acc-toggle" title="Ativar esta conta na Twitch">
+                <input type="checkbox" data-acc-enable="${i}" ${acc.enabled ? 'checked' : ''}>
+                <span>Ligar</span>
+              </label>
+            </div>
+            <div class="twitch-acc-status-row">
+              <span class="twitch-status-dot" style="background:${statusColor}"></span>
+              <span class="twitch-status-label">${statusText}</span>
+              ${gameTwitch && gameTwitch.login ? `<span class="twitch-linked-tag" title="Vinculado no jogo">Twitch: @${gameTwitch.login}</span>` : `<span class="twitch-unlinked-tag" title="Vincule pelo menu Treinador do jogo">Sem vínculo no jogo</span>`}
+            </div>
+            <div class="twitch-acc-channels-row">
+              <span class="twitch-chans-label">Presença:</span>
+              <div class="twitch-chans-list">${joinedBadges}</div>
+            </div>
+            <div class="twitch-acc-inputs">
+              <div class="twitch-input-group">
+                <label>Usuário Twitch:</label>
+                <input type="text" placeholder="ex: seu_user" value="${acc.username || ''}" data-acc-user="${i}">
+              </div>
+              <div class="twitch-input-group">
+                <label>Token de Chat (OAuth):</label>
+                <div class="twitch-token-wrap">
+                  <input type="password" placeholder="oauth:xxxxxxxxx" value="${acc.token || ''}" data-acc-token="${i}">
+                  <button type="button" class="twitch-btn-eye" title="Mostrar/ocultar token" data-toggle-eye="${i}">👁</button>
+                </div>
+              </div>
+            </div>
+            <div class="twitch-acc-actions">
+              <button type="button" class="twitch-btn-test" data-test-acc="${i}">Testar Conexão</button>
+              <span class="twitch-test-result" id="twitchTestResult${i}"></span>
+            </div>
+          `;
+          twitchAccountsGrid.appendChild(card);
+        }
+
+        twitchAccountsGrid.querySelectorAll('[data-acc-enable]').forEach(cb => {
+          cb.onchange = () => {
+            const idx = +cb.dataset.accEnable;
+            if (twitchBonusConfig.accounts[idx]) {
+              twitchBonusConfig.accounts[idx].enabled = cb.checked;
+              renderTwitchBonusUI();
+            }
+          };
+        });
+        twitchAccountsGrid.querySelectorAll('[data-acc-user]').forEach(inp => {
+          inp.oninput = () => {
+            const idx = +inp.dataset.accUser;
+            if (twitchBonusConfig.accounts[idx]) twitchBonusConfig.accounts[idx].username = inp.value.trim();
+          };
+        });
+        twitchAccountsGrid.querySelectorAll('[data-acc-token]').forEach(inp => {
+          inp.oninput = () => {
+            const idx = +inp.dataset.accToken;
+            if (twitchBonusConfig.accounts[idx]) twitchBonusConfig.accounts[idx].token = inp.value.trim();
+          };
+        });
+        twitchAccountsGrid.querySelectorAll('[data-toggle-eye]').forEach(btn => {
+          btn.onclick = () => {
+            const idx = +btn.dataset.toggleEye;
+            const inp = twitchAccountsGrid.querySelector(`[data-acc-token="${idx}"]`);
+            if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+          };
+        });
+        twitchAccountsGrid.querySelectorAll('[data-test-acc]').forEach(btn => {
+          btn.onclick = async () => {
+            const idx = +btn.dataset.testAcc;
+            const resEl = document.getElementById(`twitchTestResult${idx}`);
+            const acc = twitchBonusConfig.accounts[idx];
+            if (!acc || !acc.username || !acc.token) {
+              if (resEl) { resEl.textContent = 'Preencha usuário e token'; resEl.style.color = '#ef4444'; }
+              return;
+            }
+            btn.disabled = true;
+            if (resEl) { resEl.textContent = 'Testando...'; resEl.style.color = '#eab308'; }
+            try {
+              const r = await window.pokeAPI.twitchTestConnection(acc.username, acc.token);
+              if (r.ok) {
+                if (resEl) { resEl.textContent = '✓ Conexão OK!'; resEl.style.color = '#22c55e'; }
+              } else {
+                if (resEl) { resEl.textContent = r.error || 'Falha na conexão'; resEl.style.color = '#ef4444'; }
+              }
+            } catch (err) {
+              if (resEl) { resEl.textContent = err.message; resEl.style.color = '#ef4444'; }
+            } finally {
+              btn.disabled = false;
+            }
+          };
+        });
+      }
+
+      renderTwitchStreamersList();
+    }
+
+    function renderTwitchStreamersList() {
+      if (!twitchStreamersList) return;
+      const allStreams = new Map();
+      twitchCachedGameData.forEach(tw => {
+        if (!tw) return;
+        if (Array.isArray(tw.oficiais)) {
+          tw.oficiais.forEach(o => {
+            if (o && o.login && !allStreams.has(o.login.toLowerCase())) {
+              allStreams.set(o.login.toLowerCase(), { login: o.login, bonus: !!o.bonus, aoVivo: false, espectadores: 0 });
+            }
+          });
+        }
+        if (Array.isArray(tw.lives)) {
+          tw.lives.forEach(l => {
+            if (l && l.login) {
+              const existing = allStreams.get(l.login.toLowerCase()) || { login: l.login, bonus: true };
+              existing.aoVivo = !!l.aoVivo;
+              existing.espectadores = l.espectadores || 0;
+              allStreams.set(l.login.toLowerCase(), existing);
+            }
+          });
+        }
+      });
+
+      const list = Array.from(allStreams.values()).sort((a, b) => Number(b.aoVivo) - Number(a.aoVivo) || b.espectadores - a.espectadores);
+      const onlineCount = list.filter(s => s.aoVivo).length;
+      if (twitchStreamersCount) twitchStreamersCount.textContent = `${onlineCount} no ar`;
+
+      if (list.length === 0) {
+        twitchStreamersList.innerHTML = '<div class="twitch-empty-streamers">Aguardando dados do jogo ou nenhum streamer parceiro cadastrado.</div>';
+        return;
+      }
+
+      twitchStreamersList.innerHTML = list.map(s => {
+        const statusBadge = s.aoVivo
+          ? `<span class="twitch-badge-live">● AO VIVO (${s.espectadores} viewers)</span>`
+          : '<span class="twitch-badge-off">OFFLINE</span>';
+        const bonusBadge = s.bonus ? '<span class="twitch-badge-bonus">★ Bônus Ativo</span>' : '<span class="twitch-badge-nobonus">Sem Bônus</span>';
+        return `
+          <div class="twitch-streamer-item ${s.aoVivo ? 'live' : 'off'}">
+            <span class="twitch-streamer-name">@${s.login}</span>
+            <div class="twitch-streamer-meta">${statusBadge} ${bonusBadge}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openTwitchBonusModal() {
+      loadTwitchBonusConfig().then(() => {
+        renderTwitchBonusUI();
+        if (twitchBonusOverlay) twitchBonusOverlay.classList.add('show');
+      });
+    }
+
+    function closeTwitchBonusModal() {
+      if (twitchBonusOverlay) twitchBonusOverlay.classList.remove('show');
+    }
+
+    if (twitchBonusBtn) twitchBonusBtn.onclick = openTwitchBonusModal;
+    if (twitchBonusCloseBtn) twitchBonusCloseBtn.onclick = closeTwitchBonusModal;
+    if (twitchBonusCancel) twitchBonusCancel.onclick = closeTwitchBonusModal;
+
+    if (twitchMasterToggle) {
+      twitchMasterToggle.onchange = () => {
+        twitchBonusConfig.masterEnabled = twitchMasterToggle.checked;
+        renderTwitchBonusUI();
+      };
+    }
+
+    if (twitchBonusSave) {
+      twitchBonusSave.onclick = async () => {
+        twitchBonusSave.disabled = true;
+        try {
+          if (window.pokeAPI && window.pokeAPI.twitchSaveCreds) {
+            const ok = await window.pokeAPI.twitchSaveCreds(twitchBonusConfig);
+            if (ok) {
+              showTwitchFeedback('✓ Configurações da Twitch salvas e aplicadas!');
+              renderTwitchBonusUI();
+              setTimeout(closeTwitchBonusModal, 800);
+            } else {
+              showTwitchFeedback('Falha ao salvar configurações', true);
+            }
+          }
+        } catch (e) {
+          showTwitchFeedback(e.message, true);
+        } finally {
+          twitchBonusSave.disabled = false;
+        }
+      };
+    }
+
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && twitchBonusOverlay && twitchBonusOverlay.classList.contains('show')) {
+          e.preventDefault();
+          closeTwitchBonusModal();
+        }
+      });
+    }
+
+    if (window.pokeAPI && window.pokeAPI.onTwitchStatus) {
+      window.pokeAPI.onTwitchStatus((st) => {
+        twitchBonusLiveState = st;
+        if (twitchBonusOverlay && twitchBonusOverlay.classList.contains('show')) {
+          renderTwitchBonusUI();
+        } else {
+          const isRunning = st && st.masterEnabled && st.accounts && st.accounts.some(a => a.status === 'connected');
+          window.__twitchBonusStatus = { masterEnabled: isRunning };
+          if (window.__syncTwitchBonusBadge) window.__syncTwitchBonusBadge();
+        }
+      });
+    }
+
+    function handleTwitchGameTelemetry(accIndex, twData) {
+      if (!twData) return;
+      twitchCachedGameData[accIndex] = twData;
+
+      const liveLogins = (twData.lives || []).filter(l => l && l.aoVivo).map(l => l.login);
+      if (liveLogins.length > 0 && window.pokeAPI && window.pokeAPI.twitchSyncLives) {
+        window.pokeAPI.twitchSyncLives(liveLogins);
+      }
+
+      if (twitchBonusOverlay && twitchBonusOverlay.classList.contains('show')) {
+        renderTwitchBonusUI();
+      } else {
+        if (twData.pctAtual) window.__twitchBonusPctTxt = `+${twData.pctAtual}%`;
+        if (window.__syncTwitchBonusBadge) window.__syncTwitchBonusBadge();
+      }
+    }
+    window.handleTwitchGameTelemetry = handleTwitchGameTelemetry;
+    loadTwitchBonusConfig().then(() => { if (window.__syncTwitchBonusBadge) window.__syncTwitchBonusBadge(); });
+
     // ----- Anti-sono: impede o PC de dormir enquanto farma -----
     const awakeBtn = document.getElementById('awake');
     let awake = lsGet('awake') === '1';
@@ -7860,7 +8256,9 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     const inGame = (appEl && !appEl.classList.contains('hidden')) || (typeof document !== 'undefined' && (document.documentElement.classList.contains('modo-economia') || !!document.getElementById('eco-painel')));
     const hasData = !!(cName || (team && team.length > 0) || cLevel > 0 || P.cid || ch.id || (bm && bm.counts));
     const live = (inGame || hasData) && !isPort && !((P.meMiss || 0) >= 2 && !(P.sock && P.sock.readyState === 1));
+    const tw = (P.estado && P.estado.twitch) || (window.estado && (window.estado.eu ? window.estado.eu.twitch : window.estado.twitch)) || null;
     return { ok:true, cid: ch.id||P.cid||(P.estado&&P.estado.id)||'', name: cName, level: cLevel, gold: cGold, diamonds: cDiamonds, vip: !!ch.isVip, clan: ch.clan||(P.estado&&P.estado.guild&&(P.estado.guild.nome||P.estado.guild.name))||null, clanRank: ch.clanRank||0, shinyEnc: P.shinyEnc||0, usedList: P.usedList||[], catchLog: P.catchLog||[], shinyLog: P.shinyLog||[], chatShares: P.chatShares||[], balls: sBalls, equippedBall, activeId: actId || null, potions: sPot, revives: sRev, invMap, ballMap,
+      twitch: tw,
       prof: ch.profession||'', profRank: ch.professionRank||0, catches: ch.catches||0, hunt, gifts: mail.gifts||0,
       a, drops, bag, team, allPokes, prev,
       live, portal: isPort, sk: !!(P.sock && P.sock.readyState === 1),

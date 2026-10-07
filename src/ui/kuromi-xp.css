@@ -994,11 +994,11 @@ body[data-theme^="kuromi-xp"] #cards input[type="checkbox"] { accent-color: var(
 /* --------------------------------------------------------------------------
    10. MENU FERRAMENTAS, CONFIGURAÇÕES, MODAIS
    -------------------------------------------------------------------------- */
-body[data-theme^="kuromi-xp"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay) {
+body[data-theme^="kuromi-xp"] :is(#overlay, #scOverlay, #tlOverlay, #dtOverlay, #atOverlay, #dispatchOverlay, #autoSupplyOverlay, #twitchBonusOverlay) {
   background: var(--kx-overlay) !important;
   backdrop-filter: none !important;
 }
-body[data-theme^="kuromi-xp"] :is(#leafToolsMenu, #leafSettingsDrawer, #modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #ivCard) {
+body[data-theme^="kuromi-xp"] :is(#leafToolsMenu, #leafSettingsDrawer, #modal, #scModal, #tlModal, #dtModal, #atModal, #autoSupplyModal, #twitchBonusModal, #ivCard) {
   background: var(--kx-face) !important;
   color: var(--kx-text) !important;
   border: 0 !important;

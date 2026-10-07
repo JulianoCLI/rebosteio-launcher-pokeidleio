@@ -12,6 +12,7 @@ try {
 // Mantém a composição fora da GPU, conforme solicitado.
 app.commandLine.appendSwitch('disable-gpu-compositing');
 const https = require('https');
+const { twitchChatManager } = require('./src/domain/twitch-chat-service');
 
 // Silencia o spam do Chromium no terminal (ex.: STUN/WebRTC do jogo que a rede nao resolve).
 // E so log, nao afeta o app. Mantem so erros fatais.
@@ -348,6 +349,15 @@ ipcMain.handle('proxy:apply', async (_e) => {
   return { changed, errors };
 });
 
+ipcMain.handle('twitch:creds:load', () => twitchChatManager.loadCreds());
+ipcMain.handle('twitch:creds:save', (_e, data) => twitchChatManager.saveCreds(data));
+ipcMain.handle('twitch:test', (_e, username, token) => twitchChatManager.testConnection(username, token));
+ipcMain.handle('twitch:sync-lives', (_e, lives) => {
+  twitchChatManager.syncLives(lives);
+  return true;
+});
+ipcMain.handle('twitch:status:get', () => twitchChatManager.getStatus());
+
 // UA consistente pra passar na Cloudflare: remove o token "Electron/..." e
 // congela a versão do Chrome em .0.0.0, casando com os client hints (navigator.userAgentData).
 // Deriva da versão real do Chromium, então acompanha upgrades do Electron sozinho.
@@ -654,6 +664,12 @@ app.whenReady().then(() => {
     return { maximized: !win.isDestroyed() && win.isMaximized() };
   });
   win.loadFile(path.join(__dirname, 'index.html')); // caminho absoluto: robusto no build empacotado (asar)
+  twitchChatManager.setStatusCallback((st) => {
+    if (!win.isDestroyed()) {
+      try { win.webContents.send('twitch:status:update', st); } catch {}
+    }
+  });
+  win.on('closed', () => twitchChatManager.setStatusCallback(null));
   // a janela principal so mostra index.html: bloqueia qualquer navegacao dela (canal de exfiltracao se houver XSS)
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('file://')) { e.preventDefault(); abreFora(url); } });
   win.webContents.setWindowOpenHandler(({ url }) => { abreFora(url); return { action: 'deny' }; });
