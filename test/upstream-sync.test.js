@@ -71,7 +71,7 @@ guest.localStorage = { getItem: key => key === 'sessao-hunt:conta fictícia' ? J
 result = vm.runInContext(reader, guest);
 assert.equal(result.a.srv, 1, 'the native game session is read without a swallowed initialization error');
 assert.equal(result.a.kills, 12); assert.equal(result.a.captures, 2);
-assert.equal(result.a.supplyGold, 460); assert.equal(result.a.balance, 540);
+assert.equal(result.a.supplyGold, 460); assert.equal(result.a.balance, 550);
 assert.equal(result.a.xph, 3600); assert.equal(result.a.kph, 12);
 guest.localStorage.getItem = () => null;
 const scoreboard = { querySelector: () => ({ textContent: '1h 00m' }) };
@@ -88,9 +88,19 @@ guest.document = {
   querySelector: selector => selector in metrics ? { textContent: metrics[selector] } : null
 };
 result = vm.runInContext(reader, guest);
-assert.equal(result.a.balance, 1234.5, 'the injected parser preserves thousands separators and decimal commas');
-assert.equal(result.a.supplyGold, 120.5); assert.equal(result.a.gph, 1234.5);
+assert.equal(result.a.balance, 1244.5, 'the injected parser preserves thousands separators and decimal commas');
+assert.equal(result.a.supplyGold, 120.5); assert.equal(result.a.gph, 1245);
 assert.equal(result.a.xpg, 12345); assert.equal(result.a.xph, 12345); assert.equal(result.a.kph, 1200);
+assert.equal(result.a.capturesGold, 10, 'capture value has its own panel line');
+assert.equal(result.a.lootGold, 1355, 'capture value is not also classified as kill income');
+guest.document = emptyDocument();
+state.ws.analyzer = { seconds: 3600, balance: -5, capturesGold: 10 };
+result = vm.runInContext(reader, guest);
+assert.equal(result.a.balance, -5, 'analyzer capture income is not counted twice');
+state.ws.analyzer.capturesGold = 0;
+result = vm.runInContext(reader, guest);
+assert.equal(result.a.balance, 5, 'capture value covers the deficit when absent from the analyzer');
+delete state.ws.analyzer;
 state.meMiss = 2; state.sock.readyState = 0;
 assert.equal(vm.runInContext(reader, guest).live, false, 'a lost connection is not reported as online');
 guest.window.__poke = null;

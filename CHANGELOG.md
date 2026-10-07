@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.47
+
+- Painel: saldo e Gold/h incluem o valor estimado de venda ao NPC dos Pokémon capturados, além do ouro de abates e dos gastos.
+- Cálculo utiliza os módulos econômicos atuais do jogo, com nível, qualidade, shiny e ajustes do catálogo. Capturas repetidas não somam duas vezes; a parcela aparece como valor NPC estimado.
+
 ## 1.5.46
 
 - Ação de edição individual do Auto Supply refeita com ícone de lápis, texto curto e acabamento integrado ao cartão.

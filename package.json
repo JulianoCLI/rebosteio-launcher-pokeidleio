@@ -1,6 +1,6 @@
 {
   "name": "piorebosteio",
-  "version": "1.5.46",
+  "version": "1.5.47",
   "description": "Rode de 1 a 4 contas de Poke Idle IO ao mesmo tempo, em uma janela so / Run 1 to 4 Poke Idle IO accounts at once, in a single window",
   "main": "main.js",
   "author": "souonailo",
@@ -12,7 +12,8 @@
     "test:auto-supply": "node test/auto-supply.test.js",
     "test:auto-supply-integration": "electron test/auto-supply-electron.test.js",
     "test:tracking": "electron test/game-tracking.test.js",
-    "test:sync": "node test/upstream-sync.test.js"
+    "test:sync": "node test/upstream-sync.test.js",
+    "test:capture-value": "electron test/capture-value.test.js"
   },
   "keywords": [
     "electron",
