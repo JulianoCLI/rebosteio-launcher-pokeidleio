@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, safeStorage, Tray, Menu, powerSaveBlocker, 
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
+const { coalesceScriptLoading, blockMetaPixel } = require('./src/main/guest-runtime');
 
 // Isola este launcher do Absol Launcher original para poderem rodar simultaneamente sem conflito
 app.name = 'pionailo';
@@ -179,6 +180,8 @@ const abreFora = (url) => {
 };
 app.on('web-contents-created', (_e, contents) => {
   if (contents.getType() !== 'webview') return;
+  coalesceScriptLoading(contents);
+  blockMetaPixel(contents.session);
   contents.setWindowOpenHandler(({ url }) => { abreFora(url); return { action: 'deny' }; });
   // compara a ORIGEM, nao o prefixo: 'https://pokeidle.io.evil.com' comeca igual e
   // passaria, levando a sessao logada pra um site clonado sem barra de endereco
@@ -686,7 +689,11 @@ app.whenReady().then(() => {
           label: `Expandir painel ${n}`, accelerator: `CmdOrCtrl+${n}`,
           click: () => win.webContents.send('hotkey', 'expand' + (n - 1))
         })),
-        { label: 'Mudo', accelerator: 'CmdOrCtrl+M', click: () => win.webContents.send('hotkey', 'mute') }
+        { label: 'Mudo', accelerator: 'CmdOrCtrl+M', click: () => win.webContents.send('hotkey', 'mute') },
+        { type: 'separator' },
+        { label: 'Aumentar zoom dos jogos', accelerator: 'CmdOrCtrl+Plus', click: () => win.webContents.send('hotkey', 'zoomIn') },
+        { label: 'Diminuir zoom dos jogos', accelerator: 'CmdOrCtrl+-', click: () => win.webContents.send('hotkey', 'zoomOut') },
+        { label: 'Restaurar zoom dos jogos', accelerator: 'CmdOrCtrl+0', click: () => win.webContents.send('hotkey', 'zoomReset') }
       ]
     }
   ]));
