@@ -659,6 +659,22 @@
       letter-spacing: .04em;
     }
 
+    /* linha da extensao: grants podem ser muitos, entao encolhem com tooltip em vez de
+       espremer o nome e o botao de remover */
+    .sc-row .sc-tag {
+      flex: 0 1 auto;
+      min-width: 0;
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sc-row .sc-del,
+    .sc-row .sc-upd {
+      flex: none;
+    }
+
     .sc-del {
       padding: 2px 8px;
       font-size: 12px;
@@ -3441,6 +3457,8 @@
         if (typeof m !== 'string') return;
         if (m === '__RBZOOM__in' || m === '__RBZOOM__out') { zoomTodos(m.endsWith('in') ? 'in' : 'out'); return; }
         if (m === '__PGDLG__1' || m === '__PGDLG__0') { dlgT[i] = m === '__PGDLG__1' ? Date.now() : 0; return; } // alert/confirm/prompt aberto no painel (SELLGUARD): o vigia de 60s espera
+        if (m.lastIndexOf('__GMSET__', 0) === 0 && m.length < 300000) { gmPersist(m.slice(9)); return; } // extensao gravou valor na propria loja
+        if (m.lastIndexOf('__GMXHR__', 0) === 0 && m.length < 4096) { gmXhr(wv, m.slice(9)); return; } // extensao pediu um arquivo do GitHub
         if (m.lastIndexOf('__PGST__', 0) === 0 && m.length < 2000000) {
           try {
             const d = stSane(JSON.parse(m.slice(8)));
@@ -10404,6 +10422,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       if (!r || !r.ok) { window.alert((r && r.error) || t('scFalhou')); renderScriptsList(); return; }
       const meta = scMeta(r.code), mudou = r.code !== sc.code;
       sc.code = r.code; sc.name = meta.name || sc.name; sc.version = meta.version || sc.version; sc.author = meta.author || sc.author;
+      delete sc.grants; // @grant pode ter mudado no commit novo
       saveScripts(); renderScriptsList();
       const rec = mudou && scriptsOn[id] && window.confirm(t('scReloadAviso'));
       if (rec) webviews.forEach((w, wi) => { if (!off[wi]) try { w.reload(); } catch { } });
@@ -10419,6 +10438,81 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       if (s.file) { if (presetCache[s.file] == null) { try { presetCache[s.file] = (await window.pokeAPI.readPreset(s.file)) || ''; } catch { presetCache[s.file] = ''; } } return presetCache[s.file]; }
       return s.code || '';
     }
+    // ===== API GM_* das extensoes =====
+    // O <webview> nao tem preload, entao nao ha mundo isolado onde expor API nenhuma. O shim e
+    // TEXTO montado aqui e colado na frente do corpo, dentro da mesma IIFE do runUS: so entra o
+    // que o cabecalho @grant pediu, e sem @grant (ou @grant none) a injecao continua crua.
+    const GM_QUOTA = 256 * 1024; // por extensao; estourar nao pode custar o historico do usuario
+    const GM_PREFIX = 'gmStore:';
+    const GM_KEYS_PROTEGIDAS = ['__proto__', 'constructor', 'prototype'];
+    const scGrantsPend = new Set(); // renderScriptsList preenche grants no contexto; Set evita poluir o userScripts salvo
+    function scGrants(code) { // cabecalho ==UserScript== -> lista de @grant, sem repetir
+      const cab = String(code || '').match(/\/\/\s*==UserScript==([\s\S]*?)\/\/\s*==\/UserScript==/i);
+      const out = [];
+      if (!cab) return out;
+      for (const ln of cab[1].split('\n')) {
+        const l = ln.replace(/^\s*\/\/\s*/, '').trim();
+        if (!/^@grant\s+/i.test(l)) continue;
+        const v = l.replace(/^@grant\s+/i, '').trim();
+        if (v && out.indexOf(v) === -1) out.push(v);
+      }
+      return out;
+    }
+    function gmLoad(id) {
+      try { const v = localStorage.getItem(GM_PREFIX + id); const o = v ? JSON.parse(v) : null; return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; } catch { return {}; }
+    }
+    function gmSave(id, store) {
+      let j; try { j = JSON.stringify(store); } catch { return false; }
+      if (j.length > GM_QUOTA) return false;
+      // de proposito NAO lsSet: se a cota estourar, lsPoda corta huntLog/lifeCatch pela metade
+      // para caber. Uma extensao enche-da nunca derruba o historico de quem joga.
+      try { localStorage.setItem(GM_PREFIX + id, j); return true; } catch { return false; }
+    }
+    function gmTem(grants, nome) { return Array.isArray(grants) && grants.indexOf(nome) !== -1; }
+    function gmChaveValida(k) { return typeof k === 'string' && !!k && GM_KEYS_PROTEGIDAS.indexOf(k) === -1; }
+    function gmShim(s, code) {
+      const g = scGrants(code);
+      s.grants = g;
+      if (!g.length || g.indexOf('none') !== -1) return '';
+      const tem = (n) => g.indexOf(n) !== -1;
+      const partes = [
+        'const __rbzGmInfo=' + JSON.stringify({ id: String(s.id), name: String(s.name || ''), version: String(s.version || ''), author: String(s.author || '') }) + ';',
+        'const __rbzGmStore=' + JSON.stringify(gmLoad(s.id)) + ';',
+        'const __rbzGmQuota=' + GM_QUOTA + ';',
+        'const __rbzGmKey=function(k){k=String(k).slice(0,120);return k==="__proto__"||k==="constructor"||k==="prototype"?null:k;};',
+        'if(!window.__rbzGm){window.__rbzGm={n:0,cb:{}};window.__rbzGmResolve=function(r,o){var c=window.__rbzGm.cb[r];if(!c)return;delete window.__rbzGm.cb[r];try{if(o&&o.ok){if(c.onload)c.onload({status:o.status,responseText:o.body,response:o.body,finalUrl:o.url,ok:true});}else if(c.onerror)c.onerror({error:(o&&o.error)||"erro"});}catch(e){}};}'
+      ];
+      if (tem('GM_info')) partes.push('const GM_info=Object.freeze({script:__rbzGmInfo,uuid:__rbzGmInfo.id});');
+      if (tem('GM_addStyle')) partes.push('const GM_addStyle=function(css){var e=document.createElement("style");e.textContent=String(css);(document.head||document.documentElement).appendChild(e);return e;};');
+      if (tem('GM_getValue')) partes.push('const GM_getValue=function(k,d){k=__rbzGmKey(k);if(!k)return d;return Object.prototype.hasOwnProperty.call(__rbzGmStore,k)?__rbzGmStore[k]:d;};');
+      if (tem('GM_deleteValue')) partes.push('const GM_deleteValue=function(k){k=__rbzGmKey(k);if(!k)return;delete __rbzGmStore[k];try{console.log("__GMSET__"+JSON.stringify({i:__rbzGmInfo.id,k:k,del:1}));}catch(e){}};');
+      if (tem('GM_setValue')) partes.push('const GM_setValue=function(k,v){k=__rbzGmKey(k);if(!k)return false;var tem=Object.prototype.hasOwnProperty.call(__rbzGmStore,k),ant=__rbzGmStore[k];if(v===undefined)delete __rbzGmStore[k];else __rbzGmStore[k]=v;var j;try{j=JSON.stringify(__rbzGmStore);}catch(e){if(tem)__rbzGmStore[k]=ant;else delete __rbzGmStore[k];return false;}if(j.length>__rbzGmQuota){if(tem)__rbzGmStore[k]=ant;else delete __rbzGmStore[k];return false;}try{console.log("__GMSET__"+JSON.stringify({i:__rbzGmInfo.id,k:k,v:v}));}catch(e){}return true;};');
+      if (tem('GM_xmlhttpRequest')) partes.push('const GM_xmlhttpRequest=function(o){o=o||{};var m=window.__rbzGm,r=++m.n;m.cb[r]=o;try{console.log("__GMXHR__"+JSON.stringify({i:__rbzGmInfo.id,r:r,u:String(o.url||"")}));}catch(e){delete m.cb[r];if(o.onerror)try{o.onerror({})}catch(e2){}}};');
+      return partes.join('');
+    }
+    // O painel manda so a alteracao por console-message (mesmo canal do __PGST__); quem grava e o
+    // app. Todo pedido e validado contra o script instalado e ligado: a pagina do jogo pode forjar
+    // console.log, mas nao tem como forjar um id que so existe aqui.
+    function gmScripto(id) { return allScripts().find(x => x.id === id) || null; }
+    function gmPersist(payload) {
+      let d; try { d = JSON.parse(payload); } catch { return; }
+      if (!d || typeof d.i !== 'string' || !gmChaveValida(d.k)) return;
+      const s = gmScripto(d.i); if (!s || !scriptsOn[s.id] || !s.grants) return;
+      if (!gmTem(s.grants, 'GM_setValue') && !gmTem(s.grants, 'GM_deleteValue')) return;
+      const k = d.k.slice(0, 120);
+      const loja = gmLoad(s.id);
+      if (d.del || !('v' in d)) delete loja[k]; else loja[k] = d.v;
+      gmSave(s.id, loja);
+    }
+    function gmXhr(wv, payload) {
+      let d; try { d = JSON.parse(payload); } catch { return; }
+      if (!d || typeof d.i !== 'string' || typeof d.r !== 'number' || typeof d.u !== 'string') return;
+      const s = gmScripto(d.i); if (!s || !scriptsOn[s.id] || !gmTem(s.grants, 'GM_xmlhttpRequest')) return;
+      const responde = (o) => { try { wv.executeJavaScript('window.__rbzGmResolve && window.__rbzGmResolve(' + JSON.stringify(d.r) + ',' + JSON.stringify(o) + ')').catch(() => { }); } catch { } };
+      window.pokeAPI.fetchExtension(d.u)
+        .then(r => responde({ ok: !!(r && r.ok), status: (r && r.status) || 0, url: (r && r.url) || d.u, body: (r && r.code) || '', error: (r && r.error) || '' }))
+        .catch(() => responde({ ok: false, error: 'Nao foi possivel acessar o GitHub.' }));
+    }
     // Tres regras de injecao de userscript, num lugar so:
     // 1) NUNCA na tela de login: ali o app digita a senha do cofre, e qualquer script ligado leria o campo.
     // 2) uma execucao por documento (marca em window.__pgUS): ligar/instalar com o painel carregando caia junto com o dom-ready.
@@ -10428,8 +10522,10 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     const usNoLogin = (wv) => { try { return usNoLoginUrl(wv.getURL()); } catch { return true; } };
     const runUS = (wv, s, code) => {
       try {
+        let shim = ''; // API GM_* pedida pelo @grant; vazio = injecao crua, como antes
+        try { shim = gmShim(s, code); } catch { shim = ''; }
         wv.executeJavaScript('(()=>{const m=window.__pgUS=window.__pgUS||{},k=' + JSON.stringify(String(s.id)) + ';if(m[k])return 1;m[k]=1;return 0})()')
-          .then(ja => { if (!ja) wv.executeJavaScript('(async function(){' + code + '\n})().then(function(){})').catch(e => { try { window.pokeAPI.logError('userscript', String(s.name || s.id).slice(0, 60) + ': ' + String((e && e.message) || e).slice(0, 200)); } catch { } }); })
+          .then(ja => { if (!ja) wv.executeJavaScript('(async function(){' + shim + '\n' + code + '\n})().then(function(){})').catch(e => { try { window.pokeAPI.logError('userscript', String(s.name || s.id).slice(0, 60) + ': ' + String((e && e.message) || e).slice(0, 200)); } catch { } }); })
           .catch(() => { });
       } catch { }
     };
@@ -10445,8 +10541,23 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     }
     function renderScriptsList() {
       const el = document.getElementById('scList');
+      // grants vem do cabecalho do codigo; o preset so e lido do disco uma vez, entao preenche
+      // assincrono e redesenha so na segunda passada (scGrantsPend impede loop).
+      allScripts().forEach(s => {
+        if (s.grants !== undefined || scGrantsPend.has(s.id)) return;
+        scGrantsPend.add(s.id);
+        getScriptCode(s).then(code => { s.grants = scGrants(code); scGrantsPend.delete(s.id); renderScriptsList(); })
+          .catch(() => { s.grants = []; scGrantsPend.delete(s.id); });
+      });
+      const gTag = (s) => {
+        const g = (s.grants || []).filter(x => x !== 'none');
+        if (!g.length) return '';
+        const curto = g.length > 3 ? g.slice(0, 3).concat('+' + (g.length - 3)) : g;
+        return '<span class="sc-tag" title="' + escH(g.join(', ')) + '">' + escH(curto.join(' ')) + '</span>';
+      };
       el.innerHTML = allScripts().map(s => '<div class="sc-row"><label class="sc-chk"><input type="checkbox" data-sid="' + s.id + '"' + (scriptsOn[s.id] ? ' checked' : '') + '> <b>' + escH(s.name) + '</b>'
         + (s.version || s.author ? '<span class="sc-meta">' + (s.version ? 'v' + escH(s.version) : '') + (s.author ? ' \u00b7 ' + escH(s.author) : '') + '</span>' : '') + '</label>'
+        + gTag(s)
         + (s.file ? '<span class="sc-tag">preset \u00b7 ' + escH(s.author || '') + '</span>'
           : (s.url ? '<button class="sc-upd" data-upd="' + s.id + '" title="' + t('scAtualizarTip') + '">' + t('scAtualizar') + '</button>' : '') + '<button class="sc-del" data-del="' + s.id + '" title="' + t('rmTitle') + '">\u2715</button>') + '</div>').join('');
       el.querySelectorAll('.sc-upd').forEach(b2 => b2.onclick = () => atualizaScript(b2.dataset.upd, b2));
