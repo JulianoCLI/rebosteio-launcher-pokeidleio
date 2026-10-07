@@ -25,6 +25,7 @@
     const id = safeDex(p.sid); if (!id) return '';
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.shiny ? 'shiny/' : ''}${id}.png`;
   };
+  const getLead = (r) => (r && r.team && r.team.length) ? ((r.team.find(p => p.ld)) || (r.activeId ? r.team.find(p => p.id === r.activeId) : null) || r.team[0]) : null;
   const ico = (name) => {
     const icons = {
       moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18.6 15.8A8 8 0 0 1 8.2 5.4 8 8 0 1 0 18.6 15.8Z"/><path d="M17.5 3.5v4M15.5 5.5h4" stroke-width="1.2"/></svg>',
@@ -403,7 +404,7 @@
     if (!r || !r.ok) return false;
     const bInf = Boolean((r.equippedBall && r.equippedBall.infinite) || (+r.balls >= 999999));
     if (!bInf && (+r.balls || 0) < 100) return true;
-    const lead=(r.team||[]).find(p=>p.ld)||(r.team||[])[0];
+    const lead=getLead(r);
     return !!(lead && lead.hm > 0 && lead.hp <= 0);
   }
   async function collectOne(i) {
@@ -497,7 +498,7 @@
     const filteredArr = arr.filter(r => r.i >= 0 && r.i < 4);
     const markup = filteredArr.map(r => {
         const dividerMarkup = '';
-        const [sc,sl] = stateStatus(r); const a = r.a || {}; const lead=(r.team||[]).find(p=>p.ld)||(r.team||[])[0]; const spr=pokeSprite(lead); const hunt=prettyHunt(r.hunt)||'Aguardando dados da caça';
+        const [sc,sl] = stateStatus(r); const a = r.a || {}; const lead=getLead(r); const spr=pokeSprite(lead); const hunt=prettyHunt(r.hunt)||'Aguardando dados da caça';
         const selected = !!grid.children[r.i]?.classList.contains('expanded');
         return `${dividerMarkup}<article class="leaf-account state-${sc} ${r.ok?'is-live':''} ${attention(r)?'is-attention':''} ${selected?'is-selected':''}" data-i="${r.i}">
           <div class="leaf-account-top">
@@ -555,7 +556,7 @@
   function renderList(arr) {
     arr = arr || Array.from(states.values()).sort((a,b)=>a.i-b.i);
     const markup = arr.map(r => {
-      const a=r.a||{}, lead=(r.team||[]).find(p=>p.ld)||(r.team||[])[0], spr=pokeSprite(lead);
+      const a=r.a||{}, lead=getLead(r), spr=pokeSprite(lead);
       return `<article class="leaf-list-card" data-i="${r.i}">
         <div class="leaf-list-identity"><span class="leaf-list-index">${String(r.i+1).padStart(2,'0')}</span><div class="avatar">${spr?`<img src="${spr}" width="48" height="48" alt="" loading="lazy" onerror="this.remove()">`:ico('user')}</div>
           <div class="leaf-list-person"><div class="name">${escH(displayName(r))}</div><div class="sub">${stateStatus(r)[1]}${r.level?' · Nv '+escH(r.level):''}${lead?' · '+escH(lead.name):''}</div></div><span class="leaf-list-state ${stateStatus(r)[0]}">${stateStatus(r)[1]}</span></div>
@@ -585,7 +586,7 @@
       if (reload) reload.setAttribute('aria-label',`Recarregar conta ${i+1}`);
       if (expand) expand.setAttribute('aria-label',p.classList.contains('expanded')?`Voltar conta ${i+1} à grade`:`Expandir conta ${i+1}`);
       let f=$('.leaf-panel-footer',p); if(!f){ f=document.createElement('div');f.className='leaf-panel-footer';p.appendChild(f); }
-      const r=arr.find(x=>x.i===i)||baseState(i); const lead=(r.team||[]).find(x=>x.ld)||(r.team||[])[0]; const spr=pokeSprite(lead);
+      const r=arr.find(x=>x.i===i)||baseState(i); const lead=getLead(r); const spr=pokeSprite(lead);
       if (f.__leafSprite !== spr) {
         f.innerHTML = `${spr?`<img class="pf-sprite" src="${spr}" width="25" height="25" alt="" onerror="this.remove()">`:'<span class="pf-orbit" aria-hidden="true">◎</span>'}<span class="pf-hunt"><small>CAÇA ATUAL</small><b></b></span><span class="pf-spacer"></span><span class="pf-balls"><small>BOLAS</small><b></b></span>`;
         f.__leafSprite = spr;

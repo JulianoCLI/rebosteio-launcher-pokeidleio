@@ -7,14 +7,16 @@ const runtime = require('../src/ui/runtime-performance');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const shell = fs.readFileSync(path.join(__dirname, '..', 'src/ui/pokeleaf-shell.js'), 'utf8');
 
-function injectedLiteral(marker, ending) {
-  const pos = html.indexOf(marker);
+function injectedLiteral(marker, ending, pos = html.indexOf(marker)) {
   assert.ok(pos >= 0, 'injected source exists: ' + marker);
   const start = html.indexOf('`', pos), end = html.indexOf(ending, start + 1);
   assert.ok(end > start, 'injected literal has an ending');
   return vm.runInNewContext(html.slice(start, end + 1));
 }
-const collector = injectedLiteral('wv.executeJavaScript(`(()=>{if(window.__poke)return;', '`).catch');
+const collectorComment = html.indexOf('// coletor de estado + sessao dual-protocol');
+assert.ok(collectorComment >= 0, 'collector injection is labeled');
+const collectorStart = html.lastIndexOf('wv.executeJavaScript(`', collectorComment);
+const collector = injectedLiteral('wv.executeJavaScript(`', '`).catch', collectorStart);
 new vm.Script(collector); // The original collector failed here with Unexpected token catch.
 const reader = injectedLiteral('  const READ_STATE =', '`;');
 new vm.Script(reader);
@@ -39,7 +41,9 @@ const state = {
   sess: { start: Date.now() - 60000, kills: 10, xp: 100, captures: 3,
     drops: { 20: { qty: 4, name: 'Loot' } }, sellG: 10, supGold: 2 }
 };
-const guest = vm.createContext({ window: { __poke: state }, document: { getElementById: () => null, querySelector: () => null } });
+const emptyDocument = () => ({ getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],
+  documentElement: { classList: { contains: () => false } } });
+const guest = vm.createContext({ window: { __poke: state }, document: emptyDocument() });
 let result = vm.runInContext(reader, guest);
 assert.equal(result.live, true, 'socket state identifies a connected account without the character HTTP response');
 assert.equal(result.cid, 'trainer-fixture'); assert.equal(result.name, 'Conta fictícia');
@@ -50,6 +54,11 @@ assert.equal(result.balls, 25, 'supplies show the selected ball rather than all 
 assert.equal(result.equippedBall.name, 'Ultra Ball'); assert.equal(result.equippedBall.infinite, false);
 assert.equal(result.potions, 14); assert.equal(result.revives, 5);
 assert.equal(result.a.balance, 28); assert.ok(result.a.xph > 0);
+state.ws.pokes.list.push({ id: 'active-fixture', name: 'Pikachu', level: 90, team: true, hp: 50, maxHp: 80 });
+state.activeId = 'active-fixture';
+result = vm.runInContext(reader, guest);
+assert.equal(result.activeId, 'active-fixture');
+assert.equal(result.team.find(pokemon => pokemon.ld).name, 'Pikachu', 'the active Pokémon is selected independently of team order');
 state.automation.ballIds = [900];
 result = vm.runInContext(reader, guest);
 assert.equal(result.equippedBall.infinite, true); assert.equal(result.balls, 999999);
@@ -74,6 +83,7 @@ const metrics = {
   '[data-kpi="capturas"] .eco-kpi-v': '2', '[data-kpi="capturas"] .eco-kpi-h': '2/h'
 };
 guest.document = {
+  ...emptyDocument(),
   getElementById: id => id === 'eco-placar' ? scoreboard : null,
   querySelector: selector => selector in metrics ? { textContent: metrics[selector] } : null
 };
@@ -84,7 +94,10 @@ assert.equal(result.a.xpg, 12345); assert.equal(result.a.xph, 12345); assert.equ
 state.meMiss = 2; state.sock.readyState = 0;
 assert.equal(vm.runInContext(reader, guest).live, false, 'a lost connection is not reported as online');
 guest.window.__poke = null;
-assert.equal(vm.runInContext(reader, guest).ok, false, 'no collector is reported as unavailable');
+guest.document = emptyDocument();
+result = vm.runInContext(reader, guest);
+assert.equal(result.live, false, 'an empty cold start is not reported as an online account');
+assert.ok(guest.window.__poke.ws && guest.window.__poke.sess, 'a cold read initializes state for the upstream socket collector');
 
 async function testShellReader() {
   let calls = 0, finish;
