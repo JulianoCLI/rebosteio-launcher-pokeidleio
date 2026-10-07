@@ -728,7 +728,7 @@
       border-color: #e3350d;
     }
 
-    .sc-add .primary {
+    .sc-add button {
       align-self: flex-start;
     }
 
@@ -2629,6 +2629,29 @@
       <div class="modal-actions">
         <button id="accCancel">Cancelar</button>
         <button id="accSave" class="primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Scripts / Extensões: lista e instala userscripts nos painéis -->
+  <div id="scOverlay">
+    <div id="scModal">
+      <h2>Scripts / Extensões</h2>
+      <p class="hint">Rode userscripts (estilo Tampermonkey) dentro de cada painel do jogo. O IV calc já vem pronto.
+        Você pode colar os seus. <b>Só adicione scripts em que você confia</b>, eles têm acesso total à página do
+        jogo.</p>
+      <div id="scList"></div>
+      <div class="sc-add">
+        <div class="sc-drop">Solte o arquivo .user.js aqui</div>
+        <input id="scUrl" type="url" placeholder="Link do script no GitHub (.user.js)">
+        <button id="scAddUrl" class="primary">+ Adicionar pelo GitHub</button>
+        <div class="sc-tag" style="text-align:center">ou cole o código</div>
+        <input id="scName" placeholder="Nome do script">
+        <textarea id="scCode" placeholder="Cole aqui o código do userscript (@grant none)"></textarea>
+        <button id="scAdd">+ Adicionar script</button>
+      </div>
+      <div class="modal-actions">
+        <button id="scClose">Fechar</button>
       </div>
     </div>
   </div>
@@ -7794,6 +7817,19 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       document.querySelector('#modal .hint').textContent = t('mHint');
       document.getElementById('accCancel').textContent = t('mCancel');
       document.getElementById('accSave').textContent = t('mSave');
+      // Modal de Scripts / Extensões: rotulos fixos do HTML seguem o idioma (mesma chave do motor de userscripts)
+      const scM = document.getElementById('scModal');
+      if (scM) {
+        scM.querySelector('.hint').innerHTML = t('scHint'); // texto nosso com <b>, nada de fora
+        scM.querySelector('.sc-drop').textContent = t('scDrop');
+        const scTag = scM.querySelector('.sc-add .sc-tag'); if (scTag) scTag.textContent = t('scOuCole');
+        const scUrl = document.getElementById('scUrl'); if (scUrl) scUrl.placeholder = t('scUrlPh');
+        const scAddUrl = document.getElementById('scAddUrl'); if (scAddUrl && !scAddUrl.disabled) scAddUrl.textContent = t('scAddUrl'); // baixando: fica o "Baixando..."
+        const scName = document.getElementById('scName'); if (scName) scName.placeholder = t('scNamePh');
+        const scCode = document.getElementById('scCode'); if (scCode) scCode.placeholder = t('scCodePh');
+        const scAdd = document.getElementById('scAdd'); if (scAdd) scAdd.textContent = t('scAddBtn');
+        const scClose = document.getElementById('scClose'); if (scClose) scClose.textContent = t('closeT');
+      }
       const sth = statsEl.querySelector('.st-head'); // titulos do cabecalho do Resumo
       sth.querySelector('.st-reset').title = t('resetTitle'); sth.querySelector('.st-gear').title = t('cdConfig'); sth.querySelector('.st-x').title = t('closeT');
       statsEl.querySelector('.st-resize').title = t('cdResize');
@@ -10424,6 +10460,9 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       const scClose = document.getElementById('scClose');
       if (scClose) scClose.onclick = () => scOverlay.classList.remove('show');
       scOverlay.onclick = (e) => { if (e.target === scOverlay) scOverlay.classList.remove('show'); };
+      window.addEventListener('keydown', (e) => { // Esc fecha, igual aos outros modais
+        if (e.key === 'Escape' && scOverlay.classList.contains('show')) { e.preventDefault(); scOverlay.classList.remove('show'); }
+      });
       const sau = document.getElementById('scAddUrl');
       if (sau) sau.onclick = (e) => instalaPorUrl(document.getElementById('scUrl').value.trim(), e.target);
       const scModalEl = document.getElementById('scModal');
@@ -10655,7 +10694,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
     };
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.altKey || e.metaKey) return; // combos (Ctrl+M etc) seguem intactos
-      if (document.querySelector('#overlay.show, #dispatchOverlay.show, #autoSupplyOverlay.show')) return; // janela aberta: digitar antes de clicar no campo recarregava os paineis ('r') e desligava os alertas ('a')
+      if (document.querySelector('#overlay.show, #dispatchOverlay.show, #autoSupplyOverlay.show, #scOverlay.show')) return; // janela aberta: digitar antes de clicar no campo recarregava os paineis ('r') e desligava os alertas ('a')
       const ae = document.activeElement;
       if (ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return;
       const fn = TECLAS_ATALHO[String(e.key || '').toLowerCase()];

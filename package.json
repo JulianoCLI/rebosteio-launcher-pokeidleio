@@ -13,7 +13,8 @@
     "test:auto-supply-integration": "electron test/auto-supply-electron.test.js",
     "test:tracking": "electron test/game-tracking.test.js",
     "test:sync": "node test/upstream-sync.test.js",
-    "test:capture-value": "electron test/capture-value.test.js"
+    "test:capture-value": "electron test/capture-value.test.js",
+    "test:userscripts": "electron test/userscripts.test.js"
   },
   "keywords": [
     "electron",
