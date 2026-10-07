@@ -1711,3 +1711,50 @@ body[data-pokemon="pkmn-magnezone"] .leaf-epilogue-line {
   body[data-pokemon="pkmn-magnezone"] .leaf-account-top { grid-template-columns: 26px minmax(0,1fr); }
   body[data-pokemon="pkmn-magnezone"] .leaf-account-top > * { min-width: 0; }
 }
+
+/* Flareon: calor vulcânico, entardecer dourado e pelagem em chamas. */
+body[data-theme="pkmn-flareon"] {
+  --theme-shell-overlay: linear-gradient(180deg, rgba(24, 13, 9, 0.12), rgba(24, 13, 9, 0.28));
+  --theme-cutout-opacity: 1;
+}
+body[data-theme="pkmn-flareon"] .leaf-sidebar {
+  background: linear-gradient(180deg, rgba(24, 13, 9, 0.88), rgba(27, 15, 10, 0.82) 64%, rgba(20, 10, 7, 0.70)) !important;
+}
+body[data-pokemon="pkmn-flareon"] .leaf-sidebar {
+  overflow: visible; z-index: 2;
+}
+body[data-pokemon="pkmn-flareon"] #leafShell:after { display: none; }
+body[data-pokemon="pkmn-flareon"] #leafAccountList { flex: 0 1 auto; max-height: calc(100vh - 400px); }
+body[data-pokemon="pkmn-flareon"] .leaf-side-footer { margin-top: auto; }
+body[data-pokemon="pkmn-flareon"] .leaf-sidebar:before {
+  top: auto; right: auto; left: -24px; bottom: -8px; width: 280px; height: 350px;
+  background-size: contain; background-position: center bottom;
+  mask-image: none; opacity: 1; z-index: 2; pointer-events: none;
+}
+body[data-pokemon="pkmn-flareon"] .leaf-aside-epilogue {
+  position: absolute; left: 16px; right: auto; bottom: 245px; padding: 0;
+  max-width: 220px; align-items: flex-start; text-align: left; z-index: 3; pointer-events: none;
+}
+body[data-pokemon="pkmn-flareon"] .leaf-aside-epilogue strong {
+  white-space: pre-line; color: #fed7aa; font-size: 16px; line-height: 1.3;
+}
+body[data-pokemon="pkmn-flareon"] .leaf-epilogue-kicker {
+  color: #f97316; font-size: 6px; letter-spacing: 1px;
+}
+body[data-pokemon="pkmn-flareon"] .leaf-epilogue-line {
+  width: 80px; align-self: flex-start; background: linear-gradient(90deg, #f97316, transparent);
+}
+@media (min-height: 1000px) {
+  body[data-pokemon="pkmn-flareon"] .leaf-sidebar:before { width: 320px; height: 400px; left: -30px; bottom: -12px; }
+  body[data-pokemon="pkmn-flareon"] .leaf-aside-epilogue { bottom: 280px; }
+}
+@media (max-height: 920px) {
+  body[data-pokemon="pkmn-flareon"] #leafAccountList { flex: 1 1 auto; max-height: none; }
+  body[data-pokemon="pkmn-flareon"] .leaf-sidebar:before { width: 210px; height: 262px; left: -16px; bottom: 0; }
+  body[data-pokemon="pkmn-flareon"] .leaf-aside-epilogue { display: none; }
+}
+@media (max-width: 850px) {
+  body[data-pokemon="pkmn-flareon"] .leaf-account-top { grid-template-columns: 26px minmax(0, 1fr); }
+  body[data-pokemon="pkmn-flareon"] .leaf-account-top > * { min-width: 0; }
+}
+
