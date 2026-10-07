@@ -94,3 +94,22 @@ Ferramenta indispensável para treinadores que farmam com **Ditto Comum** ou **S
 * **Venda Protegida**: Exige confirmação explícita ao vender acidentalmente Pokémon shiny, qualidade Lendária ou itens de alto valor. Você também pode trancar itens específicos com o **🔒 Cadeado de Venda**.
 * **Alertas Sonoros, Sons do Jogo e Webhook Discord**: Alterna todos os sons nativos da configuração do jogo (Sound Mode, som de shiny, captura e drops de boss) e notificações de radar, queda de conta ou suprimentos baixos.
 * **Salvamento Criptografado**: Todas as credenciais de login são salvas utilizando as chaves seguras do próprio Windows (DPAPI) via `safeStorage` do Electron, sem qualquer envio externo.
+## HUD do jogo opcional
+
+O botão de painel lateral no topo, à esquerda de **Janelas**, recolhe ou expande o menu de equipe do launcher. O padrão continua expandido; a preferência fica salva. Recolher a lateral amplia a área das janelas sem recarregar as contas.
+
+Em **Configurações → Interface → HUD do jogo**, escolha **Original (padrão)**, **Ícones compactos** ou **Barra com rótulos**. A preferência fica salva e aplica-se às janelas abertas, inclusive após recarregar uma conta. Nenhum novo controle é adicionado ao hub.
+
+Em **Barra com rótulos**, **Casa, Torneio, Ginásio, PvP e Ranks** ficam no botão **Mais ▾** do menu do jogo. Ele abre sobre a tela, preserva as ações nativas e fecha ao escolher uma opção, clicar fora ou pressionar Esc. Os modos **Original** e **Ícones compactos** mantêm todas essas opções na barra.
+
+A compactação preserva os botões e ações do menu nativo. A troca pelo seletor é imediata, sem reiniciar o launcher ou recarregar contas. Ao escolher um modo compacto, o launcher também liga **Menu do jogo**, caso estivesse oculto. Voltar para **Original** remove o estilo opcional imediatamente. **Interface limpa** continua independente: se estiver ligada, as configurações avisam que ela precisa ser desligada para visualizar o menu. A compactação não altera equipe, suprimentos, automações nem modo Economia; configurações novas começam com Interface limpa desligada, e preferências já salvas são respeitadas na abertura.
+
+## Agendar ida ao Centro Pokémon
+
+Na cena de uma hunt, o botão de relógio ao lado de **Ir para o Centro Pokémon** agenda uma saída assim que o botão original liberar. Clique novamente para cancelar; se a saída já estiver livre, a solicitação é imediata. O ícone muda para um **X** enquanto aguarda, e a chegada só é confirmada quando a interface nativa recebe o estado do Centro.
+
+O recurso não exige habilitação nas configurações e não altera a regra de combate. O agendamento é cancelado ao trocar de hunt, sair da cena, entrar no modo econômico ou limpar a interface, desconectar ou recarregar a conta. Nesta versão, ele funciona apenas na cena normal da hunt. Cancelar não desfaz uma solicitação já enviada ao jogo.
+
+## Avisos de carregamento
+
+As injeções de código do launcher compartilham uma única espera pelo carregamento de cada painel, liberada ao terminar ou fechar a conta. Isso evita o aviso de excesso de listeners na inicialização. O script de publicidade **Meta Pixel** é bloqueado nas sessões do jogo para evitar tentativas de carregar o rastreador do Facebook que a CSP já proíbe. A política de segurança da página e os demais recursos continuam preservados.

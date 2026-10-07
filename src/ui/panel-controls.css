@@ -1,4 +1,9 @@
 /* Loaded after the themes so the account controls work with every palette. */
+body.leaf-sidebar-collapsed .leaf-body { grid-template-columns: minmax(0, 1fr) !important; margin-left: 0 !important; }
+body.leaf-sidebar-collapsed #leafSidebar { display: none !important; }
+#leafSidebarToggle { flex: none; -webkit-app-region: no-drag; }
+#leafSidebarToggle:focus-visible { outline: 2px solid var(--color-accent, #74bf61); outline-offset: 2px; }
+body.leaf-sidebar-collapsed #leafSidebarToggle .leaf-sidebar-arrow { transform: translateX(28px) scaleX(-1); }
 body #grid.featured:not(.one-col):not(.one-row) {
   grid-template-columns: minmax(0, var(--feature-main, 68fr)) minmax(0, var(--feature-rest, 32fr)) !important;
   grid-auto-flow: row !important;
@@ -43,3 +48,10 @@ body #grid .panel-header .feature:disabled { opacity: .35; cursor: default; }
 #featureSplit:focus-visible { outline: 1px solid var(--color-success, #74bf61); border-radius: 4px; }
 #featureDragShield { position: fixed; inset: 0; z-index: 89; display: none; cursor: col-resize; }
 #featureDragShield.show { display: block; }
+/* Optional HUD choices live exclusively in Settings. */
+.leaf-game-hud-setting { grid-column: 1 / -1; display: grid; gap: 5px; padding: 4px 0; }
+.leaf-game-hud-setting label { color: var(--color-text-primary, #e7f0e3); font: 650 11px/1.4 'Segoe UI', sans-serif; }
+.leaf-game-hud-setting select { box-sizing: border-box; width: 100%; height: 31px; min-height: 0; padding: 4px 7px; border: 1px solid var(--border-subtle, #547a52); border-radius: 7px; color: var(--color-text-primary, #e7f0e3); background: var(--color-surface-1, #192a1f); font: 650 10px/1 'Segoe UI', sans-serif; }
+.leaf-game-hud-setting select option { color: var(--color-text-primary, #e7f0e3); background: var(--color-surface-1, #192a1f); }
+.leaf-game-hud-setting select:focus-visible { outline: 2px solid var(--color-accent, #74bf61); outline-offset: 2px; }
+.leaf-game-hud-setting small { color: var(--color-text-secondary, #aebfaf); font: 10px/1.4 'Segoe UI', sans-serif; }

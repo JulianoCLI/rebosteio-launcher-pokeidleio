@@ -2522,6 +2522,8 @@
   <link rel="stylesheet" href="src/ui/kuromi-xp.css">
   <link rel="stylesheet" href="src/ui/panel-controls.css">
   <script src="src/ui/runtime-performance.js"></script>
+  <script src="src/ui/game-hud-layout.js"></script>
+  <script src="src/ui/center-scheduler.js"></script>
   <script src="src/ui/themes/pokemon/all-pokemon.js"></script>
   <script src="src/ui/theme-manager.js"></script>
   <script src="src/ui/kuromi-xp.js"></script>
@@ -3456,6 +3458,8 @@
           wv.executeJavaScript("(()=>{if(window.__pgGlWd)return;window.__pgGlWd=1;let tm;document.addEventListener('webglcontextlost',()=>{if(window.__pgUltraActive)return;clearTimeout(tm);tm=setTimeout(()=>location.reload(),4000);},true);document.addEventListener('webglcontextrestored',()=>clearTimeout(tm),true);})()").catch(() => { });
           wv.executeJavaScript(POPUP_SCRIPT).catch(() => { });
           wv.executeJavaScript(cleanScript(cleanOn)).catch(() => { });
+          if (gameHudLayout !== 'original') applyGameHudLayoutTo(wv);
+          wv.executeJavaScript(RebosteioCenterScheduler.script()).catch(() => { });
           wv.executeJavaScript(SELLGUARD).catch(() => { });
           wv.executeJavaScript('window.__pgSellGuardOn=' + (sellGuardOn ? 'true' : 'false') + ';window.__pgSellLock=' + JSON.stringify(sellLock) + ';window.__pgSellTxt=' + JSON.stringify([t('sgAviso'), t('sgConfirma')])).catch(() => { });
           wv.executeJavaScript(QOL_UI).catch(() => { });
@@ -4941,7 +4945,7 @@
   // (atalho de menu do Electron nao dispara quando o webview tem o teclado).
   const dockScript = (esconder) => `(() => {
     window.__dockHide = ${esconder};
-    const set = () => { const d = document.querySelector('nav.game-dock'); if (d) d.style.display = window.__dockHide ? 'none' : ''; };
+    const set = () => { document.querySelectorAll('nav.menu-topo, nav.game-dock').forEach(d => { const display = window.__dockHide ? 'none' : ''; if (d.style.display !== display) d.style.display = display; }); };
     if (!window.__dockObs) { window.__dockObs = new MutationObserver(set); window.__dockObs.observe(document.documentElement, { childList: true, subtree: true }); }
     if (!window.__dockKey) {
       window.__dockKey = true;
@@ -5005,7 +5009,7 @@
     window.dispatchEvent(new Event('resize'));
   })()`;
   const cleanBtn = document.getElementById('cleanHud');
-  let cleanOn = lsGet('cleanHud') !== '0'; // ligado por padrao
+  let cleanOn = lsGet('cleanHud') === '1'; // novas configurações preservam o HUD original
   function applyClean() {
     cleanBtn.textContent = t('clean'); cleanBtn.title = t('cleanTitle');
     cleanBtn.classList.toggle('on', cleanOn);
@@ -5020,6 +5024,21 @@
     lsSet('cleanHud', cleanOn ? '1' : '0');
   }
   cleanBtn.onclick = () => { cleanOn = !cleanOn; applyClean(); };
+
+  // New layouts require an explicit selection in Settings; no default game injection.
+  let gameHudLayout = RebosteioGameHud.normalize(lsGet('gameHudLayout'));
+  function applyGameHudLayoutTo(w) {
+    try { return w.executeJavaScript(RebosteioGameHud.script(gameHudLayout)).catch(() => {}); } catch {}
+  }
+  async function setGameHudLayout(mode) {
+    gameHudLayout = RebosteioGameHud.normalize(mode);
+    lsSet('gameHudLayout', gameHudLayout);
+    // An explicit compact-layout selection also makes its menu visible. Startup
+    // still respects the saved visibility; clean/immersive mode stays independent.
+    if (gameHudLayout !== 'original' && dockHidden) { dockHidden = false; applyDock(); }
+    document.dispatchEvent(new CustomEvent('rebosteio-game-hud-layout', { detail: { mode: gameHudLayout } }));
+    await Promise.all(webviews.map((w, i) => !off[i] && w ? applyGameHudLayoutTo(w) : null));
+  }
 
   // F2 tambem funciona com o foco na interface do app (ai alterna os 4 paineis).
   // Com o foco no jogo, quem responde e o F2 injetado na pagina, que alterna so aquele painel.

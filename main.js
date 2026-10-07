@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, safeStorage, Tray, Menu, powerSaveBlocker, 
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
+const { coalesceScriptLoading, blockMetaPixel } = require('./src/main/guest-runtime');
 
 // Isola este launcher do Absol Launcher original para poderem rodar simultaneamente sem conflito
 app.name = 'pionailo';
@@ -179,6 +180,8 @@ const abreFora = (url) => {
 };
 app.on('web-contents-created', (_e, contents) => {
   if (contents.getType() !== 'webview') return;
+  coalesceScriptLoading(contents);
+  blockMetaPixel(contents.session);
   contents.setWindowOpenHandler(({ url }) => { abreFora(url); return { action: 'deny' }; });
   // compara a ORIGEM, nao o prefixo: 'https://pokeidle.io.evil.com' comeca igual e
   // passaria, levando a sessao logada pra um site clonado sem barra de endereco
