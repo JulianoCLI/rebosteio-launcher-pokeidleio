@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.48
+
+- Eco e Só caça agora são exclusivos: ativar um desliga automaticamente o outro nas contas e nos botões.
+- Ao abrir o launcher com os dois modos salvos como ativos, Só caça é preservado e Eco é desligado.
+
 ## 1.5.47
 
 - Painel: saldo e Gold/h incluem o valor estimado de venda ao NPC dos Pokémon capturados, além do ouro de abates e dos gastos.

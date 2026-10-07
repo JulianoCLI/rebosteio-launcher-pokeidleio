@@ -4338,7 +4338,7 @@
       return d;
     }
     const ecoBtn = document.getElementById('eco');
-    let eco = lsGet('eco') !== '0'; // ligado por padrao
+    let eco = lsGet('eco') !== '0' && lsGet('cleanHud') !== '1'; // Só caça salvo tem prioridade; modos exclusivos
     // Limita o requestAnimationFrame do jogo. Troca TAMBEM o cancelAnimationFrame, com ids proprios (acima de 1e9, nunca
     // colidem com os nativos): o jogo encerra varios loops so com cancelAnimationFrame (barra da onda na pesca, etiquetas
     // da cidade), e sem isso cada loop "cancelado" seguia vivo pra sempre, um a mais por onda. Teste: test/eco-raf.test.js
@@ -4428,7 +4428,12 @@
       });
       lsSet('eco', eco ? '1' : '0');
     }
-    ecoBtn.onclick = () => { eco = !eco; applyEco(); };
+    ecoBtn.onclick = () => {
+      const nextEco = !eco;
+      if (nextEco && cleanOn) { cleanOn = false; applyClean(); }
+      eco = nextEco;
+      applyEco();
+    };
 
     // ----- Foco por Família na Grade & Otimização de Memória Background -----
     let currentFamilyFocus = 'all';
@@ -5074,14 +5079,18 @@
       webviews.forEach((w, i) => {
         if (off[i] || !w) return;
         try {
-          w.executeJavaScript(cleanScript(cleanOn)).catch(() => { });
           w.executeJavaScript(inGameEcoScript(eco)).catch(() => { });
+          w.executeJavaScript(cleanScript(cleanOn)).catch(() => { });
           w.executeJavaScript(ecoScript(ecoFps())).catch(() => { });
         } catch { }
       });
       lsSet('cleanHud', cleanOn ? '1' : '0');
     }
-    cleanBtn.onclick = () => { cleanOn = !cleanOn; applyClean(); };
+    cleanBtn.onclick = () => {
+      cleanOn = !cleanOn;
+      if (cleanOn && eco) { eco = false; applyEco(); }
+      applyClean();
+    };
 
   // New layouts require an explicit selection in Settings; no default game injection.
   let gameHudLayout = RebosteioGameHud.normalize(lsGet('gameHudLayout'));
