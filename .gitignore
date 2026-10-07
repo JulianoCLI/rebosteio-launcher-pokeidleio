@@ -89,4 +89,5 @@ tools/*
 !tools/ensure-electron.js
 src/ui/themes/pokemon/**/*.json
 src/ui/themes/pokemon/**/*.md
+pokeidle_maps/
 

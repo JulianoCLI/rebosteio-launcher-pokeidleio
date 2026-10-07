@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.5.41
+
+- Bônus Twitch organizado em três áreas: tutorial por etapas à esquerda, conta selecionada ao centro e parceiros oficiais à direita.
+- Removida a rolagem geral do painel; tutorial e parceiros usam navegação por etapas e páginas. Ações de aplicação permanecem visíveis.
+
+## 1.5.40
+
+- Lista de parceiros oficiais do Bônus Twitch integrada ao redesign: removidos fundos brancos e bordas verdes herdados, cores do tema ativo e estados legíveis para canais ao vivo e offline.
+- Contagem de espectadores em português e layout responsivo para os indicadores dos parceiros.
+
+## 1.5.39
+
+- Redesign do Bônus Twitch: navegação pelas quatro contas em uma coluna, configuração dedicada à conta selecionada e ações de aplicação sempre acessíveis.
+- Hierarquia visual refeita, com superfícies do tema ativo e orientações junto aos campos.
+
+## 1.5.38
+
+- Painel Bônus Twitch integrado às cores do tema Pokémon, com controles legíveis, quatro contas fixas e rolagem em janelas menores.
+- Tutorial no próprio painel: vínculo no jogo, geração do Access token, teste e aplicação; diferencia conexão ao chat de bônus confirmado pelo jogo.
+- Removidas promessas de consumo de memória sem medição.
+
+## 1.5.37
+
+- **Auto Supply:** a execução segue as mesmas regras comuns exibidas no modal, sem aplicar configurações individuais antigas e ocultas. Estoque ausente do item selecionado é tratado como zero, sem usar a quantidade de outra pokébola, poção ou revive.
+- A reposição lê o estado atualizado de cada conta, usa o comando WebSocket da loja do jogo e só registra sucesso após receber aumento do estoque do item pelo servidor. Falhas de conexão, falta de saldo e compras sem confirmação são exibidas e registradas.
+- Corrigida a migração das configurações antigas do Auto Supply.
+
+## 1.5.36
+
+- **Correção da detecção de streamers ao vivo na Twitch e sincronização headless.** Corrigido o bug onde streamers oficiais que estavam ao vivo (ex.: `@biscoitao`) eram exibidos como "OFFLINE" no modal de Bônus Twitch. O coletor e o sanitizador de telemetria agora reconhecem que os canais listados em `tw.lives` estão ativos sem depender de uma propriedade interna `aoVivo` inexistente. Corrigida também a atualização dinâmica de `P.estado.twitch` em pacotes `m.t === 'estado'` e a sincronização automática de canais ativos (`twitchSyncLives`) para o cliente headless de IRC.
+  *Fixed live Twitch streamers detection and headless synchronization: resolved issue where online partner streamers (e.g. `@biscoitao`) appeared as "OFFLINE" in the Twitch Bonus modal. The collector and telemetry sanitizer now recognize channels in `tw.lives` as live without expecting an absent internal `aoVivo` property. Also fixed dynamic `P.estado.twitch` updates on `m.t === 'estado'` packets and automated active channel syncing (`twitchSyncLives`) for the headless IRC client.*
+
 ## 1.5.35
 
 - **Tema Magnezone — observatório magnético.** Panorama original de montanhas, aurora e observatório elétrico; paleta de aço azulado com acentos ciano. Arte oficial do catálogo armazenada localmente, composição própria e frase decorativa sem encobrir os cartões. Seleção pelo catálogo existente, preservando as quatro contas e os logos compartilhados.

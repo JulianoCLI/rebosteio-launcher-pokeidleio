@@ -2521,6 +2521,7 @@
   <link rel="stylesheet" href="src/ui/themes.css">
   <link rel="stylesheet" href="src/ui/kuromi-xp.css">
   <link rel="stylesheet" href="src/ui/panel-controls.css">
+  <link rel="stylesheet" href="src/ui/twitch-bonus.css">
   <script src="src/ui/runtime-performance.js"></script>
   <script src="src/ui/game-hud-layout.js"></script>
   <script src="src/ui/center-scheduler.js"></script>
@@ -2901,23 +2902,22 @@
 
   <!-- Modal Bônus Twitch (Presença Headless em Chats Oficiais) -->
   <div id="twitchBonusOverlay">
-    <div id="twitchBonusModal">
+    <div id="twitchBonusModal" role="dialog" aria-modal="true" aria-labelledby="twitchBonusTitle">
       <div class="twitch-bonus-head">
         <h2>
-          <span class="twitch-bonus-icon">🟣</span>
-          <span>Bônus Twitch — Presença em Lives de Parceiros (+15% a +25% XP)</span>
+          <svg class="twitch-bonus-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h17v12l-5 5h-5l-3 3v-3H4zM9 7v6m6-6v6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span id="twitchBonusTitle">Bônus Twitch</span>
         </h2>
-        <span class="twitch-bonus-close" id="twitchBonusCloseBtn" title="Fechar">&times;</span>
+        <button type="button" class="twitch-bonus-close" id="twitchBonusCloseBtn" aria-label="Fechar Bônus Twitch">&times;</button>
       </div>
-      <p class="hint">Ganhe bônus de XP de treinador e Pokémon mantendo suas contas conectadas nos chats dos streamers oficiais. <b>Sem vídeo, sem áudio e sem gastar RAM</b> (&lt;15 MB total em segundo plano).</p>
+      <p class="hint">Presença nos chats dos parceiros, sem reproduzir vídeo ou áudio. Consulte abaixo o bônus informado pelo jogo.</p>
 
-      <div class="twitch-bonus-content">
         <!-- Master Card -->
         <div class="twitch-global-card">
           <div class="twitch-global-row">
             <label class="twitch-toggle-label">
               <input type="checkbox" id="twitchMasterToggle">
-              <span class="twitch-toggle-text"><b>Ativar Presença Automática</b> (conectar nos chats dos streamers oficiais que estiverem ao vivo com bônus)</span>
+              <span class="twitch-toggle-text"><b>Ativar Presença Automática</b> <small>Entrar nos canais ao vivo com bônus informados pelo jogo.</small></span>
             </label>
             <div class="twitch-global-kpis">
               <span class="twitch-kpi-pill" id="twitchGlobalStatusPill">● Desconectado</span>
@@ -2926,24 +2926,27 @@
           </div>
         </div>
 
+
+      <div class="twitch-bonus-content">
+<aside class="twitch-guide" aria-label="Tutorial Twitch"><h3 class="twitch-side-title">Como conectar</h3><div class="twitch-guide-tabs"><button type="button" data-guide-step="0" aria-label="Etapa 1" aria-pressed="true">1</button><button type="button" data-guide-step="1" aria-label="Etapa 2" aria-pressed="false">2</button><button type="button" data-guide-step="2" aria-label="Etapa 3" aria-pressed="false">3</button><button type="button" data-guide-step="3" aria-label="Etapa 4" aria-pressed="false">4</button><button type="button" data-guide-step="4" aria-label="Etapa 5" aria-pressed="false">5</button></div><div class="twitch-guide-body"><section class="twitch-guide-step" data-guide-panel="0"><h3>1. Vincule no jogo</h3><ol><li>No PokeIdle, abra <b>Treinador</b> e procure a conexão ou bônus Twitch.</li><li>Entre na Twitch desejada e conclua a autorização.</li><li>Volte ao launcher. Ao receber o vínculo do jogo, ele preenche o campo vazio com seu <b>login Twitch</b>, que pode ser diferente do nick do treinador.</li></ol><p>Já tem um login salvo? Confira se corresponde ao vínculo.</p></section><section class="twitch-guide-step" data-guide-panel="1" hidden><h3>2. Gere o token</h3><ol><li>Clique em <b>Gerar Token de Chat</b>, acima das contas.</li><li>Escolha <b>Bot Chat Token</b> no site. Siga a geração e autorize a mesma Twitch vinculada ao jogo.</li><li>Copie <b>Access token</b> e cole em <b>Token de Chat (OAuth)</b>.</li></ol><p>Não copie Refresh token nem Client ID. O prefixo <b>oauth:</b> é opcional.</p></section><section class="twitch-guide-step" data-guide-panel="2" hidden><h3>3. Teste e aplique</h3><ol><li>Selecione a conta do jogo e confira seu usuário Twitch.</li><li>Clique em <b>Testar Conexão</b>. Aguarde <b>✓ Conexão OK!</b>.</li><li>Marque <b>Ligar</b> nessa conta e <b>Ativar Presença Automática</b> no topo.</li><li>Clique em <b>Salvar e Aplicar</b>.</li></ol><p>O teste confirma o chat. O bônus precisa ser informado pelo jogo.</p></section><section class="twitch-guide-step" data-guide-panel="3" hidden><h3>4. Acompanhe a presença</h3><p><b>Conectado nos Chats:</b> há uma conexão Twitch ativa.</p><p><b>Nenhum canal ativo:</b> pode não haver parceiro elegível ao vivo ou o jogo ainda não enviou os dados.</p><p><b>Falha no teste?</b> Confira o login e gere um token da mesma Twitch.</p><p>Para atualizar o vínculo e o percentual de bônus, mantenha a conta do jogo conectada.</p></section><section class="twitch-guide-step" data-guide-panel="4" hidden><h3>5. Contas e privacidade</h3><p>Em cada conta, use a Twitch vinculada no jogo e seu token correspondente.</p><p>Tem apenas uma Twitch vinculada? Configure a conta correspondente e deixe as demais desligadas.</p><p>O launcher entra nos chats sem publicar mensagens ou comandos. Não reproduz vídeo ou áudio.</p><p>Não compartilhe seu token nem mostre seu valor em capturas.</p></section></div><div class="twitch-guide-pager"><button type="button" id="twitchGuidePrev">Anterior</button><span id="twitchGuidePosition">1 / 5</span><button type="button" id="twitchGuideNext">Próximo</button></div></aside>
         <!-- Seção das 4 Contas -->
-        <div class="twitch-section">
+        <div class="twitch-section twitch-setup">
           <div class="twitch-sec-head">
-            <label class="twitch-sec-title">Suas 4 Contas (Twitch vinculada e Token de Chat):</label>
-            <a href="https://twitchtokengenerator.com/" target="_blank" class="twitch-token-help-link" id="twitchTokenHelpLink">🔑 Gerar Token de Chat (1 clique) ↗</a>
+            <label class="twitch-sec-title">Suas quatro contas</label>
+            <a href="https://twitchtokengenerator.com/" target="_blank" class="twitch-token-help-link" id="twitchTokenHelpLink">Gerar Token de Chat ↗</a>
           </div>
-          <div class="twitch-accounts-grid" id="twitchAccountsGrid"></div>
+          <div class="twitch-workspace"><nav id="twitchAccountNav" class="twitch-account-nav" aria-label="Selecionar conta Twitch"></nav><div class="twitch-accounts-grid" id="twitchAccountsGrid"></div></div>
         </div>
 
         <!-- Seção Streamers Parceiros -->
-        <div class="twitch-section">
+        <div class="twitch-section twitch-partners">
           <div class="twitch-sec-head">
-            <label class="twitch-sec-title">Streamers Parceiros Oficiais (Sincronizado do PokeIdle):</label>
+            <label class="twitch-sec-title">Parceiros oficiais</label>
             <span class="twitch-streamers-count" id="twitchStreamersCount">0 no ar</span>
           </div>
           <div class="twitch-streamers-list" id="twitchStreamersList">
             <div class="twitch-empty-streamers">Aguardando dados do jogo ou nenhum streamer parceiro ao vivo no momento.</div>
-          </div>
+          </div><p class="twitch-field-help">Lista informada pelo jogo.</p><div class="twitch-partners-pager"><button type="button" id="twitchPartnersPrev">Anterior</button><span id="twitchPartnersPosition"></span><button type="button" id="twitchPartnersNext">Próximo</button></div>
         </div>
       </div>
 
@@ -2954,7 +2957,7 @@
 
       <div class="modal-actions">
         <button type="button" id="twitchBonusCancel">Fechar</button>
-        <button type="button" id="twitchBonusSave" class="primary">💾 Salvar e Aplicar</button>
+        <button type="button" id="twitchBonusSave" class="primary">Salvar e Aplicar</button>
       </div>
     </div>
   </div>
@@ -3487,7 +3490,7 @@
               wv.executeJavaScript('window.__pokeSeed=' + j).catch(() => { });
             }
           } catch { }
-          wv.executeJavaScript(`(()=>{const nL=v=>{const m=String(v==null?'':v).match(/[0-9]+([.,][0-9]+)?/);return m?+m[0].replace(',','.'):0};const nIvs=v=>{if(!v||typeof v!=='object')return null;const h=nL(v.hp),a=nL(v.atk),d=nL(v.def),sa=nL(v.spAtk!=null?v.spAtk:v.spa),sd=nL(v.spDef!=null?v.spDef:v.spd),sp=nL(v.speed!=null?v.speed:(v.spe!=null?v.spe:v.vel));return(h||a||d||sa||sd||sp)?{hp:h,atk:a,def:d,spAtk:sa,spDef:sd,speed:sp}:null;};const mk=()=>({start:Date.now(),kills:0,xp:0,balls:0,captures:0,drops:{},shinyN:0,shinySeen:{},shinyCapN:0,faintN:0,sellG:0,supGold:0,supN:0,gold:0,slug:'',hp:{}});const P=window.__poke||(window.__poke={ws:{},api:{},sess:mk(),prev:null,knownPokes:{},pokesBaselined:false,pokemonsMap:{},creaturesMap:{}});try{const sd=window.__pokeSeed;delete window.__pokeSeed;if(sd&&sd.s&&sd.s.start&&Date.now()-(sd.t||0)<600e3){P.sess=sd.s;if(sd.slug)P.lastSlug=sd.slug;if(sd.cl&&sd.cl.length)P.catchLog=sd.cl;if(sd.sl&&sd.sl.length)P.shinyLog=sd.sl;if(sd.ab&&typeof sd.ab==='object')P.anBase=sd.ab;}}catch(x){}let auth=null;const onMsg=e=>{try{if(typeof e.data==='string'){const m=JSON.parse(e.data);if(!m)return;const S=P.sess;if(m.t){P.ws[m.t]=m;if(m.t==='welcome'){const est=m.estado||{};P.estado=est;if(est.activeId!=null)P.activeId=est.activeId;P.trainerLevel=est.level||0;if(est.pokemons&&Array.isArray(est.pokemons)){est.pokemons.forEach(pk=>{if(pk&&pk.id)P.pokemonsMap[pk.id]=pk;});}if(est.automation&&typeof est.automation==='object'){P.automation=Object.assign(P.automation||{},est.automation);if(Array.isArray(est.automation.ballIds))P.autoBallIds=est.automation.ballIds;}if(m.hunts&&Array.isArray(m.hunts))P.hunts=m.hunts;P.cid=est.id||'';P.nick=est.nick||'';P.level=est.level||0;P.gold=est.gold||0;P.diamonds=est.diamonds||0;P.isVip=!!(est.loja&&est.loja.vip);P.clan=(est.guild&&(est.guild.nome||est.guild.name))||null;P.api['/api/characters/me']={character:{id:P.cid,name:P.nick,level:P.level,gold:P.gold,diamonds:P.diamonds,isVip:P.isVip,clan:P.clan}};if(m.catalogoBolas&&Array.isArray(m.catalogoBolas)){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.catalog=m.catalogoBolas.map(b=>({id:b.id,name:b.nome||b.name,priceGold:b.priceGold||0,p:b.priceGold||0,infinite:!!(b.infinite||b.infinito),catchRate:b.catchRate||1}));}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.pokemons&&Array.isArray(est.pokemons)){const H2={};P.ws.pokes={list:est.pokemons.map(pk=>{if(pk.slot!=null)H2[pk.id]=pk.hp;P.knownPokes[pk.id]=1;const ivs=nIvs(pk.ivs);return{id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivs:ivs,ivTotal:ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):null};})};S.hp=H2;P.pokesBaselined=true;if(P.catchLog&&P.catchLog.length){P.catchLog.forEach(c=>{if(!c.iv||c.iv===0||!c.ivs){const match=P.ws.pokes.list.find(x=>(c.id!=null&&x.id===c.id)||(x.name===c.n&&Math.abs(nL(x.quality)-nL(c.q))<0.02&&(x.ivTotal||x.ivs)));if(match){if(match.ivTotal&&(!c.iv||c.iv===0))c.iv=match.ivTotal;if(match.ivs&&!c.ivs)c.ivs=match.ivs;if(match.id&&!c.id)c.id=match.id;}}});}}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}}else if(m.t==='campo.init'){const sl=m.slug||'';P.ws['campo.init']=m;P.ws['field-init']={slug:sl,name:sl};P.fiT=Date.now();if(sl&&sl!=='centro'&&!['cerulean','pewter','viridian','cassino','arena_pvp'].includes(sl)){if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;}}}else if(m.t==='batalha'){(m.ev||[]).forEach(ev=>{if(ev.k==='spawn'){if(ev.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:0,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.k==='morte'){if(ev.quem==='selvagem'){S.kills++;S.lastKillT=Date.now();S.xp+=(ev.xp||ev.xpTreinador||0);S.gold=(S.gold||0)+(ev.ouro||0)+(ev.ouroVendaAuto||0);(ev.drops||[]).forEach(l=>{const k=l.itemId||l.nome;const d=S.drops[k]||(S.drops[k]={name:l.nome,qty:0});d.qty+=(l.qtd||l.qty||0);});if(ev.shiny){S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.quem==='jogador'){S.faintN=(S.faintN||0)+1;}}else if(ev.k==='bossMorto'){S.xp+=(ev.xp||ev.xpTreinador||0);S.gold=(S.gold||0)+(ev.valor||0);(ev.drops||[]).forEach(l=>{const k=l.itemId||l.nome;const d=S.drops[k]||(S.drops[k]={name:l.nome,qty:0});d.qty+=(l.qtd||l.qty||0);});}else if(ev.k==='cura'){S.supN=(S.supN||0)+1;const pId=ev.itemId;const pPrice=pId===200?50:pId===201?150:pId===202?400:pId===203?800:pId===204?1500:0;S.supGold=(S.supGold||0)+pPrice;}else if(ev.k==='revive'){S.supN=(S.supN||0)+1;const rId=ev.itemId;const rPrice=rId===205?600:rId===206?2500:0;S.supGold=(S.supGold||0)+rPrice;}else if(ev.k==='bola'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;if(ev.ballId)P.lastBallId=ev.ballId;const bPrice=ev.ballId===1?5:ev.ballId===2?20:ev.ballId===3?50:130;S.supGold=(S.supGold||0)+bPrice;}else if(ev.k==='capturado'){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;const pk=ev.pokemon||{};if(pk.shiny){S.shinyCapN=(S.shinyCapN||0)+1;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.nome||'',sid:pk.speciesId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}let iv=0;let ivs=nIvs(pk.ivs);if(ivs)iv=ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed;else if(pk.ivTotal!=null)iv=nL(pk.ivTotal);else if(pk.iv!=null)iv=nL(pk.iv);else if(pk.id!=null){const f=(P.ws.pokes&&P.ws.pokes.list||[]).find(x=>x.id===pk.id);if(f){if(f.ivTotal!=null)iv=nL(f.ivTotal);if(f.ivs&&!ivs)ivs=f.ivs;}}const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];const CL=P.catchLog=P.catchLog||[];CL.push({id:pk.id||null,n:pk.nome||pk.name||'?',sid:sd,iv:iv||0,ivs:ivs||null,q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift();}});}else if(m.t==='estado'){const est=m.estado||{};if(est.activeId!=null)P.activeId=est.activeId;if(est.level!=null){P.level=est.level;P.trainerLevel=est.level;}if(est.automation&&typeof est.automation==='object'){P.automation=Object.assign(P.automation||{},est.automation);if(Array.isArray(est.automation.ballIds))P.autoBallIds=est.automation.ballIds;}if(est.gold!=null){P.gold=est.gold;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.gold=est.gold;}if(est.level!=null){P.level=est.level;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.level=est.level;}if(est.xp!=null)P.xp=est.xp;if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}if(est.centroMotivo==='morte'){S.faintN=(S.faintN||0)+1;}if(est.pkMud&&Array.isArray(est.pkMud)){P.ws.pokes=P.ws.pokes||{list:[]};est.pkMud.forEach(pk=>{if(pk&&pk.id){if(P.pokemonsMap[pk.id])Object.assign(P.pokemonsMap[pk.id],pk);else P.pokemonsMap[pk.id]=pk;}const ix=P.ws.pokes.list.findIndex(x=>x.id===pk.id);const was=S.hp[pk.id];if(pk.slot!=null&&pk.hp===0&&was>0)S.faintN=(S.faintN||0)+1;if(pk.slot!=null)S.hp[pk.id]=pk.hp;const ivs=nIvs(pk.ivs);const ivT=ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):(pk.ivTotal!=null?nL(pk.ivTotal):(pk.iv!=null?nL(pk.iv):null));const obj={id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivTotal:ivT,ivs:ivs};if(ix>=0)Object.assign(P.ws.pokes.list[ix],obj);else P.ws.pokes.list.push(obj);const isNew=P.pokesBaselined&&!P.knownPokes[pk.id];if(isNew){P.knownPokes[pk.id]=1;if(pk.sellValue)S.sellG=(S.sellG||0)+(pk.sellValue||0);}const CL=P.catchLog=P.catchLog||[];const pkNome=pk.nome||pk.name||'';const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];const cEntry=CL.slice().reverse().find(c=>(c.id!=null&&pk.id!=null&&c.id===pk.id)||(((!c.iv||c.iv===0)||!c.ivs)&&(c.n===pkNome||c.n==='?')&&(Date.now()-(c.t||0)<60000)));if(cEntry){if(ivT!=null&&(!cEntry.iv||cEntry.iv===0))cEntry.iv=ivT;if(ivs&&!cEntry.ivs)cEntry.ivs=ivs;if(pk.id&&!cEntry.id)cEntry.id=pk.id;if(cEntry.n==='?'&&pkNome)cEntry.n=pkNome;if(!cEntry.q&&pk.quality!=null)cEntry.q=nL(pk.quality);if(!cEntry.sid&&sd)cEntry.sid=sd;}else if(isNew){CL.push({id:pk.id,n:pkNome||'?',sid:sd,iv:ivT||0,ivs:ivs||null,q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift();};});}}}if(m.type){P.ws[m.type]=m;if(m.type==='field-init'){const sl=m.slug||'';P.fiT=Date.now();if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;P.ws.analyzer=null;P.anBase=null;try{if(P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'analyzer-get'}))}catch(x){}}}else if(m.type==='field-none'||m.type==='field-teleport-city'){P.ws['field-init']=null;}else if(m.type==='field-kill'){S.kills++;S.lastKillT=Date.now();S.xp+=m.xpGained||0;(m.loot||[]).forEach(l=>{const d=S.drops[l.itemId]||(S.drops[l.itemId]={name:l.name,qty:0});d.qty+=l.qty||0;});if(m.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:m.speciesName||m.name||'',sid:m.speciesId||m.pokeId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(m.type==='catch-result'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;if(m.ballId)P.lastBallId=m.ballId;const bbc=((P.ws.balls&&P.ws.balls.catalog)||[]).find(x=>x.id===m.ballId);if(bbc&&!bbc.infinite)S.supGold=(S.supGold||0)+(+bbc.priceGold||0);if(m.success){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;}}else if(m.type==='field'){if(m.mobs&&m.mobs.length){for(const mb of m.mobs){if(mb&&+mb.maxHp>0)(S.slotHp=S.slotHp||{})[mb.slot]=+mb.maxHp;}}if(m.hits&&m.hits.length){const bm={};for(const h of m.hits){if(!(h&&h.slot>=0&&+h.amount>0))continue;const k=String(h.move||'?').slice(0,24);const c=bm[k]||(bm[k]={n:0,sl:{},p:0,pn:0});c.n++;c.sl[h.slot]=1;const mh=S.slotHp&&S.slotHp[h.slot];if(mh>0&&!h.crit&&!h.blocked){c.p+=(+h.amount)/mh;c.pn++;}}S.mv=S.mv||{};const ag=Date.now();for(const k in bm){const c=bm[k],ns=Object.keys(c.sl).length;let T=S.mv[k];if(!T){const ks=Object.keys(S.mv);if(ks.length>=12){const v=ks.sort((p,q)=>(S.mv[p].t||0)-(S.mv[q].t||0))[0],X=S.mvX=S.mvX||{n:0,s:0,a:0};X.n+=S.mv[v].n;X.s+=S.mv[v].s;X.a+=S.mv[v].a;delete S.mv[v];}T=S.mv[k]={n:0,s:0,a:0,p:0,pn:0,t:ag};}T.t=ag;T.n+=c.n;T.p+=c.p;T.pn+=c.pn;if(ns>=2){T.s++;T.a+=ns;}}}}else if(m.type==='poke-delta'){const pk=m.poke;if(pk){const LP=P.ws.pokes&&P.ws.pokes.list;if(LP){const ix=LP.findIndex(x=>x.id===pk.id);if(ix>=0)Object.assign(LP[ix],pk);else LP.push(pk);}const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)S.hp[pk.id]=pk.hp;else delete S.hp[pk.id];if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;}}else if(m.type==='pokes'){const H2={};(m.list||[]).forEach(pk=>{const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)H2[pk.id]=pk.hp;if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;});S.hp=H2;if(!P.pokesBaselined)P.pokesBaselined=true;}else if(m.type==='inventory'){let now=0;const doc0=P.api['/game/items.json']||P.api['/assets/items.json'];const cat0={};if(doc0&&doc0.items)doc0.items.forEach(it=>cat0[it.id]=it);const cur={};(m.items||[]).forEach(it=>{if(it.itemId===59195)now=it.quantity||0;const c=(cat0[it.itemId]||{}).category;if(c==='heal'||c==='potion'||c==='revive')cur[it.itemId]=it.quantity||0;});if(S.supBase){for(const id in S.supBase){const antes=S.supBase[id]||0,agora=(cur[id]!=null?cur[id]:0),d=antes-agora;if(d>0){const it=cat0[id]||{};S.supGold=(S.supGold||0)+d*(it.priceGold||it.npcPrice||0);S.supN=(S.supN||0)+d;}}}S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const doc=P.api['/game/items.json']||P.api['/assets/items.json'];const it=doc&&doc.items&&doc.items.find(x=>x.id===59195);const d=S.drops[59195]||(S.drops[59195]={name:(it&&it.name)||'Rare Pokémon Picture',qty:0});d.qty+=(now-S.picBase);}S.picBase=now;}}else if(m.type==='chat'||m.type==='history'){const chS=(mm)=>{try{if(!mm||!mm.body)return;const re=/\\[poke!([A-Za-z0-9_-]+)\\]/g;let mt;while((mt=re.exec(mm.body))){try{const j=JSON.parse(atob(mt[1].replace(/-/g,'+').replace(/_/g,'/')));if(j&&j.k==='poke'){const CS=P.chatShares=P.chatShares||[];const N=(v)=>{v=Number(v);return isFinite(v)?v:0;};const cn=String(j.n||'?').slice(0,40),cf=String(mm.fromName||'').slice(0,40);if(!CS.some(c=>c.n===cn&&c.iv===N(j.iv)&&c.lv===N(j.lv)&&c.fr===cf)){CS.push({fr:cf,n:cn,sh:!!j.sh,lv:N(j.lv),q:N(j.q),iv:N(j.iv),pw:N(j.pw),t:Date.now()});if(CS.length>15)CS.shift();}}}catch(x){}}}catch(x){}};if(m.type==='chat')chS(m.msg);else['world','trade','help'].forEach(c2=>(m[c2]||[]).forEach(chS));}}}}catch(x){}};const hookSocket=s=>{if(!s||s.__pokeHooked)return;s.__pokeHooked=true;P.sock=s;const origSend=s.send;s.send=function(data){try{if(typeof data==='string'){const sent=JSON.parse(data);if(sent&&sent.t==='hello'){P.nick=sent.nick;P.token=sent.token;}else if(sent&&sent.t==='auto.set'){P.automation=Object.assign(P.automation||{},sent);if(Array.isArray(sent.ballIds))P.autoBallIds=sent.ballIds;}else if(sent&&sent.t==='ball.throw'&&sent.ballId){P.lastBallId=sent.ballId;}else if(sent&&sent.t==='team.active'&&sent.pokemonId){P.activeId=sent.pokemonId;}}}catch(x){}return origSend.apply(this,arguments);};s.addEventListener('message',onMsg);};const OW=window.WebSocket;window.WebSocket=function(...ar){const s=Reflect.construct(OW,ar);hookSocket(s);return s;};window.WebSocket.prototype=OW.prototype;const origProtoSend=OW.prototype.send;OW.prototype.send=function(...args){try{hookSocket(this);}catch(x){}return origProtoSend.apply(this,args);};['CONNECTING','OPEN','CLOSING','CLOSED'].forEach(k=>{try{window.WebSocket[k]=OW[k]}catch(x){}});try{if(window.ws)hookSocket(window.ws);if(window.__ws)hookSocket(window.__ws);if(window.estado&&window.estado.ws)hookSocket(window.estado.ws);}catch(x){}try{const est=(window.estado&&(window.estado.eu||window.estado))||{};if(est&&(est.id||est.nick)){P.estado=P.estado||est;if(est.id)P.cid=est.id;if(est.nick)P.nick=est.nick;if(est.level!=null)P.level=est.level;if(est.gold!=null)P.gold=est.gold;if(est.diamonds!=null)P.diamonds=est.diamonds;if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}if(est.pokemons&&Array.isArray(est.pokemons)){est.pokemons.forEach(pk=>{if(pk&&pk.id)P.pokemonsMap[pk.id]=pk;});if(!P.ws.pokes){const H2={};P.ws.pokes={list:est.pokemons.map(pk=>{if(pk.slot!=null)H2[pk.id]=pk.hp;P.knownPokes[pk.id]=1;const ivs=nIvs(pk.ivs);return{id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivs:ivs,ivTotal:ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):null};})};P.sess.hp=H2;P.pokesBaselined=true;}}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}}}catch(x){}const OF=window.fetch;window.fetch=function(...a){try{let H;const r0=a[0],ini=a[1];if(ini&&ini.headers)H=ini.headers;else if(r0&&typeof r0==='object'&&r0.headers)H=r0.headers;if(H){let au;if(typeof H.get==='function')au=H.get('authorization');else au=H.Authorization||H.authorization;if(au){auth=au;P.auth=au;}}}catch(x){}const p=OF.apply(this,a);try{let u=(a[0]&&a[0].url)||a[0];if(typeof u==='string'&&(/\\/api\\/|items\\.json/.test(u)||u.includes('items.json'))){p.then(r=>{const c=r.clone();c.json().then(j=>{const key=u.split('?')[0];if(u.includes('creatures.json')){P.creatures=j.creatures||[];(j.creatures||[]).forEach(cr=>{if(cr&&cr.pokeId!=null)P.creaturesMap[cr.pokeId]=cr;});}if(u.includes('items.json')){P.api['/game/items.json']=j;P.api['/assets/items.json']=j;}if(key==='/api/game/used-balls'){if(j&&j.pokemons){const cs=new Set(Array.isArray(j.caught)?j.caught:[]);P.shinyEnc=j.pokemons.reduce((s,p)=>s+(p.shiny?(+p.total||0):0),0);P.usedList=j.pokemons.map(p=>({sid:p.speciesId||p.dexId,name:p.name,shiny:!!p.shiny,attempts:p.attempts||0,total:p.total||0,caught:!!p.caught||(p.shiny?(+p.total||0)>(+p.attempts||0):cs.has(p.dexId!=null?p.dexId:p.speciesId))}));}return;}if(key==='/api/characters/me'){if(!j||!j.character){P.meMiss=(P.meMiss||0)+1;return;}P.meMiss=0;const o0=P.api[key];if(o0&&o0.character&&o0.character.id!==j.character.id){P.knownPokes={};P.pokesBaselined=false;}}P.api[key]=j}).catch(()=>{})}).catch(()=>{})}}catch(x){}return p;};const poll=()=>{try{while(P.catchLog&&P.catchLog.length>400)P.catchLog.shift();while(P.shinyLog&&P.shinyLog.length>300)P.shinyLog.shift();const isPokeIdle=typeof location!=='undefined'&&location.hostname.includes('pokeidle.io');if(!isPokeIdle){const o=auth?{headers:{Authorization:auth}}:undefined;fetch('/api/characters/me',o).catch(()=>{});fetch('/api/game/used-balls',o).catch(()=>{});try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({type:'inv-get'}));P.sock.send(JSON.stringify({type:'analyzer-get'}));}}catch(x){}}else{try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({t:'ping'}));}}catch(x){}}}catch(x){}};setInterval(poll,30000);setTimeout(poll,9000);let bT=0;setInterval(()=>{try{const B=P.ws.boosts,lv=!!(B&&Array.isArray(B.boosts)&&B.boosts.some(b=>b&&b.live));if((lv||++bT%5===0)&&P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'boosts-refresh'}));}catch(x){}},25000);})()`).catch(() => { }); // coletor de estado + sessao dual-protocol (pokeidle.io WS + legado)
+          wv.executeJavaScript(`(()=>{const nL=v=>{const m=String(v==null?'':v).match(/[0-9]+([.,][0-9]+)?/);return m?+m[0].replace(',','.'):0};const nIvs=v=>{if(!v||typeof v!=='object')return null;const h=nL(v.hp),a=nL(v.atk),d=nL(v.def),sa=nL(v.spAtk!=null?v.spAtk:v.spa),sd=nL(v.spDef!=null?v.spDef:v.spd),sp=nL(v.speed!=null?v.speed:(v.spe!=null?v.spe:v.vel));return(h||a||d||sa||sd||sp)?{hp:h,atk:a,def:d,spAtk:sa,spDef:sd,speed:sp}:null;};const mk=()=>({start:Date.now(),kills:0,xp:0,balls:0,captures:0,drops:{},shinyN:0,shinySeen:{},shinyCapN:0,faintN:0,sellG:0,supGold:0,supN:0,gold:0,slug:'',hp:{}});const P=window.__poke||(window.__poke={ws:{},api:{},sess:mk(),prev:null,knownPokes:{},pokesBaselined:false,pokemonsMap:{},creaturesMap:{}});try{const sd=window.__pokeSeed;delete window.__pokeSeed;if(sd&&sd.s&&sd.s.start&&Date.now()-(sd.t||0)<600e3){P.sess=sd.s;if(sd.slug)P.lastSlug=sd.slug;if(sd.cl&&sd.cl.length)P.catchLog=sd.cl;if(sd.sl&&sd.sl.length)P.shinyLog=sd.sl;if(sd.ab&&typeof sd.ab==='object')P.anBase=sd.ab;}}catch(x){}let auth=null;const onMsg=e=>{try{if(typeof e.data==='string'){const m=JSON.parse(e.data);if(!m)return;const S=P.sess;if(m.t){P.ws[m.t]=m;if(m.t==='welcome'){const est=m.estado||{};P.estado=est;if(est.activeId!=null)P.activeId=est.activeId;P.trainerLevel=est.level||0;if(est.pokemons&&Array.isArray(est.pokemons)){est.pokemons.forEach(pk=>{if(pk&&pk.id)P.pokemonsMap[pk.id]=pk;});}if(est.automation&&typeof est.automation==='object'){P.automation=Object.assign(P.automation||{},est.automation);if(Array.isArray(est.automation.ballIds))P.autoBallIds=est.automation.ballIds;}if(m.hunts&&Array.isArray(m.hunts))P.hunts=m.hunts;P.cid=est.id||'';P.nick=est.nick||'';P.level=est.level||0;P.gold=est.gold||0;P.diamonds=est.diamonds||0;P.isVip=!!(est.loja&&est.loja.vip);P.clan=(est.guild&&(est.guild.nome||est.guild.name))||null;P.api['/api/characters/me']={character:{id:P.cid,name:P.nick,level:P.level,gold:P.gold,diamonds:P.diamonds,isVip:P.isVip,clan:P.clan}};if(m.catalogoBolas&&Array.isArray(m.catalogoBolas)){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.catalog=m.catalogoBolas.map(b=>({id:b.id,name:b.nome||b.name,priceGold:b.priceGold||0,p:b.priceGold||0,infinite:!!(b.infinite||b.infinito),catchRate:b.catchRate||1}));}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.pokemons&&Array.isArray(est.pokemons)){const H2={};P.ws.pokes={list:est.pokemons.map(pk=>{if(pk.slot!=null)H2[pk.id]=pk.hp;P.knownPokes[pk.id]=1;const ivs=nIvs(pk.ivs);return{id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivs:ivs,ivTotal:ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):null};})};S.hp=H2;P.pokesBaselined=true;if(P.catchLog&&P.catchLog.length){P.catchLog.forEach(c=>{if(!c.iv||c.iv===0||!c.ivs){const match=P.ws.pokes.list.find(x=>(c.id!=null&&x.id===c.id)||(x.name===c.n&&Math.abs(nL(x.quality)-nL(c.q))<0.02&&(x.ivTotal||x.ivs)));if(match){if(match.ivTotal&&(!c.iv||c.iv===0))c.iv=match.ivTotal;if(match.ivs&&!c.ivs)c.ivs=match.ivs;if(match.id&&!c.id)c.id=match.id;}}});}}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}}else if(m.t==='campo.init'){const sl=m.slug||'';P.ws['campo.init']=m;P.ws['field-init']={slug:sl,name:sl};P.fiT=Date.now();if(sl&&sl!=='centro'&&!['cerulean','pewter','viridian','cassino','arena_pvp'].includes(sl)){if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;}}}else if(m.t==='batalha'){(m.ev||[]).forEach(ev=>{if(ev.k==='spawn'){if(ev.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:0,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.k==='morte'){if(ev.quem==='selvagem'){S.kills++;S.lastKillT=Date.now();S.xp+=(ev.xp||ev.xpTreinador||0);S.gold=(S.gold||0)+(ev.ouro||0)+(ev.ouroVendaAuto||0);(ev.drops||[]).forEach(l=>{const k=l.itemId||l.nome;const d=S.drops[k]||(S.drops[k]={name:l.nome,qty:0});d.qty+=(l.qtd||l.qty||0);});if(ev.shiny){S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:ev.nome||'',sid:ev.speciesId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(ev.quem==='jogador'){S.faintN=(S.faintN||0)+1;}}else if(ev.k==='bossMorto'){S.xp+=(ev.xp||ev.xpTreinador||0);S.gold=(S.gold||0)+(ev.valor||0);(ev.drops||[]).forEach(l=>{const k=l.itemId||l.nome;const d=S.drops[k]||(S.drops[k]={name:l.nome,qty:0});d.qty+=(l.qtd||l.qty||0);});}else if(ev.k==='cura'){S.supN=(S.supN||0)+1;const pId=ev.itemId;const pPrice=pId===200?50:pId===201?150:pId===202?400:pId===203?800:pId===204?1500:0;S.supGold=(S.supGold||0)+pPrice;}else if(ev.k==='revive'){S.supN=(S.supN||0)+1;const rId=ev.itemId;const rPrice=rId===205?600:rId===206?2500:0;S.supGold=(S.supGold||0)+rPrice;}else if(ev.k==='bola'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;if(ev.ballId)P.lastBallId=ev.ballId;const bPrice=ev.ballId===1?5:ev.ballId===2?20:ev.ballId===3?50:130;S.supGold=(S.supGold||0)+bPrice;}else if(ev.k==='capturado'){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;const pk=ev.pokemon||{};if(pk.shiny){S.shinyCapN=(S.shinyCapN||0)+1;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.nome||'',sid:pk.speciesId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}let iv=0;let ivs=nIvs(pk.ivs);if(ivs)iv=ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed;else if(pk.ivTotal!=null)iv=nL(pk.ivTotal);else if(pk.iv!=null)iv=nL(pk.iv);else if(pk.id!=null){const f=(P.ws.pokes&&P.ws.pokes.list||[]).find(x=>x.id===pk.id);if(f){if(f.ivTotal!=null)iv=nL(f.ivTotal);if(f.ivs&&!ivs)ivs=f.ivs;}}const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];const CL=P.catchLog=P.catchLog||[];CL.push({id:pk.id||null,n:pk.nome||pk.name||'?',sid:sd,iv:iv||0,ivs:ivs||null,q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift();}});}else if(m.t==='estado'){const est=m.estado||{};if(est.twitch&&typeof est.twitch==='object'){P.estado=P.estado||{};P.estado.twitch=est.twitch;}if(est.activeId!=null)P.activeId=est.activeId;if(est.level!=null){P.level=est.level;P.trainerLevel=est.level;}if(est.automation&&typeof est.automation==='object'){P.automation=Object.assign(P.automation||{},est.automation);if(Array.isArray(est.automation.ballIds))P.autoBallIds=est.automation.ballIds;}if(est.gold!=null){P.gold=est.gold;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.gold=est.gold;}if(est.level!=null){P.level=est.level;if(P.api['/api/characters/me']&&P.api['/api/characters/me'].character)P.api['/api/characters/me'].character.level=est.level;}if(est.xp!=null)P.xp=est.xp;if(est.items&&typeof est.items==='object'){P.ws.inventory={items:Object.keys(est.items).map(k=>({itemId:+k,quantity:est.items[k]}))};}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}if(est.centroMotivo==='morte'){S.faintN=(S.faintN||0)+1;}if(est.pkMud&&Array.isArray(est.pkMud)){P.ws.pokes=P.ws.pokes||{list:[]};est.pkMud.forEach(pk=>{if(pk&&pk.id){if(P.pokemonsMap[pk.id])Object.assign(P.pokemonsMap[pk.id],pk);else P.pokemonsMap[pk.id]=pk;}const ix=P.ws.pokes.list.findIndex(x=>x.id===pk.id);const was=S.hp[pk.id];if(pk.slot!=null&&pk.hp===0&&was>0)S.faintN=(S.faintN||0)+1;if(pk.slot!=null)S.hp[pk.id]=pk.hp;const ivs=nIvs(pk.ivs);const ivT=ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):(pk.ivTotal!=null?nL(pk.ivTotal):(pk.iv!=null?nL(pk.iv):null));const obj={id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivTotal:ivT,ivs:ivs};if(ix>=0)Object.assign(P.ws.pokes.list[ix],obj);else P.ws.pokes.list.push(obj);const isNew=P.pokesBaselined&&!P.knownPokes[pk.id];if(isNew){P.knownPokes[pk.id]=1;if(pk.sellValue)S.sellG=(S.sellG||0)+(pk.sellValue||0);}const CL=P.catchLog=P.catchLog||[];const pkNome=pk.nome||pk.name||'';const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];const cEntry=CL.slice().reverse().find(c=>(c.id!=null&&pk.id!=null&&c.id===pk.id)||(((!c.iv||c.iv===0)||!c.ivs)&&(c.n===pkNome||c.n==='?')&&(Date.now()-(c.t||0)<60000)));if(cEntry){if(ivT!=null&&(!cEntry.iv||cEntry.iv===0))cEntry.iv=ivT;if(ivs&&!cEntry.ivs)cEntry.ivs=ivs;if(pk.id&&!cEntry.id)cEntry.id=pk.id;if(cEntry.n==='?'&&pkNome)cEntry.n=pkNome;if(!cEntry.q&&pk.quality!=null)cEntry.q=nL(pk.quality);if(!cEntry.sid&&sd)cEntry.sid=sd;}else if(isNew){CL.push({id:pk.id,n:pkNome||'?',sid:sd,iv:ivT||0,ivs:ivs||null,q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift();};});}}}if(m.type){P.ws[m.type]=m;if(m.type==='field-init'){const sl=m.slug||'';P.fiT=Date.now();if(P.lastSlug!==sl){P.prev=P.sess;P.prev.end=Date.now();P.sess=mk();P.sess.slug=sl;P.lastSlug=sl;P.ws.analyzer=null;P.anBase=null;try{if(P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'analyzer-get'}))}catch(x){}}}else if(m.type==='field-none'||m.type==='field-teleport-city'){P.ws['field-init']=null;}else if(m.type==='field-kill'){S.kills++;S.lastKillT=Date.now();S.xp+=m.xpGained||0;(m.loot||[]).forEach(l=>{const d=S.drops[l.itemId]||(S.drops[l.itemId]={name:l.name,qty:0});d.qty+=l.qty||0;});if(m.shiny){S.shinyN=(S.shinyN||0)+1;S.shOpen=(S.shOpen||0)+1;S.shOpenT=Date.now();const SL=P.shinyLog=P.shinyLog||[];SL.push({n:m.speciesName||m.name||'',sid:m.speciesId||m.pokeId||0,def:1,t:Date.now()});if(SL.length>30)SL.shift();}}else if(m.type==='catch-result'){S.balls++;S.sinceCatch=(S.sinceCatch||0)+1;if(m.ballId)P.lastBallId=m.ballId;const bbc=((P.ws.balls&&P.ws.balls.catalog)||[]).find(x=>x.id===m.ballId);if(bbc&&!bbc.infinite)S.supGold=(S.supGold||0)+(+bbc.priceGold||0);if(m.success){S.captures++;S.lastCatchT=Date.now();S.sinceCatch=0;}}else if(m.type==='field'){if(m.mobs&&m.mobs.length){for(const mb of m.mobs){if(mb&&+mb.maxHp>0)(S.slotHp=S.slotHp||{})[mb.slot]=+mb.maxHp;}}if(m.hits&&m.hits.length){const bm={};for(const h of m.hits){if(!(h&&h.slot>=0&&+h.amount>0))continue;const k=String(h.move||'?').slice(0,24);const c=bm[k]||(bm[k]={n:0,sl:{},p:0,pn:0});c.n++;c.sl[h.slot]=1;const mh=S.slotHp&&S.slotHp[h.slot];if(mh>0&&!h.crit&&!h.blocked){c.p+=(+h.amount)/mh;c.pn++;}}S.mv=S.mv||{};const ag=Date.now();for(const k in bm){const c=bm[k],ns=Object.keys(c.sl).length;let T=S.mv[k];if(!T){const ks=Object.keys(S.mv);if(ks.length>=12){const v=ks.sort((p,q)=>(S.mv[p].t||0)-(S.mv[q].t||0))[0],X=S.mvX=S.mvX||{n:0,s:0,a:0};X.n+=S.mv[v].n;X.s+=S.mv[v].s;X.a+=S.mv[v].a;delete S.mv[v];}T=S.mv[k]={n:0,s:0,a:0,p:0,pn:0,t:ag};}T.t=ag;T.n+=c.n;T.p+=c.p;T.pn+=c.pn;if(ns>=2){T.s++;T.a+=ns;}}}}else if(m.type==='poke-delta'){const pk=m.poke;if(pk){const LP=P.ws.pokes&&P.ws.pokes.list;if(LP){const ix=LP.findIndex(x=>x.id===pk.id);if(ix>=0)Object.assign(LP[ix],pk);else LP.push(pk);}const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)S.hp[pk.id]=pk.hp;else delete S.hp[pk.id];if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;}}else if(m.type==='pokes'){const H2={};(m.list||[]).forEach(pk=>{const was=S.hp[pk.id];if(pk.team&&pk.hp===0&&was>0)S.faintN++;if(pk.team)H2[pk.id]=pk.hp;if(P.pokesBaselined&&!P.knownPokes[pk.id]){S.sellG=(S.sellG||0)+(pk.sellValue||0);if(pk.shiny){S.shinyCapN++;if(S.shOpen>0&&Date.now()-S.shOpenT<60e3)S.shOpen--;else S.shinyN=(S.shinyN||0)+1;const SL=P.shinyLog=P.shinyLog||[];SL.push({n:pk.name||'',sid:pk.speciesId||pk.pokeId||0,cap:1,t:Date.now()});if(SL.length>30)SL.shift();}const CL=P.catchLog=P.catchLog||[];const sd=pk.speciesId||pk.pokeId||0;const UL=P.usedList||[];CL.push({n:pk.name||'?',iv:nL(pk.ivTotal),q:nL(pk.quality),sh:!!pk.shiny,fx:!!(sd&&UL.length&&!UL.some(u=>u.sid===sd&&u.caught)),t:Date.now()});if(CL.length>50)CL.shift()}P.knownPokes[pk.id]=1;});S.hp=H2;if(!P.pokesBaselined)P.pokesBaselined=true;}else if(m.type==='inventory'){let now=0;const doc0=P.api['/game/items.json']||P.api['/assets/items.json'];const cat0={};if(doc0&&doc0.items)doc0.items.forEach(it=>cat0[it.id]=it);const cur={};(m.items||[]).forEach(it=>{if(it.itemId===59195)now=it.quantity||0;const c=(cat0[it.itemId]||{}).category;if(c==='heal'||c==='potion'||c==='revive')cur[it.itemId]=it.quantity||0;});if(S.supBase){for(const id in S.supBase){const antes=S.supBase[id]||0,agora=(cur[id]!=null?cur[id]:0),d=antes-agora;if(d>0){const it=cat0[id]||{};S.supGold=(S.supGold||0)+d*(it.priceGold||it.npcPrice||0);S.supN=(S.supN||0)+d;}}}S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const doc=P.api['/game/items.json']||P.api['/assets/items.json'];const it=doc&&doc.items&&doc.items.find(x=>x.id===59195);const d=S.drops[59195]||(S.drops[59195]={name:(it&&it.name)||'Rare Pokémon Picture',qty:0});d.qty+=(now-S.picBase);}S.picBase=now;}}else if(m.type==='chat'||m.type==='history'){const chS=(mm)=>{try{if(!mm||!mm.body)return;const re=/\\[poke!([A-Za-z0-9_-]+)\\]/g;let mt;while((mt=re.exec(mm.body))){try{const j=JSON.parse(atob(mt[1].replace(/-/g,'+').replace(/_/g,'/')));if(j&&j.k==='poke'){const CS=P.chatShares=P.chatShares||[];const N=(v)=>{v=Number(v);return isFinite(v)?v:0;};const cn=String(j.n||'?').slice(0,40),cf=String(mm.fromName||'').slice(0,40);if(!CS.some(c=>c.n===cn&&c.iv===N(j.iv)&&c.lv===N(j.lv)&&c.fr===cf)){CS.push({fr:cf,n:cn,sh:!!j.sh,lv:N(j.lv),q:N(j.q),iv:N(j.iv),pw:N(j.pw),t:Date.now()});if(CS.length>15)CS.shift();}}}catch(x){}}}catch(x){}};if(m.type==='chat')chS(m.msg);else['world','trade','help'].forEach(c2=>(m[c2]||[]).forEach(chS));}}}}catch(x){}};const hookSocket=s=>{if(!s||s.__pokeHooked)return;s.__pokeHooked=true;P.sock=s;const origSend=s.send;s.send=function(data){try{if(typeof data==='string'){const sent=JSON.parse(data);if(sent&&sent.t==='hello'){P.nick=sent.nick;P.token=sent.token;}else if(sent&&sent.t==='auto.set'){P.automation=Object.assign(P.automation||{},sent);if(Array.isArray(sent.ballIds))P.autoBallIds=sent.ballIds;}else if(sent&&sent.t==='ball.throw'&&sent.ballId){P.lastBallId=sent.ballId;}else if(sent&&sent.t==='team.active'&&sent.pokemonId){P.activeId=sent.pokemonId;}}}catch(x){}return origSend.apply(this,arguments);};s.addEventListener('message',onMsg);};const OW=window.WebSocket;window.WebSocket=function(...ar){const s=Reflect.construct(OW,ar);hookSocket(s);return s;};window.WebSocket.prototype=OW.prototype;const origProtoSend=OW.prototype.send;OW.prototype.send=function(...args){try{hookSocket(this);}catch(x){}return origProtoSend.apply(this,args);};['CONNECTING','OPEN','CLOSING','CLOSED'].forEach(k=>{try{window.WebSocket[k]=OW[k]}catch(x){}});try{if(window.ws)hookSocket(window.ws);if(window.__ws)hookSocket(window.__ws);if(window.estado&&window.estado.ws)hookSocket(window.estado.ws);}catch(x){}try{const est=(window.estado&&(window.estado.eu||window.estado))||{};if(est&&(est.id||est.nick)){P.estado=P.estado||est;if(est.id)P.cid=est.id;if(est.nick)P.nick=est.nick;if(est.level!=null)P.level=est.level;if(est.gold!=null)P.gold=est.gold;if(est.diamonds!=null)P.diamonds=est.diamonds;if(est.huntSlug){P.lastSlug=est.huntSlug;P.ws['field-init']={slug:est.huntSlug,name:est.huntSlug};}if(est.pokemons&&Array.isArray(est.pokemons)){est.pokemons.forEach(pk=>{if(pk&&pk.id)P.pokemonsMap[pk.id]=pk;});if(!P.ws.pokes){const H2={};P.ws.pokes={list:est.pokemons.map(pk=>{if(pk.slot!=null)H2[pk.id]=pk.hp;P.knownPokes[pk.id]=1;const ivs=nIvs(pk.ivs);return{id:pk.id,speciesId:pk.speciesId,name:pk.nome||pk.name,level:pk.level,shiny:!!pk.shiny,quality:pk.quality,team:pk.slot!=null,slot:pk.slot,hp:pk.hp,maxHp:pk.maxHp,ivs:ivs,ivTotal:ivs?(ivs.hp+ivs.atk+ivs.def+ivs.spAtk+ivs.spDef+ivs.speed):null};})};P.sess.hp=H2;P.pokesBaselined=true;}}if(est.balls&&typeof est.balls==='object'){P.ws.balls=P.ws.balls||{counts:{},catalog:[]};P.ws.balls.counts=est.balls;}}}catch(x){}const OF=window.fetch;window.fetch=function(...a){try{let H;const r0=a[0],ini=a[1];if(ini&&ini.headers)H=ini.headers;else if(r0&&typeof r0==='object'&&r0.headers)H=r0.headers;if(H){let au;if(typeof H.get==='function')au=H.get('authorization');else au=H.Authorization||H.authorization;if(au){auth=au;P.auth=au;}}}catch(x){}const p=OF.apply(this,a);try{let u=(a[0]&&a[0].url)||a[0];if(typeof u==='string'&&(/\\/api\\/|items\\.json/.test(u)||u.includes('items.json'))){p.then(r=>{const c=r.clone();c.json().then(j=>{const key=u.split('?')[0];if(u.includes('creatures.json')){P.creatures=j.creatures||[];(j.creatures||[]).forEach(cr=>{if(cr&&cr.pokeId!=null)P.creaturesMap[cr.pokeId]=cr;});}if(u.includes('items.json')){P.api['/game/items.json']=j;P.api['/assets/items.json']=j;}if(key==='/api/game/used-balls'){if(j&&j.pokemons){const cs=new Set(Array.isArray(j.caught)?j.caught:[]);P.shinyEnc=j.pokemons.reduce((s,p)=>s+(p.shiny?(+p.total||0):0),0);P.usedList=j.pokemons.map(p=>({sid:p.speciesId||p.dexId,name:p.name,shiny:!!p.shiny,attempts:p.attempts||0,total:p.total||0,caught:!!p.caught||(p.shiny?(+p.total||0)>(+p.attempts||0):cs.has(p.dexId!=null?p.dexId:p.speciesId))}));}return;}if(key==='/api/characters/me'){if(!j||!j.character){P.meMiss=(P.meMiss||0)+1;return;}P.meMiss=0;const o0=P.api[key];if(o0&&o0.character&&o0.character.id!==j.character.id){P.knownPokes={};P.pokesBaselined=false;}}P.api[key]=j}).catch(()=>{})}).catch(()=>{})}}catch(x){}return p;};const poll=()=>{try{while(P.catchLog&&P.catchLog.length>400)P.catchLog.shift();while(P.shinyLog&&P.shinyLog.length>300)P.shinyLog.shift();const isPokeIdle=typeof location!=='undefined'&&location.hostname.includes('pokeidle.io');if(!isPokeIdle){const o=auth?{headers:{Authorization:auth}}:undefined;fetch('/api/characters/me',o).catch(()=>{});fetch('/api/game/used-balls',o).catch(()=>{});try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({type:'inv-get'}));P.sock.send(JSON.stringify({type:'analyzer-get'}));}}catch(x){}}else{try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({t:'ping'}));}}catch(x){}}}catch(x){}};setInterval(poll,30000);setTimeout(poll,9000);let bT=0;setInterval(()=>{try{const B=P.ws.boosts,lv=!!(B&&Array.isArray(B.boosts)&&B.boosts.some(b=>b&&b.live));if((lv||++bT%5===0)&&P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'boosts-refresh'}));}catch(x){}},25000);})()`).catch(() => { }); // coletor de estado + sessao dual-protocol (pokeidle.io WS + legado)
           // volta pra hunt (experimental): so se a conta estava farmando ha pouco (kill nos ultimos 10 min),
           // senao quem estacionou na cidade de proposito seria mandado de volta
           try {
@@ -4324,7 +4327,7 @@
           assistindoEm: Array.isArray(d.twitch.assistindoEm) ? d.twitch.assistindoEm.slice(0, 20).map(x => String(x).slice(0, 40)) : [],
           emLives: num(d.twitch.emLives),
           pctAtual: num(d.twitch.pctAtual),
-          lives: Array.isArray(d.twitch.lives) ? d.twitch.lives.slice(0, 20).map(l => ({ login: String(l.login || '').slice(0, 40), espectadores: num(l.espectadores), aoVivo: !!l.aoVivo })) : [],
+          lives: Array.isArray(d.twitch.lives) ? d.twitch.lives.slice(0, 20).map(l => ({ login: String(l.login || '').slice(0, 40), espectadores: num(l.espectadores), aoVivo: l && l.aoVivo !== false })) : [],
           oficiais: Array.isArray(d.twitch.oficiais) ? d.twitch.oficiais.slice(0, 20).map(o => ({ login: String(o.login || '').slice(0, 40), bonus: !!o.bonus })) : []
         };
       }
@@ -6034,7 +6037,7 @@
           const parsed = JSON.parse(raw);
           const res = Object.assign({}, DEFAULT_AUTO_SUPPLY_CFG, parsed);
           // Retrocompatibilidade se tiver config antiga na raiz
-          if (!res.defaultCfg && parsed.balls) {
+          if (!parsed.defaultCfg && parsed.balls) {
             res.defaultCfg = {
               balls: Object.assign({}, DEFAULT_ITEM_CONFIG.balls, parsed.balls),
               potions: Object.assign({}, DEFAULT_ITEM_CONFIG.potions, parsed.potions),
@@ -6050,7 +6053,7 @@
             };
           }
 
-          if (!Array.isArray(res.selectedAccounts)) {
+          if (!Array.isArray(parsed.selectedAccounts)) {
             if (Array.isArray(parsed.scope)) res.selectedAccounts = parsed.scope;
             else if (parsed.scope === 'all' || parsed.scope == null) res.selectedAccounts = [0, 1, 2, 3];
             else res.selectedAccounts = [+parsed.scope];
@@ -6219,10 +6222,10 @@
       let ballsLow = false, potsLow = false, revLow = false;
 
       if (!isOff && d && d.ok) {
-        curBalls = (d.ballMap && d.ballMap[bItem.id] != null) ? (+d.ballMap[bItem.id] || 0) : (+d.balls || 0);
+        curBalls = +(d.ballMap && d.ballMap[bItem.id]) || 0;
         isInfBalls = d.ballMap && d.ballMap[bItem.id] === '∞';
-        curPots = (d.invMap && d.invMap[pItem.id] != null) ? (+d.invMap[pItem.id] || 0) : (+d.potions || 0);
-        curRev = (d.invMap && d.invMap[rItem.id] != null) ? (+d.invMap[rItem.id] || 0) : (+d.revives || 0);
+        curPots = +(d.invMap && d.invMap[pItem.id]) || 0;
+        curRev = +(d.invMap && d.invMap[rItem.id]) || 0;
 
         ballsLow = activeCfg.balls.enabled && !isInfBalls && (curBalls < +activeCfg.balls.min);
         potsLow = activeCfg.potions.enabled && (curPots < +activeCfg.potions.min);
@@ -6265,10 +6268,10 @@
       const pItem = SUPPLY_POTIONS.find(x => x.id === +activeCfg.potions.selectedId) || SUPPLY_POTIONS[0];
       const rItem = SUPPLY_REVIVES.find(x => x.id === +activeCfg.revives.selectedId) || SUPPLY_REVIVES[0];
 
-      const curBalls = (d.ballMap && d.ballMap[bItem.id] != null) ? (+d.ballMap[bItem.id] || 0) : (+d.balls || 0);
+      const curBalls = +(d.ballMap && d.ballMap[bItem.id]) || 0;
       const isInfBalls = d.ballMap && d.ballMap[bItem.id] === '∞';
-      const curPots = (d.invMap && d.invMap[pItem.id] != null) ? (+d.invMap[pItem.id] || 0) : (+d.potions || 0);
-      const curRev = (d.invMap && d.invMap[rItem.id] != null) ? (+d.invMap[rItem.id] || 0) : (+d.revives || 0);
+      const curPots = +(d.invMap && d.invMap[pItem.id]) || 0;
+      const curRev = +(d.invMap && d.invMap[rItem.id]) || 0;
 
       const ballsLow = activeCfg.balls.enabled && !isInfBalls && (curBalls < +activeCfg.balls.min);
       const potsLow = activeCfg.potions.enabled && (curPots < +activeCfg.potions.min);
@@ -6487,36 +6490,48 @@
     }
 
     const SUPPLY_BUY_JS = (ordersJson) => `(async () => {
-    try {
-      const P = window.__poke;
-      const auth = (P && P.auth) ? { Authorization: P.auth } : {};
-      const orders = ${ordersJson};
-      const res = [];
-      for (const o of orders) {
-        if (!o.qty || o.qty <= 0) continue;
-        let ok = false;
-        try {
-          const url = o.kind === 'ball' ? '/api/game/balls/buy' : '/api/game/items/buy';
-          const body = o.kind === 'ball' ? { ballId: o.id, qty: o.qty } : { itemId: o.id, qty: o.qty };
-          const r = await fetch(url, {
-            method: 'POST',
-            headers: Object.assign({ 'Content-Type': 'application/json' }, auth),
-            body: JSON.stringify(body)
-          });
-          if (r && (r.status === 200 || r.ok)) ok = true;
-        } catch(e) {}
-        if (!ok && P && P.sock && P.sock.readyState === 1) {
-          try {
-            P.sock.send(JSON.stringify({ t: 'shop.buy', kind: o.kind, id: o.id, qty: o.qty }));
-            ok = true;
-          } catch(e) {}
-        }
-        res.push({ id: o.id, kind: o.kind, qty: o.qty, success: ok });
+    const P = window.__poke || {};
+    const sock = (window.estado && window.estado.ws) || P.sock;
+    const res = [];
+    for (const o of ${ordersJson}) {
+      if (!(o.qty > 0)) continue;
+      if (!sock || sock.readyState !== 1) {
+        res.push({ id: o.id, kind: o.kind, qty: o.qty, success: false, reason: 'sem conexão' });
+        break;
       }
-      return res;
-    } catch(e) {
-      return [];
+      const field = o.kind === 'ball' ? 'balls' : 'items';
+      const eu = (window.estado && window.estado.eu) || P.estado || {};
+      const before = eu[field] ? (+eu[field][o.id] || 0) : (+o.before || 0);
+      const result = await new Promise(resolve => {
+        let timer;
+        const finish = data => {
+          clearTimeout(timer);
+          sock.removeEventListener('message', onMessage);
+          sock.removeEventListener('close', onClose);
+          resolve(Object.assign({ id: o.id, kind: o.kind, qty: o.qty, before }, data));
+        };
+        const onClose = () => finish({ success: false, reason: 'conexão encerrada' });
+        const onMessage = event => {
+          try {
+            const m = JSON.parse(event.data);
+            if (m.t !== 'estado' || !m.estado || !m.estado[field]) return;
+            if (!Object.prototype.hasOwnProperty.call(m.estado[field], o.id)) return;
+            const after = +m.estado[field][o.id];
+            if (after > before) finish({ success: true, after });
+          } catch(e) {}
+        };
+        sock.addEventListener('message', onMessage);
+        sock.addEventListener('close', onClose);
+        timer = setTimeout(() => finish({ success: false, reason: 'estoque não confirmado pelo servidor' }), 8000);
+        try {
+          sock.send(JSON.stringify({ t: 'shop.buy', kind: o.kind, id: o.id, qty: o.qty }));
+        } catch(e) { finish({ success: false, reason: 'falha ao enviar compra' }); }
+      });
+      res.push(result);
+      // Evita novos pedidos com saldo incerto após uma compra sem confirmação.
+      if (!result.success) break;
     }
+    return res;
   })()`;
 
     const OPEN_INGAME_SHOP_JS = `(() => {
@@ -6544,25 +6559,31 @@
           ? cfg.selectedAccounts
           : Array.from({ length: totalAccounts }, (_, idx) => idx);
 
-        const reports = [];
+        const reports = [], failures = [];
 
         for (const i of targetAccounts) {
-          if (off[i] || !webviews[i]) continue;
-          const st = stCache[i];
-          const d = st && (st.d || st);
-          if (!d || !d.ok) continue;
+          if (off[i] || !webviews[i]) {
+            if (manual) failures.push(`Conta ${i + 1}: painel desligado`);
+            continue;
+          }
+          let d;
+          try { d = await readPanelState(i); } catch(e) {}
+          if (!d || !d.ok || d.live === false) {
+            failures.push(`Conta ${i + 1}: aguardando dados do jogo`);
+            continue;
+          }
+          stCache[i] = { t: Date.now(), d };
 
           let gold = +d.gold || 0;
           const orders = [];
 
-          // Configuração desta conta específica ou fallback para a padrão
-          const isCustom = Boolean(cfg.accountCfgs && cfg.accountCfgs[i] && cfg.accountCfgs[i].custom);
-          const accCfg = isCustom ? cfg.accountCfgs[i] : (cfg.defaultCfg || cfg);
+          // O modal edita uma regra comum; overrides legados não podem governar compras ocultas.
+          const accCfg = cfg.defaultCfg;
 
           // 1. Pokébolas
           if (accCfg.balls && accCfg.balls.enabled) {
             const bItem = SUPPLY_BALLS.find(x => x.id === +accCfg.balls.selectedId) || SUPPLY_BALLS[0];
-            const curBalls = (d.ballMap && d.ballMap[bItem.id] != null) ? (+d.ballMap[bItem.id] || 0) : (+d.balls || 0);
+            const curBalls = +(d.ballMap && d.ballMap[bItem.id]) || 0;
             const isInf = d.ballMap && d.ballMap[bItem.id] === '∞';
             const minBalls = +accCfg.balls.min || 150;
             const targetBalls = +accCfg.balls.target || 1000;
@@ -6589,7 +6610,7 @@
           // 2. Poções
           if (accCfg.potions && accCfg.potions.enabled) {
             const pItem = SUPPLY_POTIONS.find(x => x.id === +accCfg.potions.selectedId) || SUPPLY_POTIONS[0];
-            const curPots = (d.invMap && d.invMap[pItem.id] != null) ? (+d.invMap[pItem.id] || 0) : (+d.potions || 0);
+            const curPots = +(d.invMap && d.invMap[pItem.id]) || 0;
             const minPots = +accCfg.potions.min || 30;
             const targetPots = +accCfg.potions.target || 200;
 
@@ -6615,7 +6636,7 @@
           // 3. Revives
           if (accCfg.revives && accCfg.revives.enabled) {
             const rItem = SUPPLY_REVIVES.find(x => x.id === +accCfg.revives.selectedId) || SUPPLY_REVIVES[0];
-            const curRev = (d.invMap && d.invMap[rItem.id] != null) ? (+d.invMap[rItem.id] || 0) : (+d.revives || 0);
+            const curRev = +(d.invMap && d.invMap[rItem.id]) || 0;
             const minRev = +accCfg.revives.min || 10;
             const targetRev = +accCfg.revives.target || 50;
 
@@ -6639,17 +6660,34 @@
           }
 
           if (orders.length > 0) {
+            const accName = (typeof stName === 'function' ? stName(i) : null) || (accounts[i] && accounts[i].name) || `Conta ${i + 1}`;
             try {
-              await webviews[i].executeJavaScript(SUPPLY_BUY_JS(JSON.stringify(orders)));
-              const accName = (typeof stName === 'function' ? stName(i) : null) || (accounts[i] && accounts[i].name) || `Conta ${i + 1}`;
-              const summary = orders.map(o => `${nf(o.qty)}x ${o.name}${o.partial ? ' (parcial)' : ''}`).join(', ');
-              reports.push(`${accName}: ${summary}`);
-            } catch (e) { }
+              orders.forEach(o => { const stock = (o.kind === 'ball' ? d.ballMap : d.invMap) || {}; o.before = +stock[o.id] || 0; });
+              const results = await webviews[i].executeJavaScript(SUPPLY_BUY_JS(JSON.stringify(orders)));
+              const confirmed = orders.filter(o => Array.isArray(results) && results.some(r => r.id === o.id && r.kind === o.kind && r.success === true));
+              if (confirmed.length) {
+                const summary = confirmed.map(o => `${nf(o.qty)}x ${o.name}${o.partial ? ' (parcial)' : ''}`).join(', ');
+                reports.push(`${accName}: ${summary}`);
+              }
+              orders.filter(o => !confirmed.includes(o)).forEach(o => {
+                const result = Array.isArray(results) && results.find(r => r.id === o.id && r.kind === o.kind);
+                failures.push(`${accName}: ${o.name} — ${result && result.reason || 'compra não confirmada'}`);
+              });
+              stateReads.invalidate(i);
+              const updated = await readPanelState(i);
+              if (updated && updated.ok) stCache[i] = { t: Date.now(), d: updated };
+            } catch (e) { failures.push(`${accName}: falha na execução do supply`); }
+          } else {
+            const rules = [accCfg.balls, accCfg.potions, accCfg.revives];
+            const stocks = [(d.ballMap || {})[accCfg.balls.selectedId], (d.invMap || {})[accCfg.potions.selectedId], (d.invMap || {})[accCfg.revives.selectedId]];
+            if (rules.some((r, n) => r.enabled && stocks[n] !== '∞' && (+stocks[n] || 0) < +r.min)) {
+              failures.push(`Conta ${i + 1}: saldo insuficiente para a reposição`);
+            }
           }
         }
 
-        if (reports.length > 0) {
-          const msg = '✅ ' + reports.join(' · ');
+        if (reports.length > 0 || failures.length > 0) {
+          const msg = [reports.length ? '✅ ' + reports.join(' · ') : '', failures.length ? '⚠️ ' + failures.join(' · ') : ''].filter(Boolean).join(' · ');
           showAutoSupplyFeedback(msg);
           try { window.pokeAPI.logError('supply', msg); } catch { }
         } else if (manual) {
@@ -6827,9 +6865,30 @@
             }
           }
         }
+        if (window.pokeAPI && window.pokeAPI.twitchGetStatus) {
+          twitchBonusLiveState = await window.pokeAPI.twitchGetStatus();
+        }
       } catch (e) {}
     }
 
+    let twitchGuideStep = 0;
+    function selectTwitchGuideStep(step) {
+      const panels = document.querySelectorAll('[data-guide-panel]');
+      twitchGuideStep = Math.max(0, Math.min(panels.length - 1, step));
+      panels.forEach((panel, index) => { panel.hidden = index !== twitchGuideStep; });
+      document.querySelectorAll('[data-guide-step]').forEach((btn, index) => btn.setAttribute('aria-pressed', String(index === twitchGuideStep)));
+      document.getElementById('twitchGuidePosition').textContent = `${twitchGuideStep + 1} / ${panels.length}`;
+      document.getElementById('twitchGuidePrev').disabled = twitchGuideStep === 0;
+      document.getElementById('twitchGuideNext').disabled = twitchGuideStep === panels.length - 1;
+    }
+    document.querySelectorAll('[data-guide-step]').forEach(btn => { btn.onclick = () => selectTwitchGuideStep(+btn.dataset.guideStep); });
+    document.getElementById('twitchGuidePrev').onclick = () => selectTwitchGuideStep(twitchGuideStep - 1);
+    document.getElementById('twitchGuideNext').onclick = () => selectTwitchGuideStep(twitchGuideStep + 1);
+    selectTwitchGuideStep(0);
+    let twitchPartnersPage = 0;
+    document.getElementById('twitchPartnersPrev').onclick = () => { twitchPartnersPage--; renderTwitchStreamersList(); };
+    document.getElementById('twitchPartnersNext').onclick = () => { twitchPartnersPage++; renderTwitchStreamersList(); };
+    let twitchSelectedAccount = 0;
     function renderTwitchBonusUI() {
       if (twitchMasterToggle) twitchMasterToggle.checked = twitchBonusConfig.masterEnabled;
 
@@ -6853,6 +6912,23 @@
 
       if (twitchAccountsGrid) {
         twitchAccountsGrid.innerHTML = '';
+        const twitchNav = document.getElementById('twitchAccountNav');
+        twitchNav.replaceChildren();
+        for (let n = 0; n < 4; n++) {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'twitch-account-choice' + (n === twitchSelectedAccount ? ' selected' : '');
+          item.setAttribute('aria-pressed', String(n === twitchSelectedAccount));
+          const number = document.createElement('span'); number.className = 'twitch-choice-number'; number.textContent = String(n + 1);
+          const info = document.createElement('span'); info.className = 'twitch-choice-info';
+          const name = document.createElement('b'); name.textContent = shownAccountName(n, (accounts[n] && accounts[n].name) || defName(n));
+          const state = document.createElement('small');
+          const cfg = twitchBonusConfig.accounts[n];
+          state.textContent = !cfg || !cfg.enabled ? 'Desligada' : (cfg.username ? '@' + cfg.username : 'Configuração pendente');
+          info.append(name, state); item.append(number, info);
+          item.onclick = () => { twitchSelectedAccount = n; renderTwitchBonusUI(); };
+          twitchNav.appendChild(item);
+        }
         for (let i = 0; i < 4; i++) {
           const acc = twitchBonusConfig.accounts[i] || { username: '', token: '', enabled: true };
           const liveAcc = (twitchBonusLiveState && twitchBonusLiveState.accounts && twitchBonusLiveState.accounts[i]) || { status: 'disconnected', joinedChannels: [] };
@@ -6863,6 +6939,7 @@
           }
 
           const card = document.createElement('div');
+          card.hidden = i !== twitchSelectedAccount;
           card.className = 'twitch-account-card' + (acc.enabled ? ' is-active' : ' is-disabled');
 
           const statusColor = liveAcc.status === 'connected' ? '#22c55e' : (liveAcc.status === 'connecting' ? '#eab308' : (liveAcc.status === 'error' ? '#ef4444' : '#8b949e'));
@@ -6877,7 +6954,7 @@
           card.innerHTML = `
             <div class="twitch-acc-header">
               <div class="twitch-acc-title">
-                <span class="twitch-acc-badge" style="background:${ACOR[i % ACOR.length] || '#8b949e'}">${i + 1}</span>
+                <span class="twitch-acc-badge">${i + 1}</span>
                 <span class="twitch-acc-name">${shownAccountName(i, (accounts[i] && accounts[i].name) || defName(i))}</span>
                 ${inGameBonus}
               </div>
@@ -6897,20 +6974,22 @@
             </div>
             <div class="twitch-acc-inputs">
               <div class="twitch-input-group">
-                <label>Usuário Twitch:</label>
-                <input type="text" placeholder="ex: seu_user" value="${acc.username || ''}" data-acc-user="${i}">
+                <label for="twitchUser${i}">Usuário Twitch</label>
+                <input id="twitchUser${i}" type="text" autocomplete="off" spellcheck="false" placeholder="Login da Twitch" value="${acc.username || ''}" data-acc-user="${i}">
               </div>
+              <p class="twitch-field-help">Use a mesma Twitch vinculada a esta conta no jogo.</p>
               <div class="twitch-input-group">
-                <label>Token de Chat (OAuth):</label>
+                <label for="twitchToken${i}">Token de Chat (OAuth)</label>
                 <div class="twitch-token-wrap">
-                  <input type="password" placeholder="oauth:xxxxxxxxx" value="${acc.token || ''}" data-acc-token="${i}">
-                  <button type="button" class="twitch-btn-eye" title="Mostrar/ocultar token" data-toggle-eye="${i}">👁</button>
+                  <input id="twitchToken${i}" type="password" autocomplete="off" placeholder="Cole o Access token" value="${acc.token || ''}" data-acc-token="${i}">
+                  <button type="button" class="twitch-btn-eye" title="Mostrar/ocultar token" data-toggle-eye="${i}" aria-label="Mostrar ou ocultar token">Ver</button>
                 </div>
               </div>
             </div>
+            <p class="twitch-field-help">Cole o Access token gerado pela Twitch. Ele ficará oculto neste painel.</p>
             <div class="twitch-acc-actions">
               <button type="button" class="twitch-btn-test" data-test-acc="${i}">Testar Conexão</button>
-              <span class="twitch-test-result" id="twitchTestResult${i}"></span>
+              <span class="twitch-test-result" aria-live="polite" id="twitchTestResult${i}"></span>
             </div>
           `;
           twitchAccountsGrid.appendChild(card);
@@ -6990,7 +7069,7 @@
           tw.lives.forEach(l => {
             if (l && l.login) {
               const existing = allStreams.get(l.login.toLowerCase()) || { login: l.login, bonus: true };
-              existing.aoVivo = !!l.aoVivo;
+              existing.aoVivo = l && l.aoVivo !== false;
               existing.espectadores = l.espectadores || 0;
               allStreams.set(l.login.toLowerCase(), existing);
             }
@@ -7002,16 +7081,21 @@
       const onlineCount = list.filter(s => s.aoVivo).length;
       if (twitchStreamersCount) twitchStreamersCount.textContent = `${onlineCount} no ar`;
 
+      const pageCount = Math.max(1, Math.ceil(list.length / 4));
+      twitchPartnersPage = Math.max(0, Math.min(pageCount - 1, twitchPartnersPage));
+      document.getElementById('twitchPartnersPosition').textContent = `${twitchPartnersPage + 1} / ${pageCount}`;
+      document.getElementById('twitchPartnersPrev').disabled = twitchPartnersPage === 0;
+      document.getElementById('twitchPartnersNext').disabled = twitchPartnersPage === pageCount - 1;
       if (list.length === 0) {
         twitchStreamersList.innerHTML = '<div class="twitch-empty-streamers">Aguardando dados do jogo ou nenhum streamer parceiro cadastrado.</div>';
         return;
       }
 
-      twitchStreamersList.innerHTML = list.map(s => {
+      twitchStreamersList.innerHTML = list.slice(twitchPartnersPage * 4, twitchPartnersPage * 4 + 4).map(s => {
         const statusBadge = s.aoVivo
-          ? `<span class="twitch-badge-live">● AO VIVO (${s.espectadores} viewers)</span>`
-          : '<span class="twitch-badge-off">OFFLINE</span>';
-        const bonusBadge = s.bonus ? '<span class="twitch-badge-bonus">★ Bônus Ativo</span>' : '<span class="twitch-badge-nobonus">Sem Bônus</span>';
+          ? `<span class="twitch-badge-live">Ao vivo</span><span class="twitch-viewers">${s.espectadores} espectadores</span>`
+          : '<span class="twitch-badge-off">Offline</span>';
+        const bonusBadge = s.bonus ? '<span class="twitch-badge-bonus">Bônus habilitado</span>' : '<span class="twitch-badge-nobonus">Sem Bônus</span>';
         return `
           <div class="twitch-streamer-item ${s.aoVivo ? 'live' : 'off'}">
             <span class="twitch-streamer-name">@${s.login}</span>
@@ -7091,9 +7175,17 @@
       if (!twData) return;
       twitchCachedGameData[accIndex] = twData;
 
-      const liveLogins = (twData.lives || []).filter(l => l && l.aoVivo).map(l => l.login);
-      if (liveLogins.length > 0 && window.pokeAPI && window.pokeAPI.twitchSyncLives) {
-        window.pokeAPI.twitchSyncLives(liveLogins);
+      const allLiveLogins = new Set();
+      twitchCachedGameData.forEach(tw => {
+        if (!tw || !Array.isArray(tw.lives)) return;
+        tw.lives.forEach(l => {
+          if (l && l.login && l.aoVivo !== false) {
+            allLiveLogins.add(l.login.toLowerCase());
+          }
+        });
+      });
+      if (window.pokeAPI && window.pokeAPI.twitchSyncLives) {
+        window.pokeAPI.twitchSyncLives(Array.from(allLiveLogins));
       }
 
       if (twitchBonusOverlay && twitchBonusOverlay.classList.contains('show')) {
