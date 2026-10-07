@@ -343,6 +343,76 @@ body[data-theme] #leafShell:after {
   transition: opacity 0.25s ease;
 }
 
+/* Simple mode shares the active palette; Kuromi keeps its dedicated XP skin. */
+body[data-theme] #cards {
+  --cd-text: var(--color-text-primary);
+  --cd-secondary: var(--color-text-secondary);
+  --cd-muted: var(--color-text-muted);
+  --cd-positive: #3fb950;
+  --cd-warning: #f0883e;
+  --cd-danger: #f85149;
+  --cd-xp: #79c0ff;
+  --cd-shiny: #f778ba;
+  --cd-gold: #f2c665;
+  --cd-iv: #55e6d3;
+}
+body[data-theme-tone="light"] #cards {
+  --cd-positive: #18733a;
+  --cd-warning: #984600;
+  --cd-danger: #ba2535;
+  --cd-xp: #245caa;
+  --cd-shiny: #a82572;
+  --cd-gold: #815800;
+  --cd-iv: #08736b;
+}
+body[data-theme^="kuromi-xp"] #cards {
+  --cd-text: var(--kx-text);
+  --cd-secondary: var(--kx-text);
+  --cd-muted: var(--kx-text-dim);
+}
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards {
+  background: var(--color-bg-base) !important;
+  color: var(--color-text-primary) !important;
+  color-scheme: var(--theme-color-scheme);
+  scrollbar-color: var(--border-strong) var(--color-bg-base);
+}
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-kpi, .cd-sec, .cd-panel, .cd-cfg, .cd-sh) {
+  background: var(--color-surface-1) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--color-text-primary);
+}
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards .cd-row {
+  background: transparent !important;
+  border-color: var(--border-subtle) !important;
+}
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-kpi .v, .cd-cfg-row) { color: var(--color-text-primary); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-h, .cd-tt, .cd-cfg-h, .cd-kpi .l, .cd-table th, .cd-empty, .cd-row .rt, .cd-sh-acc, .cd-mv, .cd-grip) { color: var(--color-text-muted); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards .cd-sh-n { color: var(--color-text-secondary); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-table th, .cd-table td) { border-color: var(--border-subtle); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-table tbody tr:hover, .cd-cfg-row:hover) { background: var(--color-surface-hover); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(button, select, .cd-inp) {
+  background: var(--color-bg-elevated) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--border-subtle) !important;
+  accent-color: var(--color-accent);
+}
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(button:hover, button.on) {
+  background: var(--color-surface-selected) !important;
+  border-color: var(--color-accent) !important;
+}
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(button, select, input):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards input::placeholder { color: var(--color-text-muted); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards .cd-goal { background: var(--color-surface-2); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards .cd-goal > i { background: var(--cd-positive); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-sec, .cd-kpis)::-webkit-scrollbar-thumb { background: var(--border-strong); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards .cd-it.cd-over { outline-color: var(--color-accent); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-mv:hover, .cd-table th:hover) { color: var(--color-accent); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-it:hover .cd-rz::before, .cd-it:hover .cd-rz2::before) { background: var(--border-strong); }
+body[data-theme]:not([data-theme^="kuromi-xp"]) #cards :is(.cd-rz:hover::before, .cd-rz2:hover::before, .cd-it.rz-on .cd-rz::before, .cd-it.rz-on .cd-rz2::before) { background: var(--color-accent); }
+
 /* Exclusive artwork follows the existing sidebar composition. */
 body.theme-exclusive .leaf-sidebar:before {
   background-image: var(--theme-cutout-url);

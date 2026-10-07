@@ -11,10 +11,16 @@ app.whenReady().then(async () => {
     (${installCaptureValue.toString()})();
     const P = window.__poke;
     const pk = { id: 1, speciesId: 1, level: 20, quality: 1, shiny: false };
+    P.catchLog = [{id:1,sid:1,iv:151,ivs:{hp:32,atk:20,def:27,spAtk:24,spDef:32,speed:24},q:1.5,sh:false,potencia:3}];
     P.captureValue(pk);
     P.captureValue(pk);
     for (let i = 0; i < 120 && !P.sess.sellG && !P.captureValueError; i++) await new Promise(r => setTimeout(r, 250));
     if (P.captureValueError) throw new Error(P.captureValueError);
+    P.refreshCaptureValue();
+    const note = P.catchLog[0].nota;
+    const math = await import('/shared/nota-pokemon.mjs');
+    const docs = await (await fetch('/assets/creatures.json')).json();
+    const expectedNote = math.notaDePokemon({iv:151,ivs:P.catchLog[0].ivs,quality:1.5,potencia:3,shiny:false},docs.creatures.find(c=>c.pokeId===1));
     const normal = P.sess.sellG;
     P.captureValue(pk);
     const duplicate = P.sess.sellG;
@@ -22,8 +28,10 @@ app.whenReady().then(async () => {
     const withShiny = P.sess.sellG;
     P.sess = {};
     P.captureValue({ ...pk, id: 3 });
-    return { normal, duplicate, withShiny, reset: P.sess.sellG };
+    return { note, expectedNote, normal, duplicate, withShiny, reset: P.sess.sellG };
   })()`);
+  assert.equal(result.note,result.expectedNote,'note agrees with the official game calculation');
+  assert.ok(Number.isFinite(result.note));
   assert.equal(result.normal, 4200, 'current official catalog and price function value a level-20 Bulbasaur');
   assert.equal(result.duplicate, 4200, 'capture event and subsequent state update count once');
   assert.equal(result.withShiny, 46200, 'shiny multiplier is applied');

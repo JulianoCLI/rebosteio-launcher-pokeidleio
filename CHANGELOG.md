@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.5.53
+
+- Filtros de capturas: qualidade mínima identificada, potência mínima P1–P5 e nota mínima de 0 a 10, com persistência e combinação entre filtros.
+
+## 1.5.52
+
+- Lista de capturas com colunas alinhadas para identificação, IV, nota, potência, qualidade e horário; atributos em faixa de seis posições abaixo.
+
+## 1.5.51
+
+- Capturas organizadas em duas linhas: Pokémon/conta e horário no cabeçalho; IV, nota, potência, qualidade e atributos agrupados abaixo, com quebra responsiva.
+
+## 1.5.50
+
+- Capturas: atributos padronizados como HP, ATK, DEF, SPATK, SPDEF e SPEED, com dois-pontos.
+- Nota calculada pelos módulos oficiais do jogo e potência P1–P5 nas capturas, preservadas no histórico; dados indisponíveis aparecem como —.
+
+## 1.5.49
+
+- Modo Simples acompanha a paleta do tema ativo nos fundos, cartões, tabela, textos e controles, inclusive ao trocar o tema com o painel aberto.
+- Cores das métricas do Simples ajustadas para fundos claros; temas Kuromi preservam a aparência XP própria.
+
 ## 1.5.48
 
 - Eco e Só caça agora são exclusivos: ativar um desliga automaticamente o outro nas contas e nos botões.
