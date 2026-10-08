@@ -4397,7 +4397,8 @@
     window.__eco.fps = ${fps};
   })()`;
     // Modo Cartas: no ultra leve o canvas do jogo some e o rAF cai pra 1fps (o farm e do servidor)
-    let cardsOn = false, cdHtmlAnt = ''; // sempre comeca desligado: com o jogo escondido nao dava pra logar/resolver captcha
+    let cardsOn = lsGet('cardsOn') === '1', cdHtmlAnt = ''; // Simples e uma vista persistida (Janelas/Lista/Simples no shell)
+    if (cardsOn) eco = true; // Simples sempre acompanha o Modo Eco
     // janela minimizada ou na bandeja: os jogos vao pro mesmo modo leve do Simples (1 fps, canvas escondido). O main.js avisa:
     // com backgroundThrottling desligado (o que segura o farm) a pagina nunca fica 'hidden' e o jogo desenhava pra ninguem
     let janelaOculta = false;
@@ -4469,7 +4470,12 @@
       });
       lsSet('eco', eco ? '1' : '0');
     }
-    ecoBtn.onclick = () => { eco = !eco; applyEco(); };
+    ecoBtn.onclick = () => {
+      if (cardsOn) return; // Simples ativo: o Eco e obrigatorio
+      eco = !eco;
+      if (eco && cleanOn) { cleanOn = false; applyClean(); } // Eco e Caça nunca juntos
+      applyEco();
+    };
 
     // ----- Foco por Família na Grade & Otimização de Memória Background -----
     let currentFamilyFocus = 'all';
@@ -5109,6 +5115,8 @@
   })()`;
     const cleanBtn = document.getElementById('cleanHud');
   let cleanOn = lsGet('cleanHud') === '1'; // novas configurações preservam o HUD original
+    if (cardsOn) cleanOn = false;   // Simples ativo implica Eco ligado, então a Caça fica desligada
+    else if (cleanOn) eco = false;  // Eco e Caça nunca juntos
     function applyClean() {
       cleanBtn.textContent = t('clean'); cleanBtn.title = t('cleanTitle');
       cleanBtn.classList.toggle('on', cleanOn);
@@ -5122,7 +5130,15 @@
       });
       lsSet('cleanHud', cleanOn ? '1' : '0');
     }
-    cleanBtn.onclick = () => { cleanOn = !cleanOn; applyClean(); };
+    cleanBtn.onclick = () => {
+      cleanOn = !cleanOn;
+      if (cleanOn) {
+        eco = false;
+        applyEco();
+        if (cardsOn) { cardsOn = false; applyCards(); } // a Caça desliga o Simples (o shell volta pra Janelas/Lista)
+      }
+      applyClean();
+    };
 
   // New layouts require an explicit selection in Settings; no default game injection.
   let gameHudLayout = RebosteioGameHud.normalize(lsGet('gameHudLayout'));
@@ -10319,7 +10335,7 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       });
       // tabela
       cardsEl.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; if (dsort.k === k) dsort.d *= -1; else dsort = { k, d: -1 }; refreshCards(true); });
-      cardsEl.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => { const i = +tr.dataset.i; cardsOn = false; applyCards(); toggleExpand(i); });
+      cardsEl.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => { const i = +tr.dataset.i; cardsOn = false; applyCards(); window.PIWView?.set('windows'); toggleExpand(i); });
       const rb = cardsEl.querySelector('#cdReset'); if (rb) rb.onclick = resetSessao;
       // ranking
       const hsc = cardsEl.querySelector('#cdHuntScope'); if (hsc) hsc.onchange = () => { huntScope = hsc.value; lsSet('huntScope', huntScope); refreshCards(true); };
@@ -10339,7 +10355,15 @@ return {portal:isPort,live,sk:!!(P.sock&&P.sock.readyState===1),hasBalls,hasInv,
       webviews.forEach((w, i) => { if (off[i] || !w) return; try { w.setAudioMuted(!alertsOn || cardsOn || muted); w.executeJavaScript(ultraScript(leve())).catch(() => { }); w.executeJavaScript(ecoScript(ecoFps())).catch(() => { }); w.executeJavaScript(chatScript(cardsOn || chatHidden)).catch(() => { }); } catch { } });
       if (cardsOn) { cdHtmlAnt = ''; cardsEl.innerHTML = '<div class="cd-empty" style="padding:20px">' + t('cdWaiting') + '</div>'; refreshCards(); }
     }
-    cardsBtn.onclick = () => { cardsOn = !cardsOn; applyCards(); };
+    cardsBtn.onclick = () => {
+      cardsOn = !cardsOn;
+      if (cardsOn) {
+        eco = true; // Simples sempre no modo Eco dentro do jogo
+        if (cleanOn) { cleanOn = false; applyClean(); } // Eco e Caça nunca juntos
+        applyEco();
+      }
+      applyCards();
+    };
     function aplicaJanela(vis) {
       const oc = !vis; if (oc === janelaOculta) return;
       janelaOculta = oc;
