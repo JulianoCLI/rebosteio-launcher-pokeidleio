@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.5.57
+
+- Capturas: horário alinhado à borda direita da caixa de IVs, com coluna dimensionada para a data e hora completas.
+
+## 1.5.56
+
+- Sniffer v3.0: export JSON com catálogo, campos originais dos mobs, cobertura e falhas; armazenamento separado do dump antigo, avanço após entrada rejeitada e coleta imediata da amostra de 15 posições.
+
+## 1.5.55
+
+- Sniffer Tampermonkey v2.2: logs de diagnóstico exportáveis com comandos, respostas resumidas, timeouts e estado da conexão; histórico limitado a 1500 eventos por sessão.
+
+## 1.5.54
+
+- Sniffer Tampermonkey v2.1: confirmação da rota antes de coletar mobs, tentativas limitadas de entrada e pausa com aviso em desconexão ou troca sem confirmação.
+
 ## 1.5.53
 
 - Filtros de capturas: qualidade mínima identificada, potência mínima P1–P5 e nota mínima de 0 a 10, com persistência e combinação entre filtros.
