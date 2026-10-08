@@ -14,6 +14,7 @@
     "test:tracking": "electron test/game-tracking.test.js",
     "test:sync": "node test/upstream-sync.test.js",
     "test:capture-value": "electron test/capture-value.test.js",
+    "test:catch-nota": "electron test/catch-nota.test.js",
     "test:userscripts": "electron test/userscripts.test.js"
   },
   "keywords": [
