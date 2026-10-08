@@ -91,7 +91,8 @@
 
     /** A potencia de uma captura: a que ela ja guarda, senao a do pokemon que ainda esta na conta. */
     const potenciaDaCaptura = (c) => {
-      const propria = potenciaDe(c.pot);
+      // `pot` e o campo deste modulo; `potencia` e o que o coletor/capture-value ja gravam.
+      const propria = potenciaDe(c.pot) || potenciaDe(c.potencia);
       if (propria) return propria;
       const dono = c.id != null ? (P.pokemonsMap || {})[c.id] : null;
       return dono ? potenciaDe(dono.potencia) : 0;

@@ -3,7 +3,7 @@
   function installCaptureValue(dependencies) {
     const P = window.__poke;
     if (!P || P.captureValue) return;
-    let catalog = null, pricing = null, loading = null, retryAt = 0, settledHunts = null;
+    let catalog = null, pricing = null, loading = null, retryAt = 0, settledHunts = null, noteMath = null;
     const load = () => {
       if (loading || Date.now() < retryAt) return;
       const get = async path => {
@@ -14,9 +14,9 @@
       loading = (async () => {
         const names = ['sell-value', 'valor-cadeia', 'outland', 'evolucoes-cruzadas',
           'evolucoes-ramificadas', 'teto-captura', 'ajustes-especie-espelho',
-          'herdar-looktype-orre', 'herdar-looktype-outland'];
+          'herdar-looktype-orre', 'herdar-looktype-outland', 'nota-pokemon', 'linhagem-nota', 'megas'];
         const modules = dependencies ? dependencies.modules : await Promise.all(names.map(n => import('/shared/' + n + '.mjs')));
-        const [sale, chain, outland, evol, branches, ceiling, adjustments, orre, ol] = modules;
+        const [sale, chain, outland, evol, branches, ceiling, adjustments, orre, ol, notes, lineage, megas] = modules;
         const docs = dependencies ? dependencies.docs : await Promise.all(['creatures', 'creatures-novos', 'creatures-outland-novos',
           'creatures-sprites-lab'].map(n => get('/assets/' + n + '.json')));
         const list = docs.slice(0, 3).flatMap(d => d.creatures || []);
@@ -41,6 +41,11 @@
         branches.alinharNivelPadraoRamificado(list);
         evol.corrigirNiveisDeEvolucao(list);
         const { estagios } = ceiling.aplicarTetoDeCaptura(list, id => map.get(id));
+        if (notes && lineage && megas) {
+          for (const esp of megas.criarEspeciesMega(list)) { list.push(esp); map.set(esp.pokeId, esp); }
+          lineage.anotarLinhagemDaNota(list, id => map.get(id), megas.elosMegaDaNota(list));
+          noteMath = notes;
+        }
         catalog = { map, estagios, chain };
         pricing = sale.precoVendaPokemon;
         refresh();
@@ -56,6 +61,15 @@
       }
       catalog.chain.assentarValorDasEspecies(catalog.map.values(), catalog.estagios, id => lowest.get(id) ?? null);
       settledHunts = P.hunts;
+      }
+      for (const entry of P.catchLog || []) {
+        const pk = (P.pokemonsMap || {})[entry.id];
+        if (pk && pk.potencia != null) entry.potencia = Number(pk.potencia);
+        const esp = catalog.map.get(entry.sid || (pk && pk.speciesId));
+        if (noteMath && esp && (entry.iv > 0 || entry.ivs) && entry.q > 0 && entry.potencia >= 1 && entry.potencia <= 5) {
+          const nota = noteMath.notaDePokemon({ iv: entry.iv || undefined, ivs: entry.ivs, quality: entry.q, shiny: entry.sh, potencia: entry.potencia, refino: pk && pk.refino }, esp);
+          if (Number.isFinite(nota)) entry.nota = nota;
+        }
       }
       const S = P.sess;
         for (const pk of Object.values(S.capturePending || {})) {

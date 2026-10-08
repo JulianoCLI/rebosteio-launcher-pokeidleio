@@ -1,6 +1,6 @@
 {
   "name": "piorebosteio",
-  "version": "1.5.47",
+  "version": "1.5.57",
   "description": "Rode de 1 a 4 contas de Poke Idle IO ao mesmo tempo, em uma janela so / Run 1 to 4 Poke Idle IO accounts at once, in a single window",
   "main": "main.js",
   "author": "souonailo",

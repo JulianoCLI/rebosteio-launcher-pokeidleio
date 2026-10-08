@@ -2318,7 +2318,7 @@ window.PIW_ALL_POKEMON_THEMES = [
     },
     "assets": {
       "panorama": "src/ui/themes/pokemon/psyduck/panorama-water-v2.png",
-      "cutout": "src/ui/themes/pokemon/psyduck/cutout-exclusive.png"
+      "cutout": "src/ui/themes/pokemon/psyduck/cutout-catalog.png"
     },
     "exclusive": true,
     "schemaVersion": 1,
@@ -2327,10 +2327,13 @@ window.PIW_ALL_POKEMON_THEMES = [
     "footerQuote": "CADA JORNADA TEM SEU PRÓPRIO RITMO.",
     "artworkProvenance": {
       "panorama": "Built-in image generation, 2026-10-07",
-      "cutout": "User-supplied Psyduck floating illustration, background extracted with BiRefNet"
+      "cutout": "Existing catalog artwork from PokeAPI sprites, cached locally; not generated"
     },
-    "productionStatus": "integrated-local-review",
-    "missingAssets": []
+    "productionStatus": "integrated-background-pending-generated-cutouts",
+    "missingAssets": [
+      "generated-main-cutout",
+      "generated-seated-cutout"
+    ]
   },
   {
     "id": "pkmn-golduck",
@@ -5883,37 +5886,52 @@ window.PIW_ALL_POKEMON_THEMES = [
     "tone": "dark",
     "toneLabel": "Escuro",
     "category": "pokemon",
-    "glyph": "♨",
+    "glyph": "🔥",
     "brandTitle": "FLAREON <span>LAUNCHER</span>",
-    "brandSub": "O GUARDIÃO DE FIRE",
-    "quote": "O guardião elemental de FIRE que acompanha sua jornada.",
+    "brandSub": "A CHAMA QUE NUNCA SE APAGA",
+    "quote": "Nas cinzas de ontem,<br>o fogo renasce com mais força.",
     "swatches": [
-      "#1a0c10",
-      "#33181f",
-      "#fb7185"
+      "#180d09",
+      "#341c14",
+      "#f97316"
     ],
     "colors": {
       "tone": "dark",
-      "bgBase": "#1a0c10",
-      "bgElevated": "#261217",
-      "surface1": "#33181f",
-      "surface2": "#44202a",
-      "surfaceHover": "#5a2b38",
-      "surfaceSelected": "#4f2431",
-      "textPrimary": "#fff1f2",
-      "textSecondary": "#fecdd3",
-      "textMuted": "#fda4af",
-      "accent": "#fb7185",
-      "accentSoft": "rgba(251, 113, 133, 0.18)",
-      "actionPrimary": "#e11d48",
-      "actionPrimaryHover": "#be123c",
-      "borderSubtle": "#4f232f",
-      "borderStrong": "#84384e"
+      "bgBase": "#180d09",
+      "bgElevated": "#24140e",
+      "surface1": "#321b13",
+      "surface2": "#422419",
+      "surfaceHover": "#562f21",
+      "surfaceSelected": "#5a2d1d",
+      "textPrimary": "#fff4ed",
+      "textSecondary": "#fed7aa",
+      "textMuted": "#c99b7b",
+      "accent": "#f97316",
+      "accentSoft": "rgba(249, 115, 22, 0.16)",
+      "actionPrimary": "#ea580c",
+      "actionPrimaryHover": "#c2410c",
+      "borderSubtle": "#573022",
+      "borderStrong": "#9a563b"
     },
     "assets": {
-      "panorama": "src/ui/themes/biomes/fire.jpg",
-      "cutout": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/136.png"
-    }
+      "panorama": "src/ui/themes/pokemon/flareon/panorama-exclusive.png",
+      "cutout": "src/ui/themes/pokemon/flareon/cutout-exclusive.png"
+    },
+    "exclusive": true,
+    "schemaVersion": 1,
+    "sideQuote": "O fogo acende.\nA jornada continua.",
+    "sideKicker": "O ESPÍRITO DO FOGO",
+    "footerQuote": "ONDE HÁ CALOR, NENHUMA SOMBRA PREVALECE.",
+    "family": [
+      "eevee",
+      "flareon"
+    ],
+    "artworkProvenance": {
+      "cutout": "Built-in image generation & BiRefNet transparent background extraction",
+      "panorama": "Built-in image generation"
+    },
+    "productionStatus": "integrated-local-review",
+    "missingAssets": []
   },
   {
     "id": "pkmn-porygon",
@@ -19817,7 +19835,7 @@ window.PIW_ALL_POKEMON_THEMES = [
     },
     "assets": {
       "panorama": "src/ui/themes/pokemon/magnezone/panorama-exclusive.png",
-      "cutout": "src/ui/themes/pokemon/magnezone/cutout-exclusive.png"
+      "cutout": "src/ui/themes/pokemon/magnezone/cutout-catalog.png"
     },
     "exclusive": true,
     "schemaVersion": 1,
@@ -19826,7 +19844,7 @@ window.PIW_ALL_POKEMON_THEMES = [
     "footerQuote": "SOB O MESMO CÉU, CADA JORNADA ENCONTRA SUA DIREÇÃO.",
     "artworkProvenance": {
       "panorama": "Built-in image generation, 2026-10-07; prompt recorded in ARTWORK.md",
-      "cutout": "Generated metallic saucer cutout with BiRefNet alpha extraction, 2026-10-07"
+      "cutout": "Existing official artwork catalog source, cached locally: https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/462.png"
     },
     "productionStatus": "integrated-local-review",
     "missingAssets": []

@@ -1,5 +1,48 @@
 # Changelog
 
+## 1.5.57
+
+- Capturas: horário alinhado à borda direita da caixa de IVs, com coluna dimensionada para a data e hora completas.
+
+## 1.5.56
+
+- Sniffer v3.0: export JSON com catálogo, campos originais dos mobs, cobertura e falhas; armazenamento separado do dump antigo, avanço após entrada rejeitada e coleta imediata da amostra de 15 posições.
+
+## 1.5.55
+
+- Sniffer Tampermonkey v2.2: logs de diagnóstico exportáveis com comandos, respostas resumidas, timeouts e estado da conexão; histórico limitado a 1500 eventos por sessão.
+
+## 1.5.54
+
+- Sniffer Tampermonkey v2.1: confirmação da rota antes de coletar mobs, tentativas limitadas de entrada e pausa com aviso em desconexão ou troca sem confirmação.
+
+## 1.5.53
+
+- Filtros de capturas: qualidade mínima identificada, potência mínima P1–P5 e nota mínima de 0 a 10, com persistência e combinação entre filtros.
+
+## 1.5.52
+
+- Lista de capturas com colunas alinhadas para identificação, IV, nota, potência, qualidade e horário; atributos em faixa de seis posições abaixo.
+
+## 1.5.51
+
+- Capturas organizadas em duas linhas: Pokémon/conta e horário no cabeçalho; IV, nota, potência, qualidade e atributos agrupados abaixo, com quebra responsiva.
+
+## 1.5.50
+
+- Capturas: atributos padronizados como HP, ATK, DEF, SPATK, SPDEF e SPEED, com dois-pontos.
+- Nota calculada pelos módulos oficiais do jogo e potência P1–P5 nas capturas, preservadas no histórico; dados indisponíveis aparecem como —.
+
+## 1.5.49
+
+- Modo Simples acompanha a paleta do tema ativo nos fundos, cartões, tabela, textos e controles, inclusive ao trocar o tema com o painel aberto.
+- Cores das métricas do Simples ajustadas para fundos claros; temas Kuromi preservam a aparência XP própria.
+
+## 1.5.48
+
+- Eco e Só caça agora são exclusivos: ativar um desliga automaticamente o outro nas contas e nos botões.
+- Ao abrir o launcher com os dois modos salvos como ativos, Só caça é preservado e Eco é desligado.
+
 ## 1.5.47
 
 - Painel: saldo e Gold/h incluem o valor estimado de venda ao NPC dos Pokémon capturados, além do ouro de abates e dos gastos.
